@@ -16,8 +16,8 @@ Kommentar, den niemand liest.
 |---|---|---|
 | `apps/cie-reader/src/main/java/…/data/` | `Sources/IDReaderCore/` | Ein eigenes Swift-Paket ohne UIKit, CoreNFC und SwiftUI. Läuft unter `swift test` auf dem Mac — das war unter Android die Absicht hinter „`LicenceScan` ist reiner Text zu Feldern", hier ist es erzwungen. |
 | `…/ui/` (Compose) | `App/UI/` (SwiftUI) | |
-| `…/nfc/` (JMRTD) | `App/NFC/` (CoreNFC + Naht) | siehe [NFC-PACE.md](NFC-PACE.md) |
-| `src/test/` (JUnit) | `Tests/IDReaderCoreTests/` (swift-testing) | 60 Tests, darunter der **unverändert übernommene** OCR-Korpus. |
+| `…/nfc/` (JMRTD + BouncyCastle) | `ThirdParty/NFCPassportReaderCAN` + Adapter in `App/NFC/` | siehe [NFC-PACE.md](NFC-PACE.md) |
+| `src/test/` (JUnit) | `Tests/IDReaderCoreTests/` (swift-testing) | 64 Tests, darunter der **unverändert übernommene** OCR-Korpus. |
 
 ## Bausteine
 
@@ -29,7 +29,7 @@ Kommentar, den niemand liest.
 | `getQuantityString` / `plurals.xml` | zwei Formen im Katalog, im Code verzweigt | Englisch, Deutsch und Italienisch brauchen für diese Zählungen dieselben zwei Formen. Ein `.stringsdict` wäre dreimal derselbe XML-Baum, den kein Test erreicht. |
 | eigener `ContextWrapper` für die Sprache | `Strings(language:)` mit `Bundle.module` je `.lproj` | Dasselbe Problem, dieselbe Lösung: ein **benannter** Katalog statt der Prozesssprache, weil derselbe Text auch den Export baut. |
 | ML Kit `text-recognition` (gebündeltes Modell) | `VNRecognizeTextRequest` | Vision ist Teil des Systems: kein Modell im Bundle, keine fremde Bibliothek, kein Netz. `usesLanguageCorrection = false` ist dabei kein Detail — eine Sprachkorrektur macht aus `U1974B315M` ein Wort, das sie kennt. |
-| JMRTD + BouncyCastle + SpongyCastle-Notiz | offen | siehe [NFC-PACE.md](NFC-PACE.md) |
+| JMRTD + BouncyCastle + SpongyCastle-Notiz | NFCPassportReader (gepatcht) + OpenSSL 3 | Dieselbe Abwägung wie im Original: die MRTD-Schicht wird nicht selbst geschrieben. Der Patch fügt PACE mit CAN hinzu, das die Fassung oben ausdrücklich nicht kennt. |
 | `dev.keiji.jp2:jp2-android` (OpenJPEG) | offen | iOS hat keinen öffentlichen JPEG-2000-Decoder. `FaceImageDecoder` erkennt das Format an den Magic Bytes und zeigt es an der Stelle des Bildes an — derselbe Umgang wie im Original bei einem unbekannten Format. |
 | Material Symbols als Vektor-Drawables | SF Symbols | `checkmark.seal.fill` / `xmark.seal.fill`. Die Notiz über `viewBox="0 -960 960 960"` im Original wird damit gegenstandslos. |
 | Play Core `app-update-ktx` | — | Der App Store hat kein Gegenstück, das ohne Netzzugriff auskommt. |

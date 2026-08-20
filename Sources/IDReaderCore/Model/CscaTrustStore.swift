@@ -38,4 +38,22 @@ public enum CscaTrustStore {
             .sorted { $0.lastPathComponent < $1.lastPathComponent }
             .compactMap { try? Data(contentsOf: $0) }
     }
+
+    /// Dieselben Zertifikate als PEM-Buendel, auf der Platte.
+    ///
+    /// Braucht die Kettenpruefung: OpenSSL laedt einen Vertrauensspeicher ueber
+    /// `X509_LOOKUP_file`, und der will **eine** Datei in PEM. Neun einzelne
+    /// DER-Dateien nuetzen ihm nichts.
+    ///
+    /// Das Buendel liegt daneben und wird nicht aus den DER-Dateien erzeugt: es
+    /// soll genau dieselben neun Zertifikate enthalten, und eine Umwandlung zur
+    /// Laufzeit waere eine zweite Stelle, an der sich das auseinanderentwickeln
+    /// kann. Das Skript, das beide schreibt, ist dasselbe - siehe oben.
+    public static func bundleURL() -> URL? {
+        Bundle.module.url(
+            forResource: "it-csca-bundle",
+            withExtension: "pem",
+            subdirectory: "csca"
+        )
+    }
 }

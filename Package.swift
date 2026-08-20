@@ -28,8 +28,7 @@ let package = Package(
                 // Lokalisierte Kataloge. Sie liegen hier und nicht im App-Ziel,
                 // weil der Ausgabetext (siehe DocumentExport) aus denselben
                 // Zeichenketten gebaut wird wie die Oberflaeche. Zwei Kataloge
-                // waeren zwei Wahrheiten.
-                // Die Sprachkataloge - `process` legt sie als lokalisierte
+                // waeren zwei Wahrheiten. `process` legt sie als lokalisierte
                 // Ressourcen ab.
                 .process("Resources/en.lproj"),
                 .process("Resources/de.lproj"),

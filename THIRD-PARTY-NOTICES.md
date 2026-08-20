@@ -10,25 +10,22 @@ covered by [`LICENSE`](LICENSE); each component keeps its own terms.
 | Italian CSCA certificates (`App/Resources/csca/*.der`) | public documents of the Italian state, redistributed unchanged | trust anchors for the Passive Authentication chain check. Extracted from the **BSI CSCA master list** (`GermanMasterList.zip`, Bundesamt für Sicherheit in der Informationstechnik), filtered to `C=IT`. The BSI publishes the list for exactly this purpose. |
 | Apple SDK frameworks (SwiftUI, CoreNFC, Vision, CryptoKit, Security) | Apple SDK licence | the platform. Not redistributed. |
 | swift-testing | Apache-2.0 with LLVM exception | test target only, ships with the toolchain, not in the app. |
+| **NFCPassportReaderCAN** — a modified copy of [NFCPassportReader](https://github.com/AndyQ/NFCPassportReader) | **MIT, © 2019 Andy Qua** — full text at [`ThirdParty/NFCPassportReaderCAN/LICENSE`](ThirdParty/NFCPassportReaderCAN/LICENSE) | PACE / BAC, secure messaging, data-group parsing, Passive Authentication, Chip Authentication. Vendored under `ThirdParty/` because upstream **lacks CAN-based PACE**, which the CIE needs, and the place to change it is `internal`. Three of 39 files are modified; origin commit and the complete patch are in [`ThirdParty/NFCPassportReaderCAN/UPSTREAM.md`](ThirdParty/NFCPassportReaderCAN/UPSTREAM.md). |
+| [OpenSSL-Package](https://github.com/krzyzanowskim/OpenSSL-Package) → OpenSSL 3.6 | Apache-2.0 | Elliptic-curve arithmetic over **brainpoolP256r1**, which CryptoKit does not provide. Pulled in by the above as a binary xcframework; not vendored. |
 
-No third-party Swift package is linked in the current build. That is a
-deliberate state and not a permanent one — see the next section.
+### What redistributing these obliges
 
-## Planned, once the PACE back end is wired up
+* **MIT** requires the copyright notice and the licence text to travel with any
+  copy or substantial portion. Satisfied: the verbatim upstream `LICENSE` sits
+  next to the vendored source, the modified files carry a header saying so, and
+  `UPSTREAM.md` records what was changed.
+* **Apache-2.0** requires the licence, retention of notices, and a statement of
+  changes. OpenSSL is linked unmodified as a binary artefact; SwiftPM fetches it
+  at build time and it is not redistributed from this repository.
 
-The chip-reading path needs elliptic-curve arithmetic over **brainpoolP256r1**,
-which CryptoKit does not provide. Rolling that by hand in an application that
-reads identity documents would be the wrong call. The intended dependency:
-
-| Component | Licence | Note |
-|---|---|---|
-| [NFCPassportReader](https://github.com/AndyQ/NFCPassportReader) | MIT, © 2019 Andy Qua | PACE / BAC, secure messaging, data-group parsing, Passive Authentication, Chip Authentication. **Lacks CAN-based PACE**, which the CIE needs; see [`docs/NFC-PACE.md`](docs/NFC-PACE.md) for the patch. |
-| [OpenSSL-Package](https://github.com/krzyzanowskim/OpenSSL-Package) | Apache-2.0 (OpenSSL 3) | pulled in transitively by the above. |
-
-MIT and Apache-2.0 both require the copyright notice and licence text to travel
-with any redistribution. When either is linked, add its full licence text under
-`ThirdParty/` and list it in the table above — a table entry alone does not
-satisfy MIT.
+A published build must carry both licences in its acknowledgements. There is no
+`Settings.bundle` yet — that is a gap to close before any release, not a
+formality.
 
 ## What the Android original carried and this port does not
 

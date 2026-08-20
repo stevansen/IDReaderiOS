@@ -74,11 +74,16 @@ public enum MrzScan {
     /// Pruefziffer nach ICAO 9303: Gewichte 7-3-1 im Wechsel, Ziffern zaehlen
     /// ihren Wert, Buchstaben A bis Z zaehlen 10 bis 35, das Fuellzeichen zaehlt
     /// null. Die Summe modulo zehn ergibt die Ziffer.
-    public static func checkDigitMatches(_ value: String, _ expected: String) -> Bool {
-        guard expected.count == 1, let digit = expected.first, digit.isASCII, digit.isNumber else {
-            return false
-        }
-
+    ///
+    /// Wird in beide Richtungen gebraucht: beim Lesen einer Aufnahme, um eine
+    /// Erkennung zu bestaetigen, und beim Zusammensetzen des Zugangsschluessels
+    /// aus eingetippten Feldern. Beides ist dieselbe Rechnung, und zweimal
+    /// dieselbe Rechnung ist eine Stelle zu viel, an der sie auseinandergehen
+    /// kann.
+    ///
+    /// - Returns: die Ziffer als Zeichenkette, oder nil wenn `value` ein Zeichen
+    ///   enthaelt, das der MRZ-Zeichensatz nicht kennt.
+    public static func checkDigit(_ value: String) -> String? {
         var sum = 0
         for (index, character) in value.enumerated() {
             let weight = weights[index % weights.count]
@@ -91,11 +96,18 @@ public enum MrzScan {
             } else if character == filler {
                 amount = 0
             } else {
-                return false
+                return nil
             }
             sum += amount * weight
         }
-        return sum % modulus == Int(String(digit))!
+        return String(sum % modulus)
+    }
+
+    public static func checkDigitMatches(_ value: String, _ expected: String) -> Bool {
+        guard expected.count == 1, let digit = expected.first, digit.isASCII, digit.isNumber else {
+            return false
+        }
+        return checkDigit(value) == String(digit)
     }
 
     private static let filler: Character = "<"

@@ -127,30 +127,34 @@ Entscheidungen samt Begründung in
 Für die nächste Sitzung. Kopierbar.
 
 > Im Repository `IDReaderiOS` liegt eine Portierung der Android-App CIEreader
-> auf iOS. `Sources/IDReaderCore` ist fertig und durch 59 Tests gedeckt
-> (`swift test`), die App unter `App/` baut. Lies zuerst `docs/STATUS.md`,
+> auf iOS. Sie ist vollständig gebaut — einschließlich PACE mit CAN — und durch 64
+> Tests gedeckt (`swift test`). Lies zuerst `docs/STATUS.md`,
 > `docs/ANDROID-TO-IOS.md` und `docs/NFC-PACE.md`.
 >
 > Arbeite die offenen Punkte aus `docs/STATUS.md` in dieser Reihenfolge ab:
 >
-> 1. **PACE mit CAN.** Forke `AndyQ/NFCPassportReader` (MIT), setze den Patch aus
->    `docs/NFC-PACE.md` um — `CAN_PACE_KEY_REFERENCE` als Schlüsseltyp und der
->    Schlüsselkeim aus den rohen CAN-Bytes statt aus `SHA-1(MRZ-Information)` —,
->    nimm den Fork als Paketabhängigkeit auf und implementiere
->    `App/NFC/PACEEngine.swift` dagegen. Prüfe gegen eine echte CIE 3.0: ohne
->    diesen Nachweis gilt der Punkt als offen. Ergänze `THIRD-PARTY-NOTICES.md`
->    um den vollständigen MIT-Text, sobald der Fork verlinkt ist.
-> 2. **DG2 / JPEG 2000.** Binde OpenJPEG ein (SwiftPM-C-Target) und erweitere
+> 1. **Der Nachweis am Gerät.** Halte eine echte CIE 3.0 an ein iPhone und lass
+>    die vier Phasen durchlaufen. Prüfe besonders: der schnelle Weg ohne
+>    Lichtbild, das grüne Siegel bei einer echten Karte, und dass eine falsche CAN
+>    als „CAN stimmt nicht" ankommt und nicht als „unbekannter Fehler". Ohne
+>    diesen Nachweis gilt der Leseweg als gebaut, nicht als geprüft — und das ist
+>    ein Unterschied, den diese App an jeder anderen Stelle auch macht.
+> 2. **Der Fork statt der Kopie.** `ThirdParty/NFCPassportReaderCAN` ist eine
+>    gepatchte Kopie fremden Codes (MIT). Lege einen Fork von
+>    `AndyQ/NFCPassportReader` an, setze `UPSTREAM.patch`, binde ihn als
+>    Paketverweis ein und lösche die Kopie. Reiche den Patch außerdem nach oben
+>    ein — er fügt einen Weg hinzu und nimmt keinen weg.
+> 3. **DG2 / JPEG 2000.** Binde OpenJPEG ein (SwiftPM-C-Target) und erweitere
 >    `FaceImageDecoder`. Erkenne das Format an den Magic Bytes und nicht am
 >    MIME-Typ aus DG2 — der ist auf manchen Karten falsch, das ist unter Android
 >    gemessen worden. Sowohl JP2-Container als auch nackter J2K-Codestream.
-> 3. **Die Elastik der Eingabemasken.** Die drei Masken sollen ohne Scrollen auf
+> 4. **Die Elastik der Eingabemasken.** Die drei Masken sollen ohne Scrollen auf
 >    einen Bildschirm passen; Dokumentgrafik und Ziffernblock nehmen ihre Höhe
 >    aus dem Restplatz. Unter Compose war die Falle ein scrollender Vorfahr, in
 >    dem `weight` null ergibt (dreimal hineingelaufen, siehe README des
 >    Originals). Das SwiftUI-Gegenstück ist `ViewThatFits` bzw. eine `GeometryReader`
 >    -Messung — prüfe bei 100 %, 130 % und 200 % Systemschrift.
-> 4. **App-Icon und Store-Material.** Bisher nur ein Platzhalter.
+> 5. **App-Icon und Store-Material.** Bisher nur ein Platzhalter.
 >
 > Halte dabei die Maßstäbe aus Teil A dieses Dokuments ein, besonders den
 > ersten. Wenn du an eine Stelle kommst, an der iOS etwas nicht kann, dann

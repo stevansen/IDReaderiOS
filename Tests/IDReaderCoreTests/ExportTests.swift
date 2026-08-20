@@ -280,3 +280,21 @@ struct CscaTrustStoreTests {
         #expect(anchors.allSatisfy { $0.first == 0x30 })
     }
 }
+
+extension CscaTrustStoreTests {
+
+    /// Das PEM-Buendel muss dieselben neun Zertifikate fuehren wie die einzelnen
+    /// DER-Dateien.
+    ///
+    /// Zwei Dateisaetze fuer dieselbe Sache sind eine Stelle, an der sich etwas
+    /// auseinanderentwickeln kann - dieser Test ist der Grund, dass es auffaellt.
+    @Test("das PEM-Buendel deckt sich mit den DER-Dateien")
+    func bundleMatchesCertificates() throws {
+        let url = try #require(CscaTrustStore.bundleURL())
+        let pem = try String(contentsOf: url, encoding: .utf8)
+        let blocks = pem.components(separatedBy: "-----BEGIN CERTIFICATE-----").dropFirst()
+
+        #expect(blocks.count == CscaTrustStore.load().count)
+        #expect(blocks.allSatisfy { $0.contains("-----END CERTIFICATE-----") })
+    }
+}

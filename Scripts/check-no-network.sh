@@ -22,9 +22,13 @@ cd "$(dirname "$0")/.."
 # Was einen Netzzugriff möglich macht. Absichtlich weit gefasst: ein Treffer, der
 # sich als harmlos erweist, kostet eine Minute — ein übersehener kostet die
 # Zusage.
-PATTERN='URLSession|NSURLConnection|CFNetwork|import Network|NWConnection|CFStream|Socket\(|getaddrinfo|CFHTTP'
+PATTERN='URLSession|NSURLConnection|CFNetwork|import Network|NWConnection|CFStream|Socket\(|getaddrinfo|CFHTTP|Data\(contentsOf: *URL\(string|String\(contentsOf: *URL\(string'
 
-TARGETS="App Sources"
+# ThirdParty ist mit dabei, und das ist der eigentliche Grund, dass dieses Skript
+# nicht bloß Zierde ist: dort liegt fremder Code, der bei jedem Auffrischen neu
+# hereinkommt. Die Fassung, gegen die geprüft wurde, greift nicht ins Netz — dass
+# das so bleibt, sagt niemand zu.
+TARGETS="App Sources ThirdParty"
 HITS=$(grep -rnE "$PATTERN" $TARGETS --include='*.swift' || true)
 
 if [ -n "$HITS" ]; then

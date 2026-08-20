@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		1D0000000000000000000101 /* IDReaderCore in Frameworks */ = {isa = PBXBuildFile; productRef = 1D0000000000000000000201 /* IDReaderCore */; };
+		1D0000000000000000000102 /* NFCPassportReaderCAN in Frameworks */ = {isa = PBXBuildFile; productRef = 1D0000000000000000000202 /* NFCPassportReaderCAN */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -30,6 +31,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				1D0000000000000000000101 /* IDReaderCore in Frameworks */,
+				1D0000000000000000000102 /* NFCPassportReaderCAN in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -83,6 +85,7 @@
 			name = IDReader;
 			packageProductDependencies = (
 				1D0000000000000000000201 /* IDReaderCore */,
+				1D0000000000000000000202 /* NFCPassportReaderCAN */,
 			);
 			productName = IDReader;
 			productReference = 1D0000000000000000000301 /* IDReader.app */;
@@ -116,6 +119,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				1D0000000000000000000B01 /* XCLocalSwiftPackageReference "." */,
+				1D0000000000000000000B02 /* XCLocalSwiftPackageReference "ThirdParty/NFCPassportReaderCAN" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 1D0000000000000000000603 /* Products */;
@@ -293,12 +297,20 @@
 			isa = XCLocalSwiftPackageReference;
 			relativePath = .;
 		};
+		1D0000000000000000000B02 /* XCLocalSwiftPackageReference "ThirdParty/NFCPassportReaderCAN" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ThirdParty/NFCPassportReaderCAN;
+		};
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
 		1D0000000000000000000201 /* IDReaderCore */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = IDReaderCore;
+		};
+		1D0000000000000000000202 /* NFCPassportReaderCAN */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = NFCPassportReaderCAN;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

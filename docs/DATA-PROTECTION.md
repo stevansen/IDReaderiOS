@@ -5,7 +5,11 @@ angepasst, wo iOS andere Mittel hat. Keine Rechtsberatung.
 
 ## Was die App tut, damit die unangenehmen Fragen kurze Antworten haben
 
-**Nichts verlässt das Gerät von selbst.** Es gibt keinen Netzzugriff im Quelltext.
+**Nichts verlässt das Gerät von selbst.** Es gibt keinen Netzzugriff im
+Quelltext — auch nicht in der fremden Lesebibliothek unter `ThirdParty/`, die das
+Skript unten mitprüft. Das ist dort keine Nebensache: die Bibliothek nimmt für die
+Kettenprüfung eine `URL`, und eine `URL` kann auch ins Netz zeigen. Übergeben wird
+ihr das mitgelieferte PEM-Bündel auf der Platte.
 Unter Android trug diese Zusage das Manifest, das die `INTERNET`-Berechtigung
 ausdrücklich wieder entfernte — weil eine Bibliothek sie stillschweigend
 hinzufügen könnte und damit eine Aussage im Store-Eintrag aufheben würde, ohne

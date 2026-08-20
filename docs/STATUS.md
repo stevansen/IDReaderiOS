@@ -1,6 +1,6 @@
 # Stand
 
-Stand vom **20. August 2026**. Quelle: `cauer71/AndroidDev`, `apps/cie-reader`,
+Stand vom **20. August 2026**, nach dem Einbau von PACE mit CAN. Quelle: `cauer71/AndroidDev`, `apps/cie-reader`,
 Commit `7ab0d20`, Version 1.8 / versionCode 11.
 
 ## Fertig und geprüft
@@ -20,22 +20,30 @@ Commit `7ab0d20`, Version 1.8 / versionCode 11.
 | Drei Eingabemasken, Lesescreen, Ergebnis, Archiv, Teilen, Einstellungen, erster Start, Fehlerblatt | gebaut | im Simulator durchlaufen |
 | Texterkennung (Vision statt ML Kit) | gebaut | am Simulator nicht prüfbar (keine Kamera) |
 | CSCA-Vertrauensanker (9 Zertifikate) | übernommen | 1 Test |
-| CoreNFC-Sitzung, `EF.CardAccess`, `PACEInfo` zerlegen | gebaut | am Simulator nicht prüfbar |
+| **PACE mit CAN**, Datengruppen, Passive Authentication, Chip Authentication | gebaut, **am Gerät nicht nachgewiesen** | siehe [NFC-PACE.md](NFC-PACE.md) |
+| Urteilsbildung aus den vier Teilprüfungen | portiert | `PassportChipReader.authenticity(from:)` |
+| CSCA-Vertrauensanker als PEM-Bündel für die Kettenprüfung | erzeugt | 2 Tests |
 | Datenschutz-Gegenstücke (Sicherung, Dateischutz, App-Umschalter, Zwischenablage, Netzprüfung) | gebaut | `Scripts/check-no-network.sh` |
 
-60 Tests, `swift test`, alle grün. Die App baut ohne Warnung
-(`xcodebuild -target IDReader -sdk iphonesimulator`) und läuft im Simulator.
+64 Tests, `swift test`, alle grün. Die App baut ohne eine einzige Warnung im
+eigenen Code (`xcodebuild -scheme IDReader -sdk iphonesimulator`) und läuft im
+Simulator.
 
 ## Offen
 
 In der Reihenfolge, in der es sich lohnt:
 
-1. **PACE mit CAN** — die gesicherte Verbindung zum Chip, und damit der ganze
-   Leseweg. Siehe [NFC-PACE.md](NFC-PACE.md); der Patch für die einzubindende
-   Bibliothek steht dort ausformuliert. Bis dahin wirft die App an dieser Stelle
-   einen benannten Fehler mit einem Text, der sagt, was fehlt.
-2. **Datengruppen und Passive Authentication** — hängt an 1. Die Reihenfolge und
-   die Fallen stehen ebenfalls in [NFC-PACE.md](NFC-PACE.md).
+1. **Der Nachweis am Gerät.** Eine echte CIE 3.0 an ein iPhone halten und die
+   vier Phasen durchlaufen sehen. Ohne das gilt der Leseweg als gebaut, nicht als
+   geprüft — die Android-Fassung ist gegen ein echtes Dokument auf zwei Geräten
+   vermessen, und weniger ist hier keine Grundlage. Zu prüfen sind besonders: der
+   schnelle Weg ohne Lichtbild, das grüne Siegel bei einer echten Karte, und dass
+   eine falsche CAN als „CAN stimmt nicht" ankommt und nicht als „unbekannter
+   Fehler".
+2. **Der Fork statt der Kopie.** `ThirdParty/NFCPassportReaderCAN` ist eine
+   gepatchte Kopie fremden Codes. Sauberer wäre ein Fork unter eigener Adresse als
+   Paketverweis; der Patch liegt dafür bereit und ist auch als Beitrag nach oben
+   brauchbar.
 3. **JPEG 2000 für DG2** — OpenJPEG einbinden. Bis dahin zeigt die App das erkannte
    Format an der Stelle des Bildes, wie das Original bei einem unbekannten Format.
 4. **Die Elastik der Eingabemasken.** Die drei Masken sollen ohne Scrollen auf

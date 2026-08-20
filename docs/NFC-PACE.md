@@ -1,9 +1,14 @@
-# PACE mit CAN: was fehlt, und wie es hineinkommt
+# PACE mit CAN
 
-Der einzige Teil der Portierung, der noch nicht arbeitet — und der einzige, bei
-dem eine Abkürzung wirklich schadet.
+**Eingebaut.** Was das gekostet hat und warum es so und nicht anders gebaut ist,
+steht hier — samt dem Patch, mit dem sich die Änderung nach oben tragen lässt.
 
-## Warum das nicht schon fertig ist
+> **Am Gerät noch nicht nachgewiesen.** Der Simulator hat kein NFC, und ohne eine
+> echte CIE 3.0 in der Hand ist der Handschlag nicht bewiesen. Die Android-Fassung
+> ist gegen ein echtes Dokument auf zwei Geräten vermessen; weniger ist hier keine
+> Grundlage. Bis dahin gilt dieser Teil als gebaut, nicht als geprüft.
+
+## Warum das die Arbeit war
 
 Die CIE 3.0 öffnet sich über **PACE** nach ICAO 9303 Teil 11, mit der aufgedruckten
 CAN als Passwort. PACE rechnet dabei einen Diffie-Hellman über einer elliptischen
@@ -23,27 +28,50 @@ die Ausweisdokumente liest, ist kein Sparen — sie ist ein Risiko, das niemand 
 sieht, weil sie funktioniert, solange man sie nicht angreift. Die Android-Fassung
 hat aus demselben Grund JMRTD und BouncyCastle genommen und nicht selbst gerechnet.
 
-## Wo die Naht liegt
+**Gewählt ist der erste Weg.** `ThirdParty/NFCPassportReaderCAN` ist eine
+geänderte Kopie von `AndyQ/NFCPassportReader` (MIT); drei Dateien sind angefasst,
+36 sind Byte für Byte das Original. Was geändert wurde und warum, steht in
+[`../ThirdParty/NFCPassportReaderCAN/UPSTREAM.md`](../ThirdParty/NFCPassportReaderCAN/UPSTREAM.md),
+der Patch liegt daneben als `UPSTREAM.patch`.
 
-`App/NFC/ChipDocumentReader.swift` zieht die Grenze genau dort, wo die Portierung
-aufhört und die Kryptografie anfängt:
+## Warum kein Paketverweis auf die Fassung oben
+
+Weil sich von außen nichts einhängen lässt. Die Stelle, an der die CAN
+hineingehört, ist `internal`, und der Rest ist es auch: `TagReader.init` und
+`TagReader.secureMessaging` sind `internal`, `DataGroupParser` hat keine
+öffentliche Schnittstelle. Nach außen gibt die Bibliothek genau eines her —
+`PassportReader.readPassport(mrzKey:)`, also den ganzen Ablauf oder nichts.
+
+Der Gedanke, nur den Handschlag selbst zu schreiben und die fertigen
+Sitzungsschlüssel danach an ihr Secure Messaging zu übergeben, scheitert an
+derselben Wand.
+
+**Die sauberere Form bleibt ein Fork** unter eigener Adresse, als Paketverweis
+eingebunden. Der Patch ist genau dafür gemacht — und weil er einen Weg hinzufügt
+und keinen wegnimmt, ist er auch als Beitrag nach oben brauchbar. Solange es den
+Fork nicht gibt, liegt die Kopie im Repository, damit sich die App überhaupt
+bauen lässt.
+
+## Wo die Grenze jetzt verläuft
+
+`App/NFC/PassportChipReader.swift` rechnet nichts. Er übergibt den Schlüssel,
+übersetzt den Fortschritt in die vier Phasen des Lesescreens und bildet danach
+das Ergebnis auf `DocumentData` ab:
 
 ```
-CoreNFCChipReader          Sitzung, EF.CardAccess lesen, PACEInfo zerlegen   ← fertig
-   ↓ PACEEngine.establish(info:key:transceive:)                              ← die Naht
-PACE-Handschlag            brainpoolP256r1, gesicherte Kanalschlüssel        ← fehlt
-   ↓ SecureChannel.send(_:)
-Datengruppen + EF.SOD      DG1, DG2, DG11, DG12, DG14, Passive Auth          ← fehlt
+PassportChipReader     Schlüssel übergeben, Fortschritt, Abbildung, Urteil
+   ↓ readPassport(accessKey: .can("482913"))
+NFCPassportReaderCAN   PACE über brainpoolP256r1, Secure Messaging,
+                       DG1/2/11/12/14 + EF.SOD, Passive Auth, Chip Auth
+   ↓ OpenSSL 3
 ```
 
-Alles über der Naht ist fertig und geprüft: Oberfläche, Archiv, Export, das
-Urteilsmodell, die drei Parser. Solange darunter nichts steckt, wirft
-`UnavailablePACEEngine` einen **benannten** Fehler (`ReadErrorKind.paceUnavailable`)
-mit einem Text, der sagt, was fehlt. Bewusst nicht `unknown`: „unbekannter Fehler
-beim Lesen der Karte" schickt den Bediener los, die Karte zu putzen und das Telefon
-neu zu starten, und was hier fehlt, ist nichts an der Karte.
+Die eigentliche Arbeit im Adapter ist das **Urteil**: die Bibliothek liefert vier
+voneinander unabhängige Wahrheiten, und daraus eines zu machen folgt Zeile für
+Zeile der Android-Fassung — alle müssen aufgehen, sonst ist es kein Ja. Siehe
+`PassportChipReader.authenticity(from:)`.
 
-## Der empfohlene Weg: NFCPassportReader mit CAN
+## Der Patch, in Worten
 
 [`AndyQ/NFCPassportReader`](https://github.com/AndyQ/NFCPassportReader) (MIT,
 iOS 15+) bringt alles mit: PACE über GM und IM, BAC, Secure Messaging,
@@ -105,51 +133,47 @@ Handschlags, die Sitzungsschlüssel — bleibt unverändert. `paceKeyReference` 
 schon in die Ableitung ein, und `sendMSESetATMutualAuth(oid:keyType:)` nimmt den
 Typ schon als Parameter.
 
-### Schritte
+Dazu kommen zwei Dinge, die für CAN nicht nötig, aber richtig sind: der
+abgeleitete Schlüssel und der Klartext des Passworts stehen nicht mehr im
+Protokoll (im Original stand beides je einmal drin), und ein Rückfall auf BAC
+findet nur noch statt, wenn der Schlüssel dafür überhaupt taugt — BAC kennt nur
+den MRZ-Schlüssel, und mit einer leeren Zeichenkette loszulaufen scheitert an
+einer Stelle, die mit der Ursache nichts mehr zu tun hat.
 
-1. `AndyQ/NFCPassportReader` forken, den Patch setzen, taggen.
-2. Den Fork als Paketabhängigkeit in `IDReader.xcodeproj` aufnehmen.
-3. `App/NFC/PACEEngine.swift` gegen den Fork schreiben und
-   `UnavailablePACEEngine` in `IDReaderApp.swift` austauschen.
-4. **Gegen eine echte CIE 3.0 prüfen.** Ohne diesen Nachweis gilt der Punkt als
-   offen — die Android-Fassung ist gegen ein echtes Dokument auf zwei Geräten
-   vermessen, und weniger ist hier keine Grundlage.
-5. `THIRD-PARTY-NOTICES.md` um den **vollständigen** MIT-Text ergänzen. Ein
-   Tabelleneintrag genügt der MIT-Lizenz nicht.
+## Was noch offen ist
 
-## Was danach noch fehlt
+1. **Der Nachweis am Gerät.** Eine echte CIE 3.0, ein iPhone, und die vier Phasen
+   müssen durchlaufen. Zu prüfen sind dabei besonders: der schnelle Weg ohne DG2,
+   das grüne Siegel bei einer echten Karte, und dass eine falsche CAN als „CAN
+   stimmt nicht" ankommt und nicht als „unbekannter Fehler".
+2. **JPEG 2000.** Siehe unten — daran hat sich nichts geändert.
+3. **Der Fork statt der Kopie**, sobald jemand ihn anlegt.
 
-`CoreNFCChipReader.readDocument` endet heute hinter dem Handschlag. Zu ergänzen,
-in dieser Reihenfolge und mit denselben Entscheidungen wie im Original:
+## Was die Bibliothek dabei tut
 
-1. `sendSelectApplet` mit der Angabe, ob PACE lief — der Parameter sagt dem Secure
-   Messaging, welches Verfahren gelaufen ist; er fragt die Karte nicht.
-2. DG1 → DG11 → DG12 → DG2 (nur auf Wunsch) → DG14 → EF.SOD. **Jede Datengruppe
-   zuerst als rohe Bytes**, erst danach zerlegen: die Hash-Prüfung braucht genau
-   die Bytes, die von der Karte kamen — ein neu kodiertes Objekt ergibt nicht
-   zwingend denselben Hash.
-3. DG11, DG2, DG12, DG14 und EF.SOD sind **optional**. Fehlt eines, läuft der
-   Lesevorgang weiter und nur der betroffene Teil des Ergebnisses ist schwächer.
-   Ein Verbindungsabriss wird weiterhin als solcher gemeldet — sonst sähe eine
-   weggezogene Karte wie „Datei nicht vorhanden" aus.
-4. Chip Authentication **nach** allen Lesevorgängen. PACE sichert die Verbindung
-   schon, und ein Stolpern hier soll eine ansonsten einwandfreie Karte nicht
-   unlesbar machen. Ob die Karte sie überhaupt anbietet, kommt aus dem
-   **signierten** Security Object und nicht daraus, ob DG14 lesbar war — sonst käme
-   eine Kopie damit durch, DG14 einfach weglassen.
-5. Passive Authentication, vier Prüfungen, alle vier müssen aufgehen. Die dritte —
-   Kette bis zu einer hinterlegten italienischen CSCA — ist die, auf die es
-   ankommt: ohne sie könnte jemand eine Karte mit selbst erzeugtem Schlüsselpaar
-   bespielen, und die ersten zwei wären trotzdem grün. Die Anker liegen in
-   `Sources/IDReaderCore/Resources/csca/`.
-6. Zwei Fallen bei der Signaturprüfung, die im Original beide einen falschen
-   „Signatur ungültig" erzeugt haben: der in `SignerInfo` genannte Algorithmus ist
-   häufig kein brauchbarer JCE/OpenSSL-Name (`SSAwithRSA/PSS`, oder nur `RSA`, das
-   nach RFC 5652 erst mit dem Digest zu `SHA256withRSA` zusammenzusetzen ist), und
-   für RSASSA-PSS müssen die Parameter aus dem SignerInfo mitgegeben werden.
-7. Ein abgelaufener **Dokumentsignierer** gilt nicht als Fehlschlag. Signierer
-   laufen nach Monaten ab, die Karten, die sie signiert haben, bleiben zehn Jahre
-   gültig. Sperrlistenabfrage (CRL/OCSP) bleibt bewusst aus: sie bräuchte Netz.
+Nicht mehr unsere Baustelle, aber wissenswert — es sind dieselben Entscheidungen,
+die die Android-Fassung in ihren Kommentaren festhält, und sie sind der Grund,
+diese Bibliothek zu nehmen statt selbst zu schreiben:
+
+* Jede Datengruppe wird **zuerst als rohe Bytes** gelesen und erst danach
+  zerlegt. Die Hash-Prüfung braucht genau die Bytes, die von der Karte kamen — ein
+  neu kodiertes Objekt ergibt nicht zwingend denselben Hash.
+* DG11, DG2, DG12, DG14 und EF.SOD sind optional. Fehlt eines, läuft der
+  Lesevorgang weiter und nur der betroffene Teil des Ergebnisses ist schwächer.
+* Chip Authentication läuft **nach** allen Lesevorgängen. PACE sichert die
+  Verbindung schon, und ein Stolpern hier soll eine ansonsten einwandfreie Karte
+  nicht unlesbar machen.
+* Bei der Signaturprüfung sind zwei Fallen behandelt, die im Original der
+  Android-Fassung beide einen falschen „Signatur ungültig" erzeugt haben: der in
+  `SignerInfo` genannte Algorithmus ist häufig kein brauchbarer Name, und für
+  RSASSA-PSS müssen die Parameter aus dem SignerInfo mitgegeben werden.
+* Die Kettenprüfung ignoriert `X509_V_ERR_EC_KEY_EXPLICIT_PARAMS` — OpenSSL 3
+  lehnt explizite Kurvenparameter ab, ICAO verlangt sie.
+
+Womit geprüft wird, geben wir mit: das PEM-Bündel der neun italienischen CSCA aus
+`Sources/IDReaderCore/Resources/csca/`. Fehlt es, wird gelesen und nicht geprüft —
+und das Ergebnis sagt das dann auch, statt ein Siegel zu malen, das nichts belegt.
+Sperrlistenabfrage (CRL/OCSP) bleibt bewusst aus: sie bräuchte Netz.
 
 ## Und JPEG 2000
 

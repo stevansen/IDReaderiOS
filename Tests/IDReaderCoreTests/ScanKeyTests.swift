@@ -175,3 +175,32 @@ struct AccessKeyTests {
         ))
     }
 }
+
+/// Die Prüfziffer, in beide Richtungen.
+struct CheckDigitTests {
+
+    /// Die Beispiele aus ICAO 9303 Teil 3, Abschnitt 4.9.
+    @Test("gerechnete Pruefziffern stimmen mit der Norm")
+    func matchesTheStandard() {
+        #expect(MrzScan.checkDigit("520727") == "3")
+        #expect(MrzScan.checkDigit("D23145890734") == "9")
+        #expect(MrzScan.checkDigit("AB2134<<<") == "5")
+    }
+
+    /// Rechnen und Prüfen müssen dasselbe Ergebnis haben - sonst baut der
+    /// Zugangsschlüssel etwas, das die eigene Erkennung ablehnen würde.
+    @Test("Rechnen und Pruefen sind dieselbe Rechnung")
+    func computeAndVerifyAgree() {
+        for value in ["YA1234567", "800101", "300201", "AB12345<<", "000000"] {
+            let digit = MrzScan.checkDigit(value)
+            #expect(digit != nil)
+            #expect(MrzScan.checkDigitMatches(value, digit!))
+        }
+    }
+
+    @Test("ein fremdes Zeichen ergibt keine Ziffer")
+    func foreignCharacter() {
+        #expect(MrzScan.checkDigit("AB-123") == nil)
+        #expect(MrzScan.checkDigit("ab1234") == nil)
+    }
+}

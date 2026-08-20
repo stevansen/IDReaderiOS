@@ -18,8 +18,9 @@ Liste.
 
 ## Der Stand in einem Satz
 
-Alles außer der gesicherten Verbindung zum Chip ist fertig und durch 60 Tests
-gedeckt. Was fehlt und warum, steht in [`docs/STATUS.md`](docs/STATUS.md) und
+Vollständig gebaut und durch 64 Tests gedeckt — **aber der Leseweg ist noch nicht
+gegen eine echte Karte gehalten worden.** Bis das passiert ist, gilt er als
+gebaut, nicht als geprüft; siehe [`docs/STATUS.md`](docs/STATUS.md) und
 [`docs/NFC-PACE.md`](docs/NFC-PACE.md).
 
 ## Bauen
@@ -29,8 +30,11 @@ swift test
 ```
 
 ```bash
-xcodebuild -project IDReader.xcodeproj -target IDReader -sdk iphonesimulator -configuration Debug CODE_SIGNING_ALLOWED=NO build
+xcodebuild -project IDReader.xcodeproj -scheme IDReader -sdk iphonesimulator -configuration Debug CODE_SIGNING_ALLOWED=NO build
 ```
+
+`-scheme` und nicht `-target`: mit `-target` baut Xcode die Paketabhängigkeiten
+nicht mit, und der Bau bricht an einem nicht auflösbaren Modul ab.
 
 Für ein Gerät braucht die App-ID die Berechtigung **NFC Tag Reading** im
 Entwicklerkonto — ohne sie lässt sich das Ziel nicht signieren.
@@ -53,12 +57,14 @@ IDReaderiOS/
 │   ├── Archive/               AES-256-GCM, Schlüsselbund, Format Version 8
 │   ├── Export/                lesbarer Text, JSON, HTML, Lokalisierung
 │   └── Resources/             en/de/it + die italienischen CSCA-Zertifikate
-├── Tests/IDReaderCoreTests/   60 Tests, darunter der gemessene OCR-Korpus
+├── Tests/IDReaderCoreTests/   64 Tests, darunter der gemessene OCR-Korpus
 ├── App/
 │   ├── UI/                    SwiftUI: drei Masken, Lesen, Ergebnis, Archiv, Teilen
-│   ├── NFC/                   CoreNFC-Sitzung, DER, PACEInfo — und die Naht
+│   ├── NFC/                   Adapter auf die Lesebibliothek, Urteilsbildung
 │   ├── Capture/               Kamera und Vision
 │   └── Support/               Farbschemata, Schriftstile, Ausgabewege
+├── ThirdParty/                fremder Code, gepatcht — MIT, siehe dort
+│   └── NFCPassportReaderCAN/  PACE, Secure Messaging, Passive Auth, Chip Auth
 ├── Config/                    Info.plist, Berechtigungen
 ├── docs/                      STATUS, ANDROID-TO-IOS, NFC-PACE, DATA-PROTECTION
 └── MIGRATION_PROMPT.md        der Prompt, mit dem sich das fortsetzen lässt

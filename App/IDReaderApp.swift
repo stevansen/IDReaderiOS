@@ -30,11 +30,10 @@ struct IDReaderApp: App {
         archive.log = { print("[archive] \($0)") }
         #endif
 
-        let reader = CoreNFCChipReader(
-            pace: UnavailablePACEEngine(),
-            trustAnchors: CscaTrustStore.load(),
-            strings: strings
-        )
+        // Der Leser bekommt das PEM-Buendel der italienischen CSCA mit. Fehlt es,
+        // wird gelesen, aber nicht geprueft - und das Ergebnis sagt das dann auch,
+        // statt ein Siegel zu malen, das nichts belegt.
+        let reader = PassportChipReader(strings: strings)
 
         _model = State(initialValue: ReaderModel(
             archive: archive,
