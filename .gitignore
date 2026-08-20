@@ -1,0 +1,28 @@
+# Xcode / SwiftPM
+build/
+.build/
+DerivedData/
+*.xcuserstate
+xcuserdata/
+*.xcworkspace/xcuserdata/
+.swiftpm/
+Package.resolved
+
+# macOS
+.DS_Store
+
+# Was hier nie liegen darf
+#
+# Aufnahmen von Ausweisdokumenten. Der Pruefkorpus in Tests/ ist anonymisiert
+# und zeichengenau nachgebaut; echte Bilder gehoeren nicht ins Repository, auch
+# nicht "nur zum Nachschauen".
+*.jpg
+*.jpeg
+*.heic
+!App/Assets.xcassets/**/*.jpg
+
+# Signierung
+*.mobileprovision
+*.p12
+*.cer
+ExportOptions.plist

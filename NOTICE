@@ -1,0 +1,10 @@
+IDReader for iOS
+Copyright (c) 2026 Christian Auer and Stefan Hellweger.
+
+A port of the Android application CIEreader (cauer71/AndroidDev,
+apps/cie-reader) to Apple platforms. Reads the Italian electronic identity card
+CIE 3.0 and the ePassport over NFC, and the Italian driving licence from a
+photograph.
+
+See LICENSE for terms, COPYRIGHT for authorship and provenance, and
+THIRD-PARTY-NOTICES.md for the components this software depends on.

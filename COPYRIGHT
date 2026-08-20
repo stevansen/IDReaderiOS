@@ -1,0 +1,62 @@
+Authorship and provenance
+=========================
+
+Holders
+-------
+
+    Christian Auer      <cauer@gmx.net>              GitHub: cauer71
+    Stefan Hellweger    <Stefan.Hellweger@provinz.bz.it>
+
+Joint, in equal shares, for both the Android original and this iOS port. Named
+alphabetically by surname; the order carries no meaning.
+
+Why both names, when the Android history shows one
+--------------------------------------------------
+
+`git log` in `cauer71/AndroidDev` records 65 commits, all authored by Christian
+Auer. That reflects who operated the keyboard, not who made the work: the
+application was specified, designed and decided jointly by both holders, and
+the design directions the code follows ("2a", "3a", "4c" in the comments) came
+out of that collaboration. Both are therefore named here, and both must consent
+to any licence change.
+
+If either holder disagrees with this reading, this file is the place to correct
+it — before anything is published, not after.
+
+What was ported, and from where
+-------------------------------
+
+Source: `cauer71/AndroidDev`, path `apps/cie-reader`, at commit 7ab0d20
+("Ship 1.8 to the closed test"), version 1.8 / versionCode 11, read on
+2026-08-20.
+
+Carried over substantially unchanged, and therefore derived work:
+
+  * the data model (`DocumentData`, `Authenticity`, `DocumentType`,
+    `RecordProvenance`, `AccessKey`, `StoredDocument`);
+  * the three parsers (`LicenceScan`, `MrzScan`, `CanScan`) including the
+    reasoning in their comments, which is the actual value in them;
+  * the archive file format — same JSON keys, same version number 8, same
+    envelope of IV length, IV, ciphertext;
+  * the export text and its JSON field names, which a downstream report
+    importer depends on;
+  * all user-facing wording in English, German and Italian;
+  * the six colour schemes (card / passport / licence, light and dark);
+  * the measured OCR test corpus and the two tests built on it.
+
+Written for this platform, and not derived:
+
+  * everything under `App/` — SwiftUI in place of Compose;
+  * the CoreNFC reader session in place of Android reader mode;
+  * Vision text recognition in place of ML Kit;
+  * CryptoKit and Keychain in place of the Android Keystore.
+
+Attribution requirement
+-----------------------
+
+Any published build, store listing or documentation must name both holders.
+"CIEreader" and "IDReader" are the names the two applications go by; neither is
+a registered trade mark as of this file's date.
+
+The bundled Italian CSCA certificates are public documents of the Italian
+state, redistributed unchanged; see THIRD-PARTY-NOTICES.md.

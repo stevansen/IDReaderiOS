@@ -1,0 +1,56 @@
+IDReader for iOS — Licence
+==========================
+
+Copyright (c) 2026 Christian Auer and Stefan Hellweger.
+All rights reserved.
+
+The copyright holders are named alphabetically by surname. They hold this work
+JOINTLY AND IN EQUAL SHARES. No single holder may relicense the work, grant an
+exclusive licence, assign the copyright, or place it under an open-source
+licence without the written consent of the other. Consent given for one release
+does not extend to any later one.
+
+Derived work
+------------
+
+This software is a port to Apple platforms of the Android application
+"CIEreader", which lives in the repository `cauer71/AndroidDev` under
+`apps/cie-reader`. That application was written by Christian Auer with Stefan
+Hellweger and carries the same joint copyright. The port keeps the original's
+data model, its archive file format, its wording in three languages, and the
+reasoning recorded in its comments; it therefore does not stand alone in
+copyright terms and must not be licensed apart from the original.
+
+Grant
+-----
+
+No licence is granted by this file. Nobody may copy, modify, merge, publish,
+distribute, sublicense or sell this software, or any part of it, without the
+prior written permission of BOTH copyright holders.
+
+Permission IS granted, to each copyright holder individually and without
+further formality, to use, build, run, modify and internally distribute this
+software for the purposes of developing it, of testing it, and of operating it
+within an organisation that either holder acts for.
+
+Third-party components
+----------------------
+
+This software incorporates or depends on components under their own licences.
+They are listed in THIRD-PARTY-NOTICES.md and are not covered by the terms
+above. Nothing in this file restricts the rights those licences grant.
+
+No warranty
+-----------
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+This software reads identity documents. It is not a legal instrument and gives
+no legal advice. Whoever deploys it is the controller of the personal data it
+processes and answers for the lawfulness of that processing. See the first-run
+notice inside the app and docs/DATA-PROTECTION.md.

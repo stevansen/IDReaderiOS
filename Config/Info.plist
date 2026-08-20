@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>en</string>
+	<!--
+		Die drei Sprachen der App. Ausdruecklich aufgezaehlt, damit iOS sie in den
+		Systemeinstellungen unter „Sprache" fuer diese App anbietet - das
+		Gegenstueck zu locales_config.xml der Android-Fassung. Die App kann ihre
+		Sprache ausserdem selbst einstellen, siehe Strings/AppLanguage.
+	-->
+	<key>CFBundleLocalizations</key>
+	<array>
+		<string>en</string>
+		<string>de</string>
+		<string>it</string>
+	</array>
+	<key>UILaunchScreen</key>
+	<dict>
+		<key>UIColorName</key>
+		<string>LaunchBackground</string>
+	</dict>
+	<!--
+		Nur Hochformat. Die drei Eingabemasken sind darauf gebaut, ohne Scrollen auf
+		einen Bildschirm zu passen; im Querformat waere das nicht zu halten, und ein
+		Ziffernblock, der dabei unter die Kante rutscht, ist schlechter als eine
+		gesperrte Drehung.
+	-->
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+	</array>
+
+	<!--
+		Die Begruendung, die iOS beim ersten Auflegen zeigt. Sie nennt, was gelesen
+		wird, und dass es das Geraet nicht verlaesst - beides gehoert dorthin, wo
+		jemand die Frage vor sich hat.
+	-->
+	<key>NFCReaderUsageDescription</key>
+	<string>Zum Lesen des Chips in Identitätskarte und Reisepass. Die Daten bleiben verschlüsselt auf diesem Gerät.</string>
+
+	<!--
+		Die Anwendungskennungen, die die Lesesitzung auswaehlen darf. Ohne diese
+		Liste laesst iOS keine ISO7816-Sitzung zu.
+
+		A0000002471001      das eMRTD-Applet nach ICAO 9303 - CIE und ePass
+		E80704007F00070302  eID nach BSI TR-03110, das die CIE ebenfalls fuehrt
+		A00000023647010101  CIE-eigenes Applet, auf aelteren Karten
+	-->
+	<key>com.apple.developer.nfc.readersession.iso7816.select-identifiers</key>
+	<array>
+		<string>A0000002471001</string>
+		<string>E80704007F00070302</string>
+		<string>A00000023647010101</string>
+	</array>
+
+	<!--
+		Die Kamera. Anders als die Android-Fassung braucht diese App sie: dort wird
+		ueber die Kamera-App des Systems fotografiert, die ihre eigene Berechtigung
+		mitbringt. Auf iOS gibt es diesen Weg nicht. Der Satz sagt deshalb auch, was
+		mit der Aufnahme passiert - naemlich nichts ausser der Erkennung.
+	-->
+	<key>NSCameraUsageDescription</key>
+	<string>Zum Fotografieren des Dokuments. Die Aufnahme wird nur auf diesem Gerät ausgewertet, nicht gespeichert und nicht gesendet.</string>
+
+	<!--
+		Die App verschluesselt ihr Archiv, benutzt dafuer aber ausschliesslich die
+		Verfahren des Betriebssystems (AES-GCM aus CryptoKit). Das ist von der
+		Ausfuhrmeldung ausgenommen.
+	-->
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
+</dict>
+</plist>
