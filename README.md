@@ -72,7 +72,7 @@ IDReaderiOS/
 │   └── NFCPassportReaderCAN/  PACE, Secure Messaging, Passive Auth, Chip Auth
 ├── Config/                    Info.plist, Berechtigungen
 ├── docs/                      STATUS, ANDROID-TO-IOS, NFC-PACE, DATA-PROTECTION,
-│                              TESTFLIGHT, EXPORT-COMPLIANCE
+│                              TESTFLIGHT, EXPORT-COMPLIANCE (+ DOSSIER)
 ├── store/                     Store-Texte in drei Sprachen und die Screenshots
 └── MIGRATION_PROMPT.md        der Prompt, mit dem sich das fortsetzen lässt
 ```

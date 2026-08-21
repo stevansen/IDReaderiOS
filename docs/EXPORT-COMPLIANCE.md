@@ -7,6 +7,13 @@ jeden, der die Unterlagen dafür zusammenstellt.
 Quelltext — welcher Algorithmus, woher, wofür. Welche Ausnahme davon greift und
 welche Unterlagen einzureichen sind, entscheidet das nicht.
 
+> **Zum Einreichen** gibt es die englische Fassung dieser Aufstellung, in der
+> Form, die eine solche Unterlage verlangt:
+> [EXPORT-COMPLIANCE-DOSSIER.md](EXPORT-COMPLIANCE-DOSSIER.md). Sie ist für Apples
+> Feld „Dokumentation zur App-Verschlüsselung", für eine Einstufungsanfrage beim
+> BIS oder für die Durchsicht durch einen Anwalt gedacht — und auf Englisch, weil
+> sie dort gelesen wird.
+
 ## Woher die Verschlüsselung kommt
 
 Die Trennung ist der Kern der Sache, denn die Frage von Apple lautet genau so:

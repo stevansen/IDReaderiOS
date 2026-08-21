@@ -103,8 +103,13 @@ Verschlüsselung"** — seit OpenSSL für PACE mit im Bundle liegt.
 
 Die Bestandsaufnahme dazu, Verfahren für Verfahren und mit der Trennung zwischen
 Apples Kryptografie und OpenSSL, steht in
-[EXPORT-COMPLIANCE.md](EXPORT-COMPLIANCE.md). Sie ist das, was derjenige braucht,
-der die Unterlagen zusammenstellt — denn dabei hört es auf, eine
+[EXPORT-COMPLIANCE.md](EXPORT-COMPLIANCE.md). Zum **Einreichen** gibt es davon eine
+englische, vollständige Fassung:
+[EXPORT-COMPLIANCE-DOSSIER.md](EXPORT-COMPLIANCE-DOSSIER.md) — für Apples Feld
+„Dokumentation zur App-Verschlüsselung", für eine Einstufungsanfrage beim BIS oder
+für die Durchsicht durch einen Anwalt.
+
+Beide beantworten die Frage nicht, welche Ausnahme greift. Dabei hört es auf, eine
 Programmierfrage zu sein.
 
 ## Preis: kostenlos
