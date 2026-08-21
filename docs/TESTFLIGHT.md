@@ -121,11 +121,34 @@ für die Durchsicht durch einen Anwalt.
 Beide beantworten die Frage nicht, welche Ausnahme greift. Dabei hört es auf, eine
 Programmierfrage zu sein.
 
+**Der Dialog hat zwei Ausgänge, und der Unterschied ist größer als er aussieht.**
+Am 21. August 2026 durchgeklickt, mit der Antwort „standardmäßige Algorithmen
+zusätzlich zu Apples". Danach kommt genau eine weitere Frage: *Wird deine App zum
+Vertrieb in Frankreich bereitgestellt?*
+
+* **Nein** → „Sichern", fertig. Der Build ist sofort testbar.
+* **Ja** → kein „Sichern" mehr, sondern „Zur Seite App-Information gehen". Dort
+  verlangt Apple **Unterlagen zum Hochladen**; sind sie genehmigt, gibt Apple
+  einen Schlüsselwert zurück, der als `ITSEncryptionExportComplianceCode` in die
+  `Info.plist` gehört. Bis dahin bleibt der Build auf **„Fehlende Compliance"** —
+  also nicht testbar.
+
+Das ist der Punkt, an dem diese Datei früher zu optimistisch war: die
+Frankreich-Frage ist keine Kenntnisnahme, sie ist die Weiche zwischen einem
+Formular und einem Verfahren.
+
 ## Preis: kostenlos
 
-Festgelegt. In App Store Connect unter *Preise und Verfügbarkeit* → **Kostenlos**,
-ohne In-App-Käufe. Für TestFlight ist das gleichgültig — Testbuilds sind für
-Tester immer kostenlos —, es greift erst beim Store.
+Entschieden, aber **in App Store Connect noch nicht eingetragen**: dort steht am
+21. August 2026 unter *Preise und Verfügbarkeit* weiter „Preise hinzufügen" und
+„Verfügbarkeit konfigurieren". Für TestFlight ist das gleichgültig — Testbuilds
+sind für Tester immer kostenlos —, es greift erst beim Store. Einzutragen ist
+**Kostenlos**, ohne In-App-Käufe.
+
+Zwei weitere Lücken im Eintrag, am selben Tag gesehen: der Versionsdatensatz
+heißt **1.0**, während die Builds 1.8 sind — vor einer Einreichung müssen die
+zusammenpassen —, und von den Texten aus [`../store/`](../store/) ist nichts
+übernommen (Untertitel leer, Kategorie nicht gesetzt, Primärsprache Italienisch).
 
 Bemerkenswert ist daran, dass die App das nicht nur behauptet, sondern **nicht
 anders kann**: es gibt kein StoreKit, keine Werbung und keine Messtechnik. Der
