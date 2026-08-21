@@ -172,6 +172,7 @@
 "result_document_type_passport" = "PASSAPORTO";
 "result_retention_hint" = "Bleibt %d Tage verschlüsselt auf diesem Gerät.";
 "result_valid_until" = "gültig bis %@";
+"retention_minimised_hint" = "Wohnsitz, Steuernummer, Beruf und Telefon werden angezeigt, aber nicht aufbewahrt. Wer sie braucht, notiert sie jetzt.";
 "scan_caption_can" = "Die CAN wird aus dem Foto gelesen.";
 "scan_caption_mrz" = "Die MRZ wird aus dem Foto gelesen.";
 "settings_language" = "Sprache";
@@ -207,4 +208,5 @@
 "stored_copy_notice" = "Gespeicherte Kopie vom %@ — nicht gerade von der Karte gelesen.";
 "stored_delete" = "Löschen";
 "value_missing" = "nicht im Dokument";
+"value_not_retained" = "gelesen, nicht gespeichert";
 "value_provenance_photo" = "Foto, Texterkennung, nicht geprüft";

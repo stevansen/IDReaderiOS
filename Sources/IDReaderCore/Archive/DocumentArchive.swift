@@ -109,6 +109,7 @@ public final class DocumentArchive: @unchecked Sendable {
         lock.lock()
         defer { lock.unlock() }
 
+        let document = minimised(document)
         let current = loadLocked()
         // Erst sortieren, dann begrenzen - sonst faellt beim Anschlagen der
         // Notbremse ein beliebiger Eintrag weg statt des aeltesten.
@@ -121,6 +122,29 @@ public final class DocumentArchive: @unchecked Sendable {
         // Schirm soll zeigen, was wirklich aufbewahrt ist, nicht was aufbewahrt
         // sein sollte.
         return writeLocked(updated) ? updated : current
+    }
+
+    /// Bereitet einen Datensatz fuer die Ablage vor.
+    ///
+    /// Zwei Schritte, und der zweite haengt am ersten: die Felder, die kein
+    /// Anwendungsfall braucht, fallen weg, und weil dabei der Codice Fiscale
+    /// verschwindet, tritt an seine Stelle sein Abdruck. Ohne den waere die Regel
+    /// „ein Eintrag pro Person" nicht mehr zu halten.
+    ///
+    /// Scheitert der Abdruck - der Schluesselbund ist nur bei entsperrtem Geraet
+    /// zu haben -, bleibt das Feld leer und die Ablage faellt auf die
+    /// Dokumentnummer zurueck. Ein Eintrag, der einmal nicht mit einem aelteren
+    /// zusammengefuehrt wird, ist ein sichtbarer Schoenheitsfehler; ein
+    /// abgebrochenes Speichern waere ein verlorener Lesevorgang.
+    private func minimised(_ document: StoredDocument) -> StoredDocument {
+        var copy = document
+        if copy.identityDigest == nil,
+           let cf = document.data.codiceFiscale?.trimmingCharacters(in: .whitespaces),
+           !cf.isEmpty {
+            copy.identityDigest = try? crypto.identityDigest(for: cf)
+        }
+        copy.data = document.data.minimisedForStorage()
+        return copy
     }
 
     /// Entfernt die genannten Eintraege und gibt das neue Archiv zurueck.

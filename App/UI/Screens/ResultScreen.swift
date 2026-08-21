@@ -38,6 +38,9 @@ struct ResultScreen: View {
                     }
                     tiles
                     extras
+                    if fresh && data.provenance == .chip {
+                        minimisationNotice
+                    }
                     retentionNotice
                 }
                 .padding(.horizontal, 16)
@@ -184,6 +187,26 @@ struct ResultScreen: View {
         ) { EmptyView() }
     }
 
+    /// Der Hinweis, dass vier Felder nur jetzt zu sehen sind.
+    ///
+    /// Steht nur beim frisch gelesenen Datensatz, und dort ist er noetig: wer die
+    /// Anschrift braucht, hat genau diesen Augenblick, um sie abzuschreiben. Beim
+    /// Blick aus dem Archiv waere der Hinweis zu spaet und deshalb nur Ballast -
+    /// dort sagen die Felder selbst, was mit ihnen war.
+    private var minimisationNotice: some View {
+        HStack(alignment: .top, spacing: 8) {
+            Image(systemName: "eye.slash")
+                .font(.system(size: 13))
+                .padding(.top, 2)
+            Text(strings[.retentionMinimisedHint]).font(.footnote)
+            Spacer(minLength: 0)
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(palette.tertiaryContainer, in: .rect(cornerRadius: 14))
+        .foregroundStyle(palette.onTertiaryContainer)
+    }
+
     private var retentionNotice: some View {
         Text(strings.format(.resultRetentionHint, retentionDays))
             .font(.footnote)
@@ -225,6 +248,10 @@ struct ResultScreen: View {
             }
             if let cf = data.codiceFiscale {
                 tile(strings[.labelCodiceFiscale], cf, mono: true)
+            } else if data.wasDropped(.codiceFiscale) {
+                // Die Kachel bleibt stehen und sagt, warum sie leer ist. Ohne sie
+                // saehe es aus, als habe die Karte keine Steuernummer gefuehrt.
+                tile(strings[.labelCodiceFiscale], strings[.valueNotRetained])
             }
             if let categories = data.categories {
                 tile(strings[.labelCategories], categories)
@@ -249,18 +276,32 @@ struct ResultScreen: View {
     /// Die uebrigen Angaben, sofern das Dokument sie fuehrt. Auf den allermeisten
     /// Dokumenten ist hier nichts gesetzt, und ein Abschnitt aus neun Zeilen
     /// „nicht im Dokument" waere Ballast.
+    /// „Nicht im Dokument" und „gelesen, nicht gespeichert" sind zwei
+    /// verschiedene Auskuenfte. Eine Zeile, die fehlt, liest sich als die erste -
+    /// also muss die zweite dastehen, wenn sie zutrifft.
+    ///
+    /// Kein verschachtelter Hilfsausdruck im `ViewBuilder`: der versucht, jede
+    /// Anweisung als Ansicht zu lesen, und ein `return` darin schaltet ihn ab.
+    private func orNotRetained(_ value: String?, _ field: MinimisedField) -> String {
+        if let value, !value.isEmpty { return value }
+        return data.wasDropped(field) ? strings[.valueNotRetained] : ""
+    }
+
     @ViewBuilder private var extras: some View {
         let rows: [(String, String)] = [
             (strings[.labelResidence],
-             BilingualText.pick(data.residence, preferGerman: strings.prefersGerman) ?? ""),
+             orNotRetained(
+                BilingualText.pick(data.residence, preferGerman: strings.prefersGerman),
+                .residence
+             )),
             (strings[.labelIssuingAuthority],
              BilingualText.pick(data.issuingAuthority, preferGerman: strings.prefersGerman) ?? ""),
             (strings[.labelIssuingState], data.issuingState ?? ""),
             (strings[.labelOtherNames], data.otherNames ?? ""),
             (strings[.labelTitle], data.title ?? ""),
-            (strings[.labelProfession], data.profession ?? ""),
+            (strings[.labelProfession], orNotRetained(data.profession, .profession)),
             (strings[.labelPersonalSummary], data.personalSummary ?? ""),
-            (strings[.labelTelephone], data.telephone ?? ""),
+            (strings[.labelTelephone], orNotRetained(data.telephone, .telephone)),
             (strings[.labelOtherDocuments], data.otherValidDocuments ?? ""),
             (strings[.labelCustody], data.custodyInformation ?? ""),
             (strings[.labelEndorsements], data.endorsements ?? ""),

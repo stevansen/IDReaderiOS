@@ -21,11 +21,21 @@ public enum StoredDocumentCodec {
     /// Datensatz ohne Herkunft muesste als Chip-Lesung gelten, und genau das ist
     /// die Aussage, die nicht geraten werden darf.
     ///
+    /// 9 seit dem Durchgang zur Datenminimierung: Wohnsitz, Steuernummer, Beruf
+    /// und Telefon werden nicht mehr aufbewahrt, dafuer stehen der Abdruck des
+    /// Personenschluessels und die Liste der weggelassenen Felder darin.
+    ///
+    /// **Diese Erhoehung kostet die Deckungsgleichheit mit dem Android-Format**,
+    /// und das ist der Preis, der es wert war: ein Archiv, das eine Steuernummer
+    /// nicht enthaelt, kann sie auch nicht verlieren. Die Android-Fassung sollte
+    /// dieselbe Aenderung bekommen; bis dahin sind die Formate 8 und 9 nicht
+    /// gegenseitig lesbar.
+    ///
     /// Eine Erhoehung verwirft das vorhandene Archiv - siehe ``decodeAll(_:)``.
     /// Das ist bewusst in Kauf genommen: ein Feld nachtraeglich als optional zu
     /// lesen waere moeglich, wuerde aber bedeuten, dass gespeicherte Scans
     /// dauerhaft ohne es dastehen.
-    public static let version = 8
+    public static let version = 9
 
     public static func encodeAll(_ documents: [StoredDocument]) throws -> Data {
         let root: [String: Any] = [
@@ -85,19 +95,18 @@ public enum StoredDocumentCodec {
         // Optionales einzeln, damit ein fehlender Wert als JSON-null erscheint und
         // nicht als leere Zeichenkette. Der Unterschied ist die Aussage "steht
         // nicht im Dokument" gegen "wurde als leer gelesen".
+        // Wohnsitz, Steuernummer, Beruf und Telefon stehen hier mit Absicht
+        // nicht: sie werden angezeigt und nicht aufbewahrt. Was davon dagewesen
+        // ist, sagt `droppedFields`.
         let optionals: [String: String?] = [
             "issuingState": d.issuingState,
             "documentCode": d.documentCode,
             "placeOfBirth": d.placeOfBirth,
-            "residence": d.residence,
-            "codiceFiscale": d.codiceFiscale,
             "issuingAuthority": d.issuingAuthority,
             "dateOfIssue": d.dateOfIssue,
             "otherNames": d.otherNames,
-            "profession": d.profession,
             "title": d.title,
             "personalSummary": d.personalSummary,
-            "telephone": d.telephone,
             "otherValidDocuments": d.otherValidDocuments,
             "custodyInformation": d.custodyInformation,
             "endorsements": d.endorsements,
@@ -108,11 +117,13 @@ public enum StoredDocumentCodec {
             data[key] = value ?? NSNull()
         }
         data["photo"] = encode(d.photo)
+        data["droppedFields"] = d.droppedFields.map(\.rawValue)
 
         return [
             "storedAt": document.storedAt,
             "cardId": document.cardId ?? NSNull(),
             "can": document.can,
+            "identityDigest": document.identityDigest ?? NSNull(),
             "data": data,
         ]
     }
@@ -149,29 +160,28 @@ public enum StoredDocumentCodec {
             documentCode: string(raw, "documentCode"),
             dateOfExpiry: dateOfExpiry,
             placeOfBirth: string(raw, "placeOfBirth"),
-            residence: string(raw, "residence"),
-            codiceFiscale: string(raw, "codiceFiscale"),
             issuingAuthority: string(raw, "issuingAuthority"),
             dateOfIssue: string(raw, "dateOfIssue"),
             otherNames: string(raw, "otherNames"),
-            profession: string(raw, "profession"),
             title: string(raw, "title"),
             personalSummary: string(raw, "personalSummary"),
-            telephone: string(raw, "telephone"),
             otherValidDocuments: string(raw, "otherValidDocuments"),
             custodyInformation: string(raw, "custodyInformation"),
             endorsements: string(raw, "endorsements"),
             taxOrExitRequirements: string(raw, "taxOrExitRequirements"),
             categories: string(raw, "categories"),
             photo: (raw["photo"] as? [String: Any]).flatMap(decodePhoto),
-            authenticity: decodeAuthenticity(authenticityRaw)
+            authenticity: decodeAuthenticity(authenticityRaw),
+            droppedFields: (raw["droppedFields"] as? [Any])?
+                .compactMap { ($0 as? String).flatMap(MinimisedField.init(rawValue:)) } ?? []
         )
 
         return StoredDocument(
             data: data,
             storedAt: storedAt,
             cardId: string(record, "cardId"),
-            can: string(record, "can") ?? ""
+            can: string(record, "can") ?? "",
+            identityDigest: string(record, "identityDigest")
         )
     }
 

@@ -103,7 +103,16 @@ public struct DocumentExport: Sendable {
     public func structure(_ document: StoredDocument) -> ExportRecord {
         let data = document.data
         let missing = strings[.valueMissing]
+        let notRetained = strings[.valueNotRetained]
         let preferGerman = strings.prefersGerman
+
+        /// „Nicht im Dokument" und „gelesen, nicht gespeichert" sind zwei
+        /// verschiedene Auskuenfte. Ein Bericht, der die zweite als die erste
+        /// ausgibt, behauptet, das Dokument habe etwas nicht gefuehrt - und das
+        /// ist eine Aussage ueber das Dokument, die hier niemand treffen darf.
+        func absent(_ field: MinimisedField) -> String {
+            data.wasDropped(field) ? notRetained : missing
+        }
 
         var documentRows: [ExportRow] = [
             row(.labelDocumentNumber, data.documentNumber)
@@ -144,9 +153,10 @@ public struct DocumentExport: Sendable {
                 ),
                 row(
                     .labelResidence,
-                    BilingualText.pick(data.residence, preferGerman: preferGerman) ?? missing
+                    BilingualText.pick(data.residence, preferGerman: preferGerman)
+                        ?? absent(.residence)
                 ),
-                row(.labelCodiceFiscale, data.codiceFiscale ?? missing),
+                row(.labelCodiceFiscale, data.codiceFiscale ?? absent(.codiceFiscale)),
             ]
         )
 
@@ -183,13 +193,19 @@ public struct DocumentExport: Sendable {
             data.provenance == .photo ? .exportSectionExtraDocument : .exportSectionExtra
         ]
 
+        // Beruf und Telefon werden nicht aufbewahrt. Standen sie im Dokument,
+        // gehoert das in den Bericht - nicht der Wert, aber die Tatsache. Wer
+        // spaeter fragt, warum dort nichts steht, findet die Antwort.
+        let notRetained = strings[.valueNotRetained]
         let candidates: [(StringKey, String?)] = [
             (.labelCategories, data.categories),
             (.labelOtherNames, data.otherNames),
             (.labelTitle, data.title),
-            (.labelProfession, data.profession),
+            (.labelProfession, data.profession
+                ?? (data.wasDropped(.profession) ? notRetained : nil)),
             (.labelPersonalSummary, data.personalSummary),
-            (.labelTelephone, data.telephone),
+            (.labelTelephone, data.telephone
+                ?? (data.wasDropped(.telephone) ? notRetained : nil)),
             (.labelOtherDocuments, data.otherValidDocuments),
             (.labelCustody, data.custodyInformation),
             (.labelEndorsements, data.endorsements),

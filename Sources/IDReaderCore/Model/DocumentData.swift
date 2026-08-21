@@ -25,6 +25,23 @@ public struct DocumentPhoto: Sendable, Codable, Equatable {
     }
 }
 
+/// Ein Feld, das angezeigt und nicht aufbewahrt wird.
+///
+/// Die Auswahl folgt einer Frage: **braucht ein Anwendungsfall dieses Feld,
+/// nachdem das Dokument aus der Hand ist?** Fuer diese vier lautet die Antwort
+/// nein. Der Chip fuehrt sie, und „der Chip hatte es" ist kein Zweck.
+///
+/// Angezeigt werden sie trotzdem, einmal, solange der Datensatz frisch ist: wer
+/// eine Anschrift braucht, soll sie sehen und abschreiben koennen. Danach ist sie
+/// weg, und der Datensatz sagt, dass sie es einmal gab - siehe
+/// ``DocumentData/droppedFields``.
+public enum MinimisedField: String, Sendable, Codable, CaseIterable {
+    case residence = "residence"
+    case codiceFiscale = "codiceFiscale"
+    case profession = "profession"
+    case telephone = "telephone"
+}
+
 /// Ergebnis eines Lesevorgangs.
 ///
 /// Alle Datumsfelder sind bereits als TT.MM.JJJJ formatiert. Felder aus DG11
@@ -96,6 +113,22 @@ public struct DocumentData: Sendable, Codable, Equatable {
     public var photo: DocumentPhoto?
     public var authenticity: Authenticity
 
+    /// Welche Felder beim Aufbewahren weggelassen wurden.
+    ///
+    /// Leer, solange der Datensatz frisch vom Chip kommt - dann steht alles da,
+    /// was das Dokument hergab. Nach dem Aufbewahren stehen hier die Felder, die
+    /// **das Dokument fuehrte und die Ablage nicht behalten hat.**
+    ///
+    /// Der Unterschied ist der ganze Zweck dieser Liste. „Nicht im Dokument" und
+    /// „gelesen, nicht gespeichert" sind zwei verschiedene Auskuenfte, und diese
+    /// App verwechselt solche Paare an keiner Stelle. Ohne diese Liste stuende
+    /// spaeter bei einer fehlenden Anschrift „nicht im Dokument" - und das waere
+    /// gelogen.
+    ///
+    /// Eine Fahrerlaubnis fuehrt diese Felder nie; dort bleibt die Liste leer,
+    /// und die Oberflaeche behauptet richtigerweise nichts.
+    public var droppedFields: [MinimisedField]
+
     public init(
         provenance: RecordProvenance,
         surname: String,
@@ -123,7 +156,8 @@ public struct DocumentData: Sendable, Codable, Equatable {
         taxOrExitRequirements: String? = nil,
         categories: String? = nil,
         photo: DocumentPhoto? = nil,
-        authenticity: Authenticity
+        authenticity: Authenticity,
+        droppedFields: [MinimisedField] = []
     ) {
         self.provenance = provenance
         self.surname = surname
@@ -152,6 +186,39 @@ public struct DocumentData: Sendable, Codable, Equatable {
         self.categories = categories
         self.photo = photo
         self.authenticity = authenticity
+        self.droppedFields = droppedFields
+    }
+
+    /// Derselbe Datensatz, ohne die Felder, die kein Anwendungsfall braucht.
+    ///
+    /// Vermerkt in ``droppedFields`` nur, was **tatsaechlich** dagewesen ist. Ein
+    /// Feld, das das Dokument nicht fuehrte, wird nicht als weggelassen gemeldet -
+    /// sonst behauptete die Anzeige spaeter, es habe etwas gegeben.
+    public func minimisedForStorage() -> DocumentData {
+        var copy = self
+        var dropped: [MinimisedField] = []
+
+        func hasValue(_ value: String?) -> Bool {
+            guard let value else { return false }
+            return !value.trimmingCharacters(in: .whitespaces).isEmpty
+        }
+
+        if hasValue(residence) { dropped.append(.residence) }
+        if hasValue(codiceFiscale) { dropped.append(.codiceFiscale) }
+        if hasValue(profession) { dropped.append(.profession) }
+        if hasValue(telephone) { dropped.append(.telephone) }
+
+        copy.residence = nil
+        copy.codiceFiscale = nil
+        copy.profession = nil
+        copy.telephone = nil
+        copy.droppedFields = dropped
+        return copy
+    }
+
+    /// Ob dieses Feld gelesen, aber nicht aufbewahrt wurde.
+    public func wasDropped(_ field: MinimisedField) -> Bool {
+        droppedFields.contains(field)
     }
 
     /// Vollstaendiger Name fuer die Kopfzeile des Ergebnisschirms.

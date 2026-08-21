@@ -76,6 +76,8 @@ public enum StringKey: String, Sendable, CaseIterable {
     case labelProvenance = "label_provenance"
     case valueProvenancePhoto = "value_provenance_photo"
     case valueMissing = "value_missing"
+    case valueNotRetained = "value_not_retained"
+    case retentionMinimisedHint = "retention_minimised_hint"
     case genderMale = "gender_male"
     case genderFemale = "gender_female"
     case genderUnknown = "gender_unknown"

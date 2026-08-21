@@ -17,6 +17,24 @@ dass irgendwo im Code steht, dass etwas übertragen wird. iOS kennt keine solche
 Berechtigung. Also übernimmt `Scripts/check-no-network.sh` die Rolle: er sucht
 nach allem, womit sich senden ließe, und schlägt fehl, wenn er etwas findet.
 
+**Vier Felder werden angezeigt und nicht aufbewahrt.** Wohnsitz, Steuernummer,
+Beruf und Telefon. Die Frage dahinter: braucht ein Anwendungsfall dieses Feld,
+nachdem das Dokument aus der Hand ist? Für diese vier lautet die Antwort nein —
+und „der Chip hatte es" ist kein Zweck. Wer eine Anschrift braucht, sieht sie
+einmal und schreibt sie ab; danach ist sie weg.
+
+Der Datensatz merkt sich dabei, **welche** Felder es gab, nicht ihren Inhalt. Das
+ist nicht Beiwerk: sonst stünde später bei einer fehlenden Anschrift „nicht im
+Dokument", und das wäre eine Aussage über das Dokument, die niemand treffen darf.
+Ein Reisepass, der nie einen Wohnsitz führte, sagt weiter „nicht im Dokument".
+
+Ein Feld hing daran: die Steuernummer war der Personenschlüssel des Archivs — sie
+überlebt einen Kartenwechsel und hält die Regel „ein Eintrag pro Person". An ihre
+Stelle tritt ein **Abdruck** unter einem Schlüssel, der aus dem Archivschlüssel
+abgeleitet ist und das Gerät nicht verlässt. Dieselbe Person wird wiedererkannt,
+und eine Steuernummer steht nirgends mehr. Ein nackter Hash hätte das nicht
+geleistet: sechzehn Stellen mit starrem Aufbau sind durchzuprobieren.
+
 **Was gespeichert wird, und wie lange.** Datensätze liegen mit AES-256-GCM
 verschlüsselt, der Schlüssel im Schlüsselbund mit
 `kSecAttrAccessibleWhenUnlockedThisDeviceOnly`: er wird nie gesichert, nie auf ein
@@ -86,11 +104,12 @@ das, statt es zu verschweigen:
   (Doc-Web 10244289). Wer diese App einsetzt, braucht seine eigene Antwort, und
   `DocumentArchive.retentionDays` ist die Stelle, an die sie gehört.
 
-## Offene Punkte am Datenschutz selbst
+## Was noch zu erwägen wäre
 
-Aus dem Original übernommen, weil sie es weiterhin sind:
+Der Durchgang zur Datenminimierung hat vier Felder erledigt. Zwei liegen in
+derselben Kategorie und sind es nicht:
 
-* Felder, die kein Anwendungsfall braucht, werden gespeichert, wenn der Chip sie
-  liefert — Wohnsitz, Steuernummer, Beruf, Telefon. „Der Chip hatte es" ist kein
-  Zweck; das verdient einen Durchgang zur Datenminimierung.
-* Keine Sperrlistenabfrage. Sie bräuchte Netz, und das hat diese App nicht.
+* **Angaben zur Person** (Größe, Augenfarbe) und **weitere Dokumentnummern** aus
+  DG11. Auf den allermeisten Dokumenten steht dort nichts, weshalb es nie
+  aufgefallen ist — aber wenn etwas steht, gilt dieselbe Frage: braucht das ein
+  Anwendungsfall, nachdem das Dokument aus der Hand ist? Bisher nicht gestellt.

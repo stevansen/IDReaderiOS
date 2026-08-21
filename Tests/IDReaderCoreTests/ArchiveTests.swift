@@ -68,16 +68,40 @@ enum Sample {
 /// Das Archivformat.
 struct StoredDocumentCodecTests {
 
-    @Test("ein Datensatz uebersteht Schreiben und Lesen unveraendert")
+    @Test("ein abgelegter Datensatz uebersteht Schreiben und Lesen unveraendert")
     func roundTrip() throws {
         let photo = DocumentPhoto(jpegData: Sample.jpeg, mimeType: "image/jp2", sizeBytes: 4711)
-        let original = Sample.record(Sample.chipData(photo: photo), storedAt: 1_700_000_000_000)
+        // Was der Codec sieht, ist immer schon minimiert - so legt das Archiv ab.
+        var original = Sample.record(Sample.chipData(photo: photo), storedAt: 1_700_000_000_000)
+        original.data = original.data.minimisedForStorage()
+        original.identityDigest = "abc123"
 
         let encoded = try StoredDocumentCodec.encodeAll([original])
         let decoded = StoredDocumentCodec.decodeAll(encoded)
 
         #expect(decoded.count == 1)
         #expect(decoded.first == original)
+    }
+
+    /// Die Probe, um die es bei der Datenminimierung geht: die Steuernummer darf
+    /// im geschriebenen Format nicht vorkommen - auch nicht vor dem
+    /// Verschluesseln.
+    @Test("die Steuernummer steht in keiner geschriebenen Fassung")
+    func taxNumberIsNotWritten() throws {
+        let record = Sample.record(Sample.chipData(codiceFiscale: "MSTNTA68D47A952K"))
+        var stored = record
+        stored.data = record.data.minimisedForStorage()
+
+        let encoded = try StoredDocumentCodec.encodeAll([stored])
+        let text = String(decoding: encoded, as: UTF8.self)
+
+        // Die Werte selbst kommen nicht vor.
+        #expect(!text.contains("MSTNTA68D47A952K"))
+        #expect(!text.contains("VIA C.AUGUSTA"))
+        // Als Feld auch nicht - wohl aber als Name in `droppedFields`, und genau
+        // das ist der Unterschied: dort steht, dass es etwas gab, nicht was.
+        #expect(!text.contains("\"codiceFiscale\":"))
+        #expect(text.contains("droppedFields"))
     }
 
     /// Eine Erhoehung der Formatnummer verwirft das Archiv. Das darf aber nicht
@@ -119,19 +143,20 @@ struct StoredDocumentCodecTests {
     /// gelesen" ist genau das, wofuer ein Lesegeraet da ist.
     @Test("fehlende Felder bleiben null und werden nicht leer")
     func missingStaysNil() throws {
-        var data = Sample.chipData(codiceFiscale: nil)
-        data.residence = nil
+        var data = Sample.chipData()
+        data.placeOfBirth = nil
+        data.issuingAuthority = nil
         let encoded = try StoredDocumentCodec.encodeAll([Sample.record(data)])
 
         let root = try JSONSerialization.jsonObject(with: encoded) as! [String: Any]
         let record = (root["records"] as! [[String: Any]])[0]
         let raw = record["data"] as! [String: Any]
-        #expect(raw["codiceFiscale"] is NSNull)
-        #expect(raw["residence"] is NSNull)
+        #expect(raw["placeOfBirth"] is NSNull)
+        #expect(raw["issuingAuthority"] is NSNull)
 
         let decoded = StoredDocumentCodec.decodeAll(encoded)
-        #expect(decoded.first?.data.codiceFiscale == nil)
-        #expect(decoded.first?.data.residence == nil)
+        #expect(decoded.first?.data.placeOfBirth == nil)
+        #expect(decoded.first?.data.issuingAuthority == nil)
     }
 }
 
@@ -146,17 +171,34 @@ struct DocumentArchiveTests {
         return (DocumentArchive(file: file, keys: InMemoryArchiveKeyStore()), file)
     }
 
-    @Test("was hineingelegt wurde, kommt verschluesselt zurueck")
+    @Test("was hineingelegt wurde, kommt minimiert zurueck")
     func addAndLoad() throws {
         let (archive, file) = try makeArchive()
         let record = Sample.record(Sample.chipData())
 
-        #expect(archive.add(record) == [record])
-        #expect(archive.load() == [record])
+        let after = archive.add(record)
+        #expect(after.count == 1)
+        #expect(after == archive.load())
 
-        // Auf der Platte darf der Name nicht zu finden sein.
+        // Was bleibt.
+        #expect(after.first?.data.surname == "MUSTERMANN")
+        #expect(after.first?.data.documentNumber == "CA12345AB")
+
+        // Und was nicht. Angezeigt wurde beides, aufbewahrt keines.
+        #expect(after.first?.data.codiceFiscale == nil)
+        #expect(after.first?.data.residence == nil)
+        #expect(after.first?.data.wasDropped(.codiceFiscale) == true)
+        #expect(after.first?.data.wasDropped(.residence) == true)
+
+        // Der Personenschluessel ist ein Abdruck und nicht die Nummer selbst.
+        let digest = try #require(after.first?.identityDigest)
+        #expect(digest.count == 64)
+        #expect(digest != "MSTNTA68D47A952K")
+
+        // Auf der Platte darf nichts davon zu finden sein.
         let bytes = try Data(contentsOf: file)
         #expect(!bytes.contains(Array("MUSTERMANN".utf8)))
+        #expect(!bytes.contains(Array("MSTNTA68D47A952K".utf8)))
     }
 
     /// Zwei Zeitpunkte, kurz hintereinander und **innerhalb** der
@@ -274,5 +316,128 @@ struct DocumentArchiveTests {
         #expect(archive.remainingDays(storedAt: currentTimeMillis()) == DocumentArchive.retentionDays)
         let old = currentTimeMillis() - Int64(DocumentArchive.retentionDays) * 86_400_000
         #expect(archive.remainingDays(storedAt: old) == 0)
+    }
+}
+
+/// Der Durchgang zur Datenminimierung.
+///
+/// Vier Felder werden angezeigt und nicht aufbewahrt. Was daran zu prüfen ist,
+/// ist nicht das Weglassen — das ist eine Zeile — sondern dass alles, was am
+/// weggelassenen Feld hing, weiter trägt.
+struct MinimisationTests {
+
+    @Test("genau die vier Felder fallen weg")
+    func dropsExactlyFour() {
+        var data = Sample.chipData()
+        data.profession = "MECCANICO"
+        data.telephone = "+39 0471 000000"
+        data.personalSummary = "180 CM"
+
+        let stored = data.minimisedForStorage()
+
+        #expect(stored.residence == nil)
+        #expect(stored.codiceFiscale == nil)
+        #expect(stored.profession == nil)
+        #expect(stored.telephone == nil)
+        #expect(Set(stored.droppedFields) == Set(MinimisedField.allCases))
+
+        // Alles andere bleibt. Insbesondere der Geburtsort: er steht auf jedem
+        // Bericht und ist keiner der vier.
+        #expect(stored.placeOfBirth == data.placeOfBirth)
+        #expect(stored.personalSummary == "180 CM")
+        #expect(stored.surname == data.surname)
+    }
+
+    /// Ein Feld, das das Dokument nicht führte, wird nicht als weggelassen
+    /// gemeldet — sonst behauptete die Anzeige später, es habe etwas gegeben.
+    @Test("nur was dagewesen ist, gilt als weggelassen")
+    func onlyReportsWhatWasThere() {
+        var data = Sample.chipData(codiceFiscale: "MSTNTA68D47A952K")
+        data.residence = nil
+        data.profession = nil
+        data.telephone = nil
+
+        let stored = data.minimisedForStorage()
+        #expect(stored.droppedFields == [.codiceFiscale])
+        #expect(stored.wasDropped(.codiceFiscale))
+        #expect(!stored.wasDropped(.residence))
+    }
+
+    /// Eine Fahrerlaubnis führt diese Felder nie. Sie darf deshalb auch nicht
+    /// behaupten, es sei etwas weggelassen worden.
+    @Test("die Fahrerlaubnis meldet nichts als weggelassen")
+    func licenceDropsNothing() {
+        let stored = LicenceInput.sample.toDocumentData().minimisedForStorage()
+        #expect(stored.droppedFields.isEmpty)
+    }
+
+    private func makeArchive() throws -> DocumentArchive {
+        let directory = URL(fileURLWithPath: NSTemporaryDirectory())
+            .appendingPathComponent("idreader-min-" + UUID().uuidString)
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        return DocumentArchive(
+            file: directory.appendingPathComponent("archive.bin"),
+            keys: InMemoryArchiveKeyStore()
+        )
+    }
+
+    /// **Der Test, um den es hier eigentlich geht.**
+    ///
+    /// Die Regel „ein Eintrag pro Person" hing am Codice Fiscale. Der wird nicht
+    /// mehr aufbewahrt — wenn der Abdruck seine Stelle nicht einnimmt, wird aus
+    /// einer neu ausgestellten Karte ein zweiter Eintrag, und niemand merkt es,
+    /// bis die Liste doppelt ist.
+    @Test("eine neu ausgestellte Karte bleibt derselbe Eintrag")
+    func reissuedCardStaysOneRecord() throws {
+        let archive = try makeArchive()
+        let now = currentTimeMillis()
+        let cf = "MSTNTA68D47A952K"
+
+        let old = Sample.chipData(documentNumber: "CA11111AA", codiceFiscale: cf,
+                                  expiry: "07.04.2028")
+        let new = Sample.chipData(documentNumber: "CA99999ZZ", codiceFiscale: cf,
+                                  expiry: "07.04.2035")
+
+        _ = archive.add(Sample.record(old, storedAt: now - 60_000))
+        let after = archive.add(Sample.record(new, storedAt: now - 30_000))
+
+        #expect(after.count == 1)
+        #expect(after.first?.data.documentNumber == "CA99999ZZ")
+    }
+
+    /// Und zwei verschiedene Personen bleiben zwei Einträge, auch wenn von ihrer
+    /// Steuernummer nur noch ein Abdruck übrig ist.
+    @Test("zwei Steuernummern ergeben zwei Abdruecke")
+    func differentPeopleStayApart() throws {
+        let archive = try makeArchive()
+        let now = currentTimeMillis()
+
+        _ = archive.add(Sample.record(
+            Sample.chipData(codiceFiscale: "AAAAAA00A00A000A"), storedAt: now - 60_000))
+        let after = archive.add(Sample.record(
+            Sample.chipData(documentNumber: "CA55555CD", codiceFiscale: "BBBBBB00B00B000B"),
+            storedAt: now - 30_000))
+
+        #expect(after.count == 2)
+        #expect(Set(after.compactMap(\.identityDigest)).count == 2)
+    }
+
+    /// Der Abdruck hängt am Archivschlüssel. Zwei Geräte kommen deshalb zu
+    /// verschiedenen Abdrücken für dieselbe Person — das ist gewollt: ein
+    /// Abdruck, der überall gleich wäre, wäre wieder ein Personenkennzeichen.
+    @Test("derselbe Abdruck nur unter demselben Schluessel")
+    func digestIsDeviceBound() throws {
+        let one = ArchiveCrypto(keys: InMemoryArchiveKeyStore())
+        let two = ArchiveCrypto(keys: InMemoryArchiveKeyStore())
+
+        let a = try one.identityDigest(for: "MSTNTA68D47A952K")
+        let b = try one.identityDigest(for: "MSTNTA68D47A952K")
+        let c = try two.identityDigest(for: "MSTNTA68D47A952K")
+
+        #expect(a == b)
+        #expect(a != c)
+        #expect(!a.contains("MSTNTA"))
+        // Gross- und Kleinschreibung darf nicht zu zwei Personen führen.
+        #expect(try one.identityDigest(for: "mstnta68d47a952k") == a)
     }
 }

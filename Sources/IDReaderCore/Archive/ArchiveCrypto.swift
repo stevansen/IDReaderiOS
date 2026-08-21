@@ -66,6 +66,46 @@ public struct ArchiveCrypto: Sendable {
         return try AES.GCM.open(sealed, using: try keys.key())
     }
 
+    /// Der Personenschluessel eines Datensatzes, als Abdruck.
+    ///
+    /// ## Warum es diesen Abdruck gibt
+    ///
+    /// Das Archiv haelt einen Eintrag pro **Person**, nicht pro Karte - das ist
+    /// der Grund, warum ein neu ausgestellter Ausweis den alten Eintrag ersetzt
+    /// statt einen zweiten anzulegen. Dafuer braucht es etwas, das den
+    /// Kartenwechsel ueberlebt, und das ist der Codice Fiscale.
+    ///
+    /// Der wird jetzt nicht mehr aufbewahrt (siehe
+    /// ``DocumentData/minimisedForStorage()``). Ohne Ersatz waere damit die Regel
+    /// „ein Eintrag pro Person" weg: die Ablage faellt auf die Dokumentnummer
+    /// zurueck, und dieselbe Person mit neuer Karte waere ein zweiter Eintrag.
+    ///
+    /// Der Abdruck loest beides. Er identifiziert dieselbe Person wieder und ist
+    /// keine Steuernummer mehr.
+    ///
+    /// ## Warum ein Schluessel und nicht bloss ein Hash
+    ///
+    /// Ein nackter SHA-256 ueber einen Codice Fiscale waere zurueckzurechnen: die
+    /// Nummer hat sechzehn Stellen mit starrem Aufbau, und der Suchraum ist klein
+    /// genug, um ihn durchzuprobieren. Der Abdruck ist deshalb ein HMAC unter
+    /// einem Schluessel, der aus dem Archivschluessel abgeleitet ist - und der
+    /// liegt im Schluesselbund und verlaesst das Geraet nicht.
+    ///
+    /// Damit ist kein zweites Geheimnis zu verwalten, und der Abdruck ist auf
+    /// diesem Geraet eindeutig und ausserhalb wertlos.
+    public func identityDigest(for value: String) throws -> String {
+        let derived = HKDF<SHA256>.deriveKey(
+            inputKeyMaterial: try keys.key(),
+            info: Data("IDReader identity key v1".utf8),
+            outputByteCount: 32
+        )
+        let mac = HMAC<SHA256>.authenticationCode(
+            for: Data(value.uppercased().utf8),
+            using: derived
+        )
+        return Data(mac).map { String(format: "%02x", $0) }.joined()
+    }
+
     public func discardKey() { keys.discardKey() }
 
     private let maxIvLength = 16

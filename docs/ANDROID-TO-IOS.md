@@ -112,7 +112,15 @@ Wert dieses Projekts:
 * `BilingualText` — der Schrägstrich, der keine Hausnummer zerlegt.
 * `DocumentExport` — Spaltenbreite aus den vorkommenden Beschriftungen, die
   JSON-Feldnamen des Importskripts, `birthdate` nur wenn es wirklich ISO ist.
-* Das Archivformat samt Formatnummer 8 und dem Verhalten bei „ein Eintrag pro
-  Person".
+* Das Verhalten bei „ein Eintrag pro Person", einschließlich der Regel, dass die
+  neu ausgestellte Karte gewinnt.
+
+Und eine Stelle, an der die Fassungen **auseinandergehen**: das Archivformat. Es
+war bitgleich (Version 8); mit dem Durchgang zur Datenminimierung steht iOS auf
+**Version 9** — Wohnsitz, Steuernummer, Beruf und Telefon werden nicht mehr
+abgelegt, dafür der Abdruck des Personenschlüssels und die Liste der
+weggelassenen Felder. Das kostet die Vergleichbarkeit und war es wert: ein
+Archiv, das eine Steuernummer nicht enthält, kann sie auch nicht verlieren. Die
+Android-Fassung sollte dieselbe Änderung bekommen.
 * Der Hinweis beim ersten Start, einschließlich der Reihenfolge seiner drei Punkte
   und der Fassungsnummer.

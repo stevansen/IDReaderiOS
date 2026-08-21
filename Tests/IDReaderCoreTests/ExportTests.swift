@@ -298,3 +298,64 @@ extension CscaTrustStoreTests {
         #expect(blocks.allSatisfy { $0.contains("-----END CERTIFICATE-----") })
     }
 }
+
+extension DocumentExportTests {
+
+    /// „Nicht im Dokument" und „gelesen, nicht gespeichert" dürfen im Bericht
+    /// nicht dasselbe heißen. Das erste ist eine Aussage über das Dokument, das
+    /// zweite über die Ablage.
+    @Test("der Bericht unterscheidet fehlend von nicht aufbewahrt")
+    func reportDistinguishesAbsentFromNotRetained() {
+        let export = DocumentExport(strings: Strings(language: .de))
+
+        var read = Sample.chipData()
+        read.profession = "MECCANICO"
+        let fresh = export.structure(Sample.record(read))
+        let stored = export.structure(Sample.record(read.minimisedForStorage()))
+
+        func value(_ record: ExportRecord, _ label: String) -> String? {
+            record.sections.flatMap(\.rows).first { $0.label == label }?.value
+        }
+
+        // Frisch gelesen steht der Wert da.
+        #expect(value(fresh, "Wohnsitz") == "C.-AUGUSTA-STR., 16/B, BOZEN, BZ")
+        #expect(value(fresh, "Steuernummer") == "MSTNTA68D47A952K")
+        #expect(value(fresh, "Beruf") == "MECCANICO")
+
+        // Aufbewahrt steht dort, dass es gelesen wurde und nicht bleibt.
+        #expect(value(stored, "Wohnsitz") == "gelesen, nicht gespeichert")
+        #expect(value(stored, "Steuernummer") == "gelesen, nicht gespeichert")
+        #expect(value(stored, "Beruf") == "gelesen, nicht gespeichert")
+    }
+
+    /// Ein Dokument, das den Wohnsitz nie führte — ein Reisepass —, meldet weiter
+    /// „nicht im Dokument". Sonst behauptete der Bericht, es habe etwas gegeben.
+    @Test("ein Pass ohne Wohnsitz sagt weiter: nicht im Dokument")
+    func passportWithoutResidence() {
+        let export = DocumentExport(strings: Strings(language: .de))
+        var data = Sample.chipData(documentCode: "P")
+        data.residence = nil
+        data.codiceFiscale = nil
+
+        let stored = export.structure(Sample.record(data.minimisedForStorage()))
+        let value = stored.sections.flatMap(\.rows).first { $0.label == "Wohnsitz" }?.value
+        #expect(value == "nicht im Dokument")
+    }
+
+    /// Der JSON-Export speist einen Einsatzbericht. Für einen aufbewahrten
+    /// Datensatz ist die Adresse nicht mehr da — und dann gehört dort null hin
+    /// und keine Auskunft in Prosa.
+    @Test("das JSON traegt keine Prosa statt einer Adresse")
+    func jsonKeepsNullForDroppedAddress() throws {
+        let export = DocumentExport(strings: Strings(language: .de))
+        let text = export.build(
+            [Sample.record(Sample.chipData().minimisedForStorage())], format: .json
+        )
+        let root = try JSONSerialization.jsonObject(with: Data(text.utf8)) as! [String: Any]
+        let person = (root["people"] as! [[String: Any]])[0]
+
+        #expect(person["address"] is NSNull)
+        // Der Geburtsort ist keiner der vier und bleibt.
+        #expect(person["birthlocation"] as? String == "BOZEN, BZ")
+    }
+}

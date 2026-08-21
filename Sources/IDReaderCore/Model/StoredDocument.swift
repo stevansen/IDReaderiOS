@@ -31,11 +31,25 @@ public struct StoredDocument: Sendable, Equatable, Identifiable {
     /// der Hand wertlos.
     public var can: String
 
-    public init(data: DocumentData, storedAt: Int64, cardId: String?, can: String) {
+    /// Abdruck des Personenschluessels, oder nil.
+    ///
+    /// Tritt an die Stelle des Codice Fiscale, der nicht mehr aufbewahrt wird -
+    /// siehe ``ArchiveCrypto/identityDigest(for:)``. Wird vom Archiv beim Ablegen
+    /// gesetzt; ein frisch gelesener Datensatz hat ihn noch nicht.
+    public var identityDigest: String?
+
+    public init(
+        data: DocumentData,
+        storedAt: Int64,
+        cardId: String?,
+        can: String,
+        identityDigest: String? = nil
+    ) {
         self.data = data
         self.storedAt = storedAt
         self.cardId = cardId
         self.can = can
+        self.identityDigest = identityDigest
     }
 
     /// Kennung des Datensatzes.
@@ -49,9 +63,15 @@ public struct StoredDocument: Sendable, Equatable, Identifiable {
     /// Schluessel, der die Person bezeichnet - nicht die Karte.
     ///
     /// Der Codice Fiscale bleibt ueber einen Kartenwechsel hinweg gleich und ist
-    /// deshalb der bessere Schluessel. Fehlt er auf der Karte, muss die
-    /// Dokumentennummer einstehen.
+    /// deshalb der bessere Schluessel. Aufbewahrt wird er nicht mehr, sondern nur
+    /// sein Abdruck; fehlt beides, muss die Dokumentennummer einstehen.
+    ///
+    /// Die Reihenfolge ist wichtig: erst der Abdruck, dann - fuer einen Datensatz,
+    /// der noch nicht abgelegt ist - der Klartext, den er gerade noch hat.
     public var identityKey: String {
+        if let digest = identityDigest, !digest.isEmpty {
+            return digest
+        }
         if let cf = data.codiceFiscale?.uppercased(),
            !cf.trimmingCharacters(in: .whitespaces).isEmpty {
             return cf

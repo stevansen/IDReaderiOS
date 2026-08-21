@@ -172,6 +172,7 @@
 "result_document_type_passport" = "PASSAPORTO";
 "result_retention_hint" = "Kept encrypted on this device for %d days.";
 "result_valid_until" = "valid until %@";
+"retention_minimised_hint" = "Residence, codice fiscale, profession and telephone are shown but not kept. Note them now if you need them.";
 "scan_caption_can" = "The CAN is read from the photograph.";
 "scan_caption_mrz" = "The MRZ is read from the photograph.";
 "settings_language" = "Language";
@@ -207,4 +208,5 @@
 "stored_copy_notice" = "Stored copy from %@ — not read from the card just now.";
 "stored_delete" = "Delete";
 "value_missing" = "not in the document";
+"value_not_retained" = "read, not retained";
 "value_provenance_photo" = "Photograph, text recognition, not verified";
