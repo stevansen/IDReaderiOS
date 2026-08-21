@@ -96,68 +96,16 @@ Löschen des alten. `Scripts/archive.sh 2` setzt sie.
 
 ## Die Frage, die Apple beim Upload stellt
 
-**Ausfuhrmeldung.** In `Config/Info.plist` stand `ITSAppUsesNonExemptEncryption =
-false`, solange die App für ihr Archiv nur CryptoKit benutzte — dann greift die
-Ausnahme „ausschließlich Verschlüsselung des Betriebssystems".
+**Ausfuhrmeldung.** Die Antwort auf „Welche Art von Verschlüsselungsalgorithmus
+verwendest du?" ist **„Standardmäßige Verschlüsselungsalgorithmen statt oder
+zusätzlich zu der im Betriebssystem von Apple verwendeten bzw. zugänglichen
+Verschlüsselung"** — seit OpenSSL für PACE mit im Bundle liegt.
 
-Seit PACE eingebaut ist, liegt **OpenSSL 3** mit im Bundle. Damit ist diese
-Ausnahme weg, und der Schlüssel steht bewusst nicht mehr in der Datei: App Store
-Connect fragt bei jedem Upload nach, und die Frage soll bewusst beantwortet
-werden statt von einer Zeile, die vor dem Einbau geschrieben wurde.
-
-Für einen Test im eigenen Team genügt die Antwort im Dialog. Vor einer
-öffentlichen Verteilung zu klären — und das ist eine Rechtsfrage, keine
-Programmierfrage:
-
-* greift die Ausnahme für massenmarktgängige Software (5D992.c)?
-* ist der Jahresbericht an die BIS fällig?
-* braucht Frankreich eine eigene Erklärung?
-
-## Intern oder extern testen
-
-* **Intern** (bis 100 Personen aus dem eigenen Team): keine Beta-Prüfung, der
-  Build steht nach der Verarbeitung sofort bereit. **Der Weg für diesen Test.**
-* **Extern** (bis 10 000 Tester): Apple prüft den ersten Build einer Fassung. Dann
-  braucht es zusätzlich eine Datenschutzerklärung im Netz, eine
-  Beschreibung, was zu testen ist, und eine Begründung, wozu die App NFC braucht.
-
-## Was die Tester wissen müssen
-
-Sonst kommen Fehlermeldungen zurück, die keine sind:
-
-* **NFC gibt es nur auf einem echten iPhone.** Im Simulator meldet die App „Kein
-  NFC verfügbar", und das ist richtig.
-* **Es braucht eine echte CIE 3.0** und ihre aufgedruckte CAN (sechs Ziffern,
-  Vorderseite unten rechts). Eine ältere CIE ohne PACE meldet die App als solche.
-* **Das Lichtbild bleibt vorerst leer.** DG2 der CIE ist JPEG 2000, und iOS bringt
-  dafür keinen Decoder mit; die App zeigt statt des Bildes das erkannte Format an.
-  Das ist ein offener Punkt und kein Fehler — siehe [STATUS.md](STATUS.md).
-* **Der Leseweg ist noch nie gegen eine Karte gelaufen.** Genau darum geht dieser
-  Test. Was besonders interessiert: laufen die vier Phasen durch, kommt bei einer
-  echten Karte das grüne Siegel, und meldet eine falsche CAN „CAN stimmt nicht"
-  und nicht „unbekannter Fehler"?
-* Bildschirmfotos sind absichtlich möglich — genau dafür, damit Rückmeldungen
-  belegt werden können. Dieselbe Abwägung wie in der Android-Fassung.
-
-## Was für eine öffentliche Verteilung noch fehlt
-
-Für den Test nicht nötig, für den Store schon:
-
-* Ein **App-Zeichen, das jemand entworfen hat.** Das jetzige ist ein Entwurf von
-  mir, aus `Scripts/make-app-icon.swift` gezeichnet.
-* Bildschirmfotos und die Store-Texte. Für Deutsch liegt die Android-Fassung vor:
-  `apps/cie-reader/store/listing-de-DE.txt` im Android-Repository.
-* Eine **Datenschutzerklärung im Netz.** Auch dafür gibt es die Vorlage:
-  `apps/cie-reader/store/privacy-policy-{de,en,it}.md`. Sie ist zu überarbeiten —
-  auf iOS braucht die App die **Kamera-Berechtigung**, die die Android-Fassung
-  nicht braucht, und das gehört hinein.
-* Die Datenschutzangaben im App-Store-Eintrag („App Privacy"). Die Antwort ist
-  kurz: es wird nichts erhoben. `App/PrivacyInfo.xcprivacy` sagt dasselbe.
-* Die **Lizenzfrage** aus [`../LICENSE`](../LICENSE) und
-  [`../COPYRIGHT`](../COPYRIGHT), und die Bestätigung der Miturheberschaft.
-* Die Anerkennungen für **MIT (NFCPassportReader)** und **Apache-2.0 (OpenSSL)**
-  müssen in der App erreichbar sein. Es gibt noch keinen Ort dafür — siehe
-  [`../THIRD-PARTY-NOTICES.md`](../THIRD-PARTY-NOTICES.md).
+Die Bestandsaufnahme dazu, Verfahren für Verfahren und mit der Trennung zwischen
+Apples Kryptografie und OpenSSL, steht in
+[EXPORT-COMPLIANCE.md](EXPORT-COMPLIANCE.md). Sie ist das, was derjenige braucht,
+der die Unterlagen zusammenstellt — denn dabei hört es auf, eine
+Programmierfrage zu sein.
 
 ## Preis: kostenlos
 
