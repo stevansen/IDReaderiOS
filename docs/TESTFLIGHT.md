@@ -137,6 +137,19 @@ Das ist der Punkt, an dem diese Datei früher zu optimistisch war: die
 Frankreich-Frage ist keine Kenntnisnahme, sie ist die Weiche zwischen einem
 Formular und einem Verfahren.
 
+**Für Build 2 eingetragen: Frankreich → nein.** Damit steht der Build auf „Bereit
+zur Übermittlung". Die Begründung, und der Vorbehalt, der dazugehört: ein Build,
+der nur an Tester geht, ist kein Vertrieb im App Store, und TestFlight ist keine
+Bereitstellung in Frankreich. Für den Build, der **eingereicht** wird, gilt das
+nicht mehr — dann ist die Frage ernst zu beantworten, und bei „ja" fängt der
+Unterlagenweg oben an.
+
+Apple sagt an dieser Stelle selbst, worauf es ankommt: *„Du bist für die
+Einhaltung der Ausfuhrbestimmungen verantwortlich. Du solltest dich erneut mit
+diesen Fragen befassen, wenn sich deine Verschlüsselung oder dein Ausnahmestatus
+ändert."* Beides hat sich in dieser Fassung geändert — der Netzzugriff kam dazu,
+und der Quelltext ist jetzt offen lizenziert.
+
 ## Preis: kostenlos
 
 Entschieden, aber **in App Store Connect noch nicht eingetragen**: dort steht am
