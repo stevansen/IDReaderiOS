@@ -53,8 +53,15 @@ In der Reihenfolge, in der es sich lohnt:
    200 % Systemschrift zu prüfen. Die Falle, in die die Compose-Fassung dreimal
    gelaufen ist: in einem scrollenden Vorfahren ist die Höhe unendlich, und dort
    ergibt ein Gewicht null.
-5. **App-Icon und Store-Material.** Bisher nur ein Platzhalter.
-6. **Die Wiedererkennung einer aufgelegten Karte** entfällt dauerhaft — iOS hat
+5. **Store-Material.** Ein App-Zeichen liegt vor, aber als Entwurf aus
+   `Scripts/make-app-icon.swift`. Bildschirmfotos, Store-Texte und die
+   überarbeitete Datenschutzerklärung fehlen; die Vorlagen dafür liegen im
+   Android-Repository unter `apps/cie-reader/store/`. Was für einen Testupload
+   genügt und was erst für den Store nötig ist, trennt
+   [TESTFLIGHT.md](TESTFLIGHT.md).
+6. **Die Anerkennungen für MIT und Apache-2.0** müssen in der App erreichbar
+   sein. Es gibt noch keinen Ort dafür.
+7. **Die Wiedererkennung einer aufgelegten Karte** entfällt dauerhaft — iOS hat
    keinen Dauerlesemodus. Kein offener Punkt, sondern eine Festlegung; hier
    aufgeführt, damit niemand sie sucht.
 
@@ -64,5 +71,5 @@ In der Reihenfolge, in der es sich lohnt:
   Gegenstück, das ohne Netzzugriff auskommt.
 * Die Meldung „NFC ist ausgeschaltet". iOS hat keinen Schalter dafür. Der Text
   bleibt im Katalog, damit die drei Sprachfassungen deckungsgleich bleiben.
-* `StoredDocument.cardId` wird nicht mehr gefüllt (siehe Punkt 6), bleibt aber im
+* `StoredDocument.cardId` wird nicht mehr gefüllt (siehe Punkt 7), bleibt aber im
   Format — ein unter Android geschriebenes Archiv soll lesbar sein.

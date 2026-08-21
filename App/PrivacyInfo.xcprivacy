@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!--
+		Kein Tracking, keine Tracking-Domains. Das ist keine Behauptung, die man
+		nachreichen muss: die App hat keinen Netzzugriff, und
+		Scripts/check-no-network.sh sorgt dafuer, dass das so bleibt.
+	-->
+	<key>NSPrivacyTracking</key>
+	<false/>
+	<key>NSPrivacyTrackingDomains</key>
+	<array/>
+
+	<!--
+		Nichts erhoben. „Collected" heisst nach Apples Begriff: vom Geraet
+		uebertragen. Die App liest Ausweisdaten und legt sie verschluesselt auf
+		dem Geraet ab; hinaus geht davon nur, was der Bediener ausdruecklich
+		teilt, und das geht an ihn selbst oder an eine Adresse, die er eingetragen
+		hat - nicht an uns.
+
+		Das ist der Grund, warum diese Liste leer sein darf und nicht, weil hier
+		etwas vergessen wurde.
+	-->
+	<key>NSPrivacyCollectedDataTypes</key>
+	<array/>
+
+	<!--
+		Schnittstellen, die Apple begruendet haben will.
+
+		Nur eine: die Einstellungen der App selbst - Sprache, Ausgabeformat, die
+		hinterlegte Mailadresse und die bestaetigte Fassung des Hinweises beim
+		ersten Start. CA92.1 ist genau dieser Fall: Zugriff auf die eigenen Werte,
+		nicht auf die von anderen.
+
+		Ausdruecklich NICHT dabei, weil die App sie nicht benutzt:
+		Datei-Zeitstempel, freier Speicherplatz, aktive Tastatur, Systemstartzeit.
+		Das Archiv wird geschrieben und gelesen, aber seine Zeitstempel werden
+		nicht abgefragt - der Zeitpunkt eines Lesevorgangs steht im Datensatz.
+	-->
+	<key>NSPrivacyAccessedAPITypes</key>
+	<array>
+		<dict>
+			<key>NSPrivacyAccessedAPIType</key>
+			<string>NSPrivacyAccessedAPICategoryUserDefaults</string>
+			<key>NSPrivacyAccessedAPITypeReasons</key>
+			<array>
+				<string>CA92.1</string>
+			</array>
+		</dict>
+	</array>
+</dict>
+</plist>

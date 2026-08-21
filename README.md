@@ -37,7 +37,12 @@ xcodebuild -project IDReader.xcodeproj -scheme IDReader -sdk iphonesimulator -co
 nicht mit, und der Bau bricht an einem nicht auflösbaren Modul ab.
 
 Für ein Gerät braucht die App-ID die Berechtigung **NFC Tag Reading** im
-Entwicklerkonto — ohne sie lässt sich das Ziel nicht signieren.
+Entwicklerkonto — ohne sie lässt sich das Ziel nicht signieren. Der Weg auf ein
+Testgerät steht in [`docs/TESTFLIGHT.md`](docs/TESTFLIGHT.md):
+
+```bash
+Scripts/archive.sh
+```
 
 ```bash
 Scripts/check-no-network.sh
@@ -66,7 +71,8 @@ IDReaderiOS/
 ├── ThirdParty/                fremder Code, gepatcht — MIT, siehe dort
 │   └── NFCPassportReaderCAN/  PACE, Secure Messaging, Passive Auth, Chip Auth
 ├── Config/                    Info.plist, Berechtigungen
-├── docs/                      STATUS, ANDROID-TO-IOS, NFC-PACE, DATA-PROTECTION
+├── docs/                      STATUS, ANDROID-TO-IOS, NFC-PACE, DATA-PROTECTION,
+│                              TESTFLIGHT
 └── MIGRATION_PROMPT.md        der Prompt, mit dem sich das fortsetzen lässt
 ```
 

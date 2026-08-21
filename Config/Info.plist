@@ -65,11 +65,30 @@
 	<string>Zum Fotografieren des Dokuments. Die Aufnahme wird nur auf diesem Gerät ausgewertet, nicht gespeichert und nicht gesendet.</string>
 
 	<!--
-		Die App verschluesselt ihr Archiv, benutzt dafuer aber ausschliesslich die
-		Verfahren des Betriebssystems (AES-GCM aus CryptoKit). Das ist von der
-		Ausfuhrmeldung ausgenommen.
+		ZUR AUSFUHRMELDUNG - hier steht mit Absicht kein Wert.
+		=====================================================
+
+		Hier stand `ITSAppUsesNonExemptEncryption = false`, solange die App fuer
+		ihr Archiv nur AES-GCM aus CryptoKit benutzte: dann trifft die Ausnahme
+		„ausschliesslich Verschluesselung des Betriebssystems" zu, und die Frage
+		ist beantwortet.
+
+		Das gilt nicht mehr. Seit PACE eingebaut ist, liegt **OpenSSL 3** mit im
+		Bundle - eine eigene Umsetzung der Verfahren, nicht die des Systems. Damit
+		ist die Ausnahme, auf die sich das `false` stuetzte, weg.
+
+		Welche der uebrigen Ausnahmen greift, ist eine Rechtsfrage und keine
+		Programmierfrage. Deshalb steht der Schluessel nicht mehr hier: App Store
+		Connect fragt bei jedem Upload nach, und diese Frage soll bewusst
+		beantwortet werden und nicht von einer Zeile, die vor dem Einbau von PACE
+		geschrieben wurde.
+
+		Zu klaeren, bevor die App oeffentlich verteilt wird - fuer einen
+		Testupload an das eigene Team genuegt die Antwort im Dialog:
+		  * greift die Ausnahme fuer massenmarktgaengige Software (5D992.c)?
+		  * ist der Jahresbericht an die BIS faellig?
+		  * braucht Frankreich eine eigene Erklaerung?
+		Siehe docs/TESTFLIGHT.md.
 	-->
-	<key>ITSAppUsesNonExemptEncryption</key>
-	<false/>
 </dict>
 </plist>
