@@ -28,10 +28,19 @@ Commit `7ab0d20`, Version 1.8 / versionCode 11.
 | Lizenz: Apache-2.0 | umgestellt, **Christians Zustimmung fehlt noch** | [LICENCE-CHOICE.md](LICENCE-CHOICE.md) |
 | Sperrprüfung: CRL lesen, Signatur prüfen, ablegen, offline abgleichen, offene Prüfungen nachholen, Datum am Datensatz | gebaut, **gegen die echte italienische CRL durchlaufen** | 29 Tests; im Simulator geholt, geprüft und angezeigt |
 
-**Fassung 1.8 (Build 1) liegt seit dem 21. August 2026 in App Store Connect**
-(Delivery `10e2826e-8bae-4b29-a954-eb089e6a5f9b`), signiert mit
-`Apple Distribution`, für TestFlight freigegeben. Damit ist der Weg auf ein Gerät
-offen — der Nachweis am Gerät selbst ist Punkt 1 unten.
+**Fassung 1.8 (Build 2) liegt seit dem 21. August 2026 in App Store Connect**
+(Delivery `1b03a02f-6914-4c84-a9d8-3b0fc8f69ab3`), signiert mit
+`Apple Distribution`, für TestFlight freigegeben. Build 1 vom
+selben Tag ist damit überholt: er kannte weder die Datenminimierung noch die
+Sperrprüfung. Die Fassungsnummer bleibt 1.8 — veröffentlicht war Build 1 nie,
+also ist dies weiterhin die erste iOS-Auslieferung und nur ein neuer Bau.
+
+Damit ist der Weg auf ein Gerät offen — der Nachweis am Gerät selbst ist Punkt 1
+unten. Was ein Tester an Build 2 gegenüber Build 1 prüfen soll: dass beim ersten
+Start der Hinweis **erneut** erscheint (Fassung 2, weil der Satz über den
+Netzzugriff nicht mehr stimmte), dass bei einem gelesenen Dokument „gelesen,
+nicht gespeichert" steht statt einer Anschrift, und dass die Sperrprüfung ein
+Datum zeigt statt „noch nicht geprüft".
 
 103 Tests, `swift test`, alle grün. Die App baut ohne eine einzige Warnung im
 eigenen Code (`xcodebuild -scheme IDReader -sdk iphonesimulator`) und läuft im

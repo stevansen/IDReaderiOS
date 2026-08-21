@@ -93,7 +93,15 @@ exportiert die `.ipa`. Das zweite prüft und lädt hoch. Getrennt, weil ein Arch
 zu bauen harmlos ist und ein Upload eine Veröffentlichung an Apple.
 
 Jeder Upload braucht eine **höhere Buildnummer** als der vorige — auch nach dem
-Löschen des alten. `Scripts/archive.sh 2` setzt sie.
+Löschen des alten. Zwei Wege dafür: `Scripts/archive.sh 3` setzt sie nur für
+diesen Bau, `CURRENT_PROJECT_VERSION` in `IDReader.xcodeproj/project.pbxproj`
+setzt sie dauerhaft. Der zweite ist der richtige für einen Bau, der hochgeht:
+dann steht im Repository, was ausgeliefert wurde. Der erste ist für Probeläufe.
+
+Die Fassungsnummer (`MARKETING_VERSION`) steigt davon nicht mit, und soll es
+nicht: solange eine Fassung nicht veröffentlicht ist, ist ein neuer Bau derselben
+Fassung genau das — ein neuer Bau. 1.8 (1) und 1.8 (2) sind beide die erste
+iOS-Auslieferung.
 
 ## Die Frage, die Apple beim Upload stellt
 
