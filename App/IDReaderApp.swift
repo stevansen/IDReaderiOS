@@ -24,10 +24,20 @@ struct IDReaderApp: App {
         let file = (try? DocumentArchive.defaultFile())
             ?? URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("archive.bin")
 
-        let archive = DocumentArchive(file: file, keys: KeychainArchiveKeyStore())
+        let archive: DocumentArchive
         #if DEBUG
+        if DemoData.isRequested {
+            // Beispieldaten fuer Bildschirmfotos, mit eigenem Archiv und
+            // fluechtigem Schluessel. Siehe DemoData - der ganze Weg existiert
+            // im Auslieferungsbau nicht.
+            archive = DemoData.archive()
+        } else {
+            archive = DocumentArchive(file: file, keys: KeychainArchiveKeyStore())
+        }
         // Nur Fehlerarten, nie Inhalte - hier laufen Personendaten durch.
         archive.log = { print("[archive] \($0)") }
+        #else
+        archive = DocumentArchive(file: file, keys: KeychainArchiveKeyStore())
         #endif
 
         // Der Leser bekommt das PEM-Buendel der italienischen CSCA mit. Fehlt es,

@@ -1,0 +1,54 @@
+IDReader legge i dati dal chip di un documento di identità via NFC e verifica che il documento sia autentico. Sono supportate la carta di identità elettronica italiana (CIE 3.0) e i passaporti secondo ICAO 9303. La patente di guida italiana non ha chip e viene acquisita da una fotografia.
+
+TRE TIPI DI DOCUMENTO
+Si cambia in alto nello schermo. Ogni tipo ha la sua schermata e il suo colore, così resta visibile che cosa si sta leggendo.
+• Carta di identità: il CAN di sei cifre, in basso a destra sul fronte
+• Passaporto: numero, data di nascita e data di scadenza dalla pagina dei dati
+• Patente: il fronte, fotografato
+
+Senza il documento in mano non si legge nulla.
+
+FOTOGRAFARE LA CHIAVE
+Sul passaporto vengono verificate le tre cifre di controllo della zona a lettura ottica — il riconoscimento è confermato prima di appoggiare il documento. Il CAN non ha cifra di controllo; se è giusto lo dice la lettura. Digitare resta possibile.
+
+DATI MOSTRATI
+Nome, data e luogo di nascita, sesso, cittadinanza, numero del documento, date di emissione e scadenza, ente di emissione. Residenza e codice fiscale, se il documento li riporta.
+
+In Alto Adige luoghi e vie sono stampati in due lingue. Viene mostrata la metà corrispondente alla lingua impostata.
+
+VERIFICA DI AUTENTICITÀ
+Completamente offline, con i certificati inclusi nell'app. Nessuna consultazione delle liste di revoca.
+• Autenticazione passiva: le impronte dei gruppi di dati letti contro l'oggetto di sicurezza firmato della carta, questo contro il certificato del firmatario e questo contro l'autorità radice italiana.
+• Autenticazione del chip: la carta dimostra che il chip è l'originale e non una copia dei dati.
+
+Tutte le verifiche devono riuscire. Altrimenti non c'è alcun sigillo.
+
+LA PATENTE È DIVERSA
+Nessun chip, nessuna zona a lettura ottica, nessuna cifra di controllo. I dati provengono dal riconoscimento del testo di una fotografia e nulla di essi è confermato. Per questo tutti i campi sono modificabili: il riconoscimento può sbagliare, e solo chi ha il documento in mano se ne accorge.
+
+Un record così non porta alcun sigillo — né grigio né barrato, ma la riserva scritta a parole. Un sigillo barrato significherebbe "verifica non superata", e qui non c'è mai stata una verifica.
+
+LA FOTOGRAFIA
+La lettura rapida la esclude, quella completa la include; è il gruppo di dati più grande sul chip.
+
+Una limitazione per ora: sulla carta italiana è in JPEG 2000, e iOS non ha un decodificatore. L'app mostra allora il formato rilevato invece di non mostrare nulla in silenzio. Il decodificatore è in lavorazione.
+
+ARCHIVIO
+I documenti letti restano sul dispositivo per 30 giorni e poi si cancellano da sé. Un record per persona. Più record possono essere esportati insieme, come testo leggibile o come JSON.
+
+PROTEZIONE DEI DATI
+• Nessun accesso alla rete. Nel codice non esiste alcuna connessione, e un controllo in fase di compilazione lo impone.
+• I dati restano sul dispositivo, cifrati con AES-256 e una chiave nel portachiavi che non lo lascia.
+• Nessuno strumento di analisi, nessuna pubblicità, nessun tracciamento. Nulla viene raccolto.
+• Per fotografare serve l'autorizzazione alla fotocamera; su iOS non è evitabile. L'immagine non entra mai nella libreria foto né sul disco, e il riconoscimento avviene sul dispositivo.
+• I dati escono solo con un'esportazione esplicita; la fotografia solo per e-mail.
+
+CHI DECIDE
+Se si possa leggere un documento lo sa soltanto chi lo fa. L'app legge quello che le viene mostrato. Non conosce la base giuridica, e trenta giorni di conservazione sono un valore predefinito, non un accertamento. Lo dice al primo avvio.
+
+REQUISITI
+Un iPhone con NFC — iPhone 7 o successivo — e iOS 17. Per il chip, una CIE 3.0 o un passaporto con il simbolo del chip sulla copertina.
+
+Italiano, tedesco, inglese.
+
+Questa app non è un servizio ufficiale di un ente pubblico.

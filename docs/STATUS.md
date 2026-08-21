@@ -58,12 +58,13 @@ In der Reihenfolge, in der es sich lohnt:
    200 % Systemschrift zu prüfen. Die Falle, in die die Compose-Fassung dreimal
    gelaufen ist: in einem scrollenden Vorfahren ist die Höhe unendlich, und dort
    ergibt ein Gewicht null.
-5. **Store-Material.** Ein App-Zeichen liegt vor, aber als Entwurf aus
-   `Scripts/make-app-icon.swift`. Bildschirmfotos, Store-Texte und die
-   überarbeitete Datenschutzerklärung fehlen; die Vorlagen dafür liegen im
-   Android-Repository unter `apps/cie-reader/store/`. Was für einen Testupload
-   genügt und was erst für den Store nötig ist, trennt
-   [TESTFLIGHT.md](TESTFLIGHT.md).
+5. **Store-Material.** Texte in drei Sprachen und 15 Bildschirmfotos liegen in
+   [`../store/`](../store/); die Längen sind gegen Apples Feldgrenzen geprüft. Es
+   fehlen zwei Pflichtangaben, die niemand erfinden kann: eine **Support-URL** und
+   eine **Datenschutz-URL**. Letztere ist der heiklere Punkt — die bestehende Seite
+   der Android-Fassung behauptet, es erscheine keine Kamera-Berechtigung, und das
+   ist auf iOS falsch. Siehe [`../store/README.md`](../store/README.md).
+   Das App-Zeichen ist ein Entwurf aus `Scripts/make-app-icon.swift`.
 6. **Die Anerkennungen für MIT und Apache-2.0** müssen in der App erreichbar
    sein. Es gibt noch keinen Ort dafür.
 7. **Die Wiedererkennung einer aufgelegten Karte** entfällt dauerhaft — iOS hat

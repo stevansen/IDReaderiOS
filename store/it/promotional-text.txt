@@ -1,0 +1,1 @@
+Legge il chip della carta di identità italiana e dei passaporti via NFC e verifica offline che il documento sia autentico. Nessun accesso alla rete.

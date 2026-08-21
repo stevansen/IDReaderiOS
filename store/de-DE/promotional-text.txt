@@ -1,0 +1,1 @@
+Liest den Chip italienischer Identitätskarten und von Reisepässen über NFC und prüft offline, ob das Dokument echt ist. Kein Netzzugriff, nichts verlässt das Gerät.

@@ -73,6 +73,7 @@ IDReaderiOS/
 ├── Config/                    Info.plist, Berechtigungen
 ├── docs/                      STATUS, ANDROID-TO-IOS, NFC-PACE, DATA-PROTECTION,
 │                              TESTFLIGHT, EXPORT-COMPLIANCE
+├── store/                     Store-Texte in drei Sprachen und die Screenshots
 └── MIGRATION_PROMPT.md        der Prompt, mit dem sich das fortsetzen lässt
 ```
 

@@ -1,0 +1,1 @@
+CIE Reader,ID card,NFC,chip,MRZ,CAN,ICAO,eID,passport,carta identità,patente

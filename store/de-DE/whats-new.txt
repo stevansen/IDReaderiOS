@@ -1,0 +1,3 @@
+Erste Fassung für iPhone.
+
+Portiert aus der Android-Fassung CIEreader, mit demselben Verhalten, demselben Wortlaut und demselben Archivformat. Neu gebaut wurde alles, was die Plattform betrifft: die Oberfläche, die Texterkennung und die Verschlüsselung des Archivs.

@@ -1,0 +1,1 @@
+Reads the chip of Italian identity cards and passports over NFC and verifies offline that the document is genuine. No network access; nothing leaves the device.
