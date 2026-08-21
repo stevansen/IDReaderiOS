@@ -43,6 +43,14 @@ let package = Package(
         .testTarget(
             name: "IDReaderCoreTests",
             dependencies: ["IDReaderCore"],
+            resources: [
+                // Eine selbst erzeugte Pruefstelle mit eigener Sperrliste. Keine
+                // echten Behoerdendaten, und ausdruecklich *nicht* eines der
+                // hinterlegten CSCA-Zertifikate: die Tests sollen die Wege durch
+                // Leser und Signaturpruefung abgehen, nicht die Echtheit einer
+                // fremden Liste bezeugen.
+                .copy("Fixtures"),
+            ],
             swiftSettings: [.swiftLanguageMode(.v6)]
         ),
     ]

@@ -104,12 +104,24 @@ the factual position is stated here so the determination can be made on facts.
 
 Stated as facts, not conclusions.
 
-* **No network capability.** The product contains no network code at all. There is
-  no `URLSession`, no `Network` framework use, no socket API; the authenticity
-  check runs offline against bundled certificates and consults no directory and no
-  revocation list. A build-time check (`Scripts/check-no-network.sh`) fails the
-  build if such code appears, and it covers the vendored third-party library as
-  well.
+* **One network operation, and it uses the operating system's TLS.** The product
+  makes a single kind of network request: an HTTPS `GET` for the certificate
+  revocation list published by the Italian Ministry of the Interior, whose address
+  is read from the bundled CSCA certificates rather than hard-coded. The request
+  carries no data from any document and no device identifier. The transport
+  encryption is `URLSession`'s, that is Apple's own — the product neither
+  implements nor bundles any TLS code. Everything else runs offline: the
+  authenticity check itself, and the comparison against the fetched list.
+  A build-time check (`Scripts/check-no-network.sh`) fails the build if network
+  code appears anywhere other than the single file
+  `App/Revocation/RevocationDownloader.swift`, and it covers the vendored
+  third-party library as well.
+* **The bundled OpenSSL performs no transport encryption.** It is not used for
+  TLS, and no TLS code path reaches it; the revocation download goes through
+  `URLSession`. OpenSSL's role is unchanged: key agreement, CMAC, and signature
+  and certificate-chain verification. The signature on the fetched revocation
+  list is verified with Apple's `Security` framework
+  (`SecKeyVerifySignature`).
 * **No open cryptographic interface.** The product exposes no way for a user or
   another program to insert, substitute, or configure cryptographic algorithms,
   keys, or key lengths. The algorithms are fixed by the ICAO 9303 protocols and by
@@ -196,9 +208,12 @@ Everything above is verifiable in the source:
 | PACE, including the CAN password | `ThirdParty/NFCPassportReaderCAN/Sources/PACEHandler.swift` |
 | Negotiable cipher and digest per ICAO | `ThirdParty/NFCPassportReaderCAN/Sources/DataGroups/PACEInfo.swift` |
 | Trust anchors, public keys only | `Sources/IDReaderCore/Resources/csca/` |
-| Absence of network code | `Scripts/check-no-network.sh` |
+| Network code confined to one file, and no hard-coded host | `Scripts/check-no-network.sh` |
+| The single network operation | `App/Revocation/RevocationDownloader.swift` |
+| Revocation-list signature verification (Apple `Security`) | `Sources/IDReaderCore/Revocation/RevocationListVerifier.swift` |
 | The modifications to the vendored library | `ThirdParty/NFCPassportReaderCAN/UPSTREAM.patch` |
 
-Prepared 21 August 2026, for version 1.8 (build 1). It must be revised if the
-cryptographic functionality changes — in particular if a JPEG 2000 decoder or any
-further third-party library is added.
+Prepared 21 August 2026, for version 1.8 (build 1), and revised the same day for
+the revocation check, which added the network operation described in section 4. It
+must be revised again if the cryptographic functionality changes — in particular if
+a JPEG 2000 decoder or any further third-party library is added.

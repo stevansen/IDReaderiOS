@@ -159,6 +159,64 @@ public final class DocumentArchive: @unchecked Sendable {
         return copy
     }
 
+    // -----------------------------------------------------------------------
+    // Sperrpruefung nachholen
+    // -----------------------------------------------------------------------
+
+    /// Holt ausstehende Sperrpruefungen nach und gibt das neue Archiv zurueck.
+    ///
+    /// ## Warum das eine Aufgabe des Archivs ist
+    ///
+    /// Beim Lesen ist oft kein Netz da - im Keller, im Zug, an der Grenze. Genau
+    /// dann soll die Pruefung nicht ausfallen, sondern **offen** bleiben und
+    /// spaeter nachgeholt werden. Nachholen heisst: die vorhandenen Eintraege
+    /// noch einmal gegen den inzwischen geladenen Bestand abgleichen, und das
+    /// geht nur dort, wo die Eintraege liegen.
+    ///
+    /// Angefasst werden zwei Sorten: die noch nie geprueften, und die, deren
+    /// Pruefung gegen eine aeltere Liste lief als die jetzt vorliegende. Ein
+    /// bereits gesperrter Signierer bleibt unberuehrt - eine Sperre wird nicht
+    /// zurueckgenommen.
+    ///
+    /// Gibt es nichts zu tun, wird auch nicht geschrieben: ein Aufruf bei jedem
+    /// Start soll nicht bei jedem Start die Archivdatei neu schreiben.
+    @discardableResult
+    public func catchUpRevocation(
+        using store: RevocationStore,
+        now: Date = Date()
+    ) -> [StoredDocument] {
+        lock.lock()
+        defer { lock.unlock() }
+
+        let current = loadLocked()
+        guard let newest = store.newestListIssuedAt else { return current }
+
+        var changed = false
+        let updated = current.map { record -> StoredDocument in
+            guard let signer = record.signer else { return record }
+            if let existing = record.revocation,
+               !existing.deservesRetry(withListIssuedAt: newest) {
+                return record
+            }
+            guard let check = store.evaluate(signer, now: now) else { return record }
+            guard check != record.revocation else { return record }
+            var copy = record
+            copy.revocation = check
+            changed = true
+            return copy
+        }
+        guard changed else { return current }
+        log?("Sperrpruefung nachgeholt")
+        return writeLocked(updated) ? updated : current
+    }
+
+    /// Wie viele Eintraege noch auf eine Sperrpruefung warten.
+    public func pendingRevocationCount() -> Int {
+        lock.lock()
+        defer { lock.unlock() }
+        return loadLocked().filter(\.revocationPending).count
+    }
+
     /// Entfernt die genannten Eintraege und gibt das neue Archiv zurueck.
     public func remove(ids: Set<String>) -> [StoredDocument] {
         lock.lock()

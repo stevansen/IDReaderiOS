@@ -143,17 +143,39 @@ be deleted in the app at any time.
 
 No snapshot of the last record shown appears in the app switcher.
 
-### No transmission
+### The one network access: the revocation list
 
-The app **does not access the network**. There is no network connection in its
-source, and a check at build time fails if one appears. It transmits nothing —
-neither to the developers nor to third parties. There is no analytics, no
-advertising and no tracking.
+The app transmits **no personal data** — neither to the developers nor to third
+parties. There is no analytics, no advertising and no tracking, and no server of
+the developers' that the app talks to.
 
-The authenticity check also runs entirely offline, against certificates bundled
-with the app; no directory and no revocation list is consulted. The libraries used
-are part of the app and likewise do not talk outward.
+It does make one network access, and only this one: it fetches the **public
+certificate revocation list** from the authority that issues it — for Italian
+documents the Ministry of the Interior. The address is taken from the bundled
+certificates. For this:
 
+- **Nothing about the document goes out.** A public file is fetched, the way a
+  web page is loaded. No item from the document, no device identifier, no
+  indication that a document was read at all.
+- **Never during a read.** The fetch happens when the app starts and when you ask
+  for it in the settings. The timing of a request would otherwise be a message in
+  itself.
+- **The comparison runs offline.** The list is fetched whole and compared on the
+  device. That is why a revocation list and not OCSP: with OCSP a separate request
+  would go out for every document checked.
+- **It can be switched off.** In the settings. Switched off, the app accesses
+  nothing; lists already fetched stay usable, no new ones arrive.
+- What the operator of the distribution point sees, as with any fetch, is the
+  device's IP address and the time.
+
+**What the revocation list says:** whether the certificate the document was
+signed with has been withdrawn. **Not** whether this document has been reported
+lost or stolen — records of that kind are not open to a public app. Each record
+shows when it was checked and which list was used.
+
+The authenticity check itself still runs entirely on the device, against bundled
+certificates. The libraries used do not speak outward; a build-time check fails if
+network access appears anywhere other than the one place provided for it.
 ### When data leaves the app
 
 Only when the user explicitly exports it, and only to the destination chosen at
@@ -200,4 +222,5 @@ days is a default, not a finding.
 ### Changes
 
 This policy describes the state as of 21 August 2026 and applies from version 1.8
-of the iOS release. It will be updated when the behaviour of the app changes.
+of the iOS release. It will be updated when the behaviour of the app changes — most
+recently for data minimisation and for the revocation-list fetch.

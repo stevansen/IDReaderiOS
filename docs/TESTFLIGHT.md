@@ -120,11 +120,13 @@ ohne In-App-Käufe. Für TestFlight ist das gleichgültig — Testbuilds sind f�
 Tester immer kostenlos —, es greift erst beim Store.
 
 Bemerkenswert ist daran, dass die App das nicht nur behauptet, sondern **nicht
-anders kann**: es gibt kein StoreKit, keine Werbung, keine Messtechnik und keinen
-Netzzugriff, und `Scripts/check-no-network.sh` hält das so. Bei einer kostenlosen
-App ist die nächste Frage sonst immer, womit sie stattdessen bezahlt wird; hier
-lautet die Antwort: mit nichts. Dasselbe sagen die Datenschutzangaben — **Data Not
-Collected** — und `App/PrivacyInfo.xcprivacy`.
+anders kann**: es gibt kein StoreKit, keine Werbung und keine Messtechnik. Der
+einzige Netzzugriff holt eine öffentliche Sperrliste bei der Behörde, die sie
+ausgibt — kein Server des Entwicklers ist beteiligt, und
+`Scripts/check-no-network.sh` setzt durch, dass es bei dieser einen Stelle
+bleibt. Bei einer kostenlosen App ist die nächste Frage sonst immer, womit sie
+stattdessen bezahlt wird; hier lautet die Antwort: mit nichts. Dasselbe sagen die
+Datenschutzangaben — **Data Not Collected** — und `App/PrivacyInfo.xcprivacy`.
 
 Nicht zu verwechseln: **kostenlos ist nicht dasselbe wie offen.** Der Quelltext
 steht weiterhin unter „alle Rechte vorbehalten"
@@ -143,9 +145,11 @@ Praktisch folgt daraus dreierlei:
 
 * **App Review wird nach der NFC-Nutzung fragen** — wozu die App Chips liest und
   was mit den Daten passiert. Die Antwort ist kurz und steht schon geschrieben:
-  nichts verlässt das Gerät, das Archiv löscht sich nach 30 Tagen,
-  `Scripts/check-no-network.sh` setzt das durch. Verweisen kann man auf
-  [DATA-PROTECTION.md](DATA-PROTECTION.md).
+  gelesene Daten verlassen das Gerät nur, wenn der Benutzer sie teilt, das Archiv
+  löscht sich nach 30 Tagen, und der eine Netzzugriff holt eine öffentliche
+  Sperrliste, ohne etwas über das Dokument mitzuteilen.
+  `Scripts/check-no-network.sh` setzt durch, dass es dabei bleibt. Verweisen kann
+  man auf [DATA-PROTECTION.md](DATA-PROTECTION.md).
 * **Die Datenschutzerklärung im Netz ist Pflicht**, nicht optional. Vorlage:
   `apps/cie-reader/store/privacy-policy-{de,en,it}.md` im Android-Repository —
   zu überarbeiten, weil auf iOS die **Kamera-Berechtigung** dazukommt.
@@ -153,6 +157,9 @@ Praktisch folgt daraus dreierlei:
   Team fällt sie weg; sobald jemand von außen dazukommt, prüft Apple den ersten
   Build einer Fassung.
 
-Die Datenschutzangaben im Eintrag („App Privacy") sind dagegen schnell erledigt:
-**Data Not Collected.** `App/PrivacyInfo.xcprivacy` sagt dasselbe, und beides ist
-richtig, weil die App keinen Netzzugriff hat.
+Die Datenschutzangaben im Eintrag („App Privacy") bleiben **Data Not Collected**,
+und das ist auch mit dem Netzzugriff richtig: gefragt wird dort, welche Daten die
+App **vom Benutzer erhebt**. Ein Abruf einer öffentlichen Datei erhebt nichts —
+es wird nichts gesendet, nichts gespeichert und nichts mit einer Person
+verknüpft. `App/PrivacyInfo.xcprivacy` sagt dasselbe. Wer trotzdem fragt, findet
+die Begründung in [DATA-PROTECTION.md](DATA-PROTECTION.md).

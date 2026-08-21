@@ -94,6 +94,15 @@ final class ReaderModel {
     private let archive: DocumentArchive
     private let reader: ChipDocumentReader
     private let settings: AppSettings
+    private let revocation: RevocationStore
+
+    /// Laeuft gerade ein Abruf der Sperrliste.
+    private(set) var revocationRefreshing = false
+
+    /// Was der letzte Abruf ergeben hat, fuer die Anzeige in den Einstellungen.
+    private(set) var revocationNotice: RevocationNotice?
+
+    private var revocationTask: Task<Void, Never>?
 
     private var readTask: Task<Void, Never>?
 
@@ -109,16 +118,20 @@ final class ReaderModel {
     init(
         archive: DocumentArchive,
         reader: ChipDocumentReader,
-        settings: AppSettings = AppSettings()
+        settings: AppSettings = AppSettings(),
+        revocation: RevocationStore = RevocationStore.standard()
     ) {
         self.archive = archive
         self.reader = reader
         self.settings = settings
+        self.revocation = revocation
         self.canReadChips = reader.isAvailable
         self.language = settings.language
         self.strings = Strings(language: settings.language)
         archive.retainsAllFields = settings.retainsAllFields
-        self.records = archive.load()
+        // Erst nachholen, dann anzeigen: liegt vom letzten Mal eine Liste da,
+        // sollen die offenen Eintraege ihr Urteil haben, bevor sie zu sehen sind.
+        self.records = archive.catchUpRevocation(using: revocation)
     }
 
     // -----------------------------------------------------------------------
@@ -346,13 +359,14 @@ final class ReaderModel {
 
     private func run(key: AccessKey) {
         readTask?.cancel()
-        readTask = Task { [reader, archive] in
+        readTask = Task { [reader, archive, revocation] in
             var lastStep = ReadStep.waitingForCard
             do {
-                let data = try await reader.read(key: key, readPhoto: readPhoto) { [weak self] step in
+                let result = try await reader.read(key: key, readPhoto: readPhoto) { [weak self] step in
                     guard let self, case .reading = self.stage else { return }
                     self.stage = .reading(step)
                 }
+                let data = result.data
                 lastStep = .done
                 try Task.checkCancellation()
 
@@ -367,7 +381,12 @@ final class ReaderModel {
                     // leer: der MRZ-Schluessel besteht aus Dokumentnummer,
                     // Geburts- und Ablaufdatum, also aus genau den Personendaten,
                     // die das Archiv schuetzen soll.
-                    can: key.canValue ?? ""
+                    can: key.canValue ?? "",
+                    signer: result.signer,
+                    // Gegen den vorhandenen Bestand, nicht gegen das Netz: waehrend
+                    // eines Lesevorgangs wird nichts abgerufen. Liegt keine Liste
+                    // vor, bleibt die Pruefung offen und wird nachgeholt.
+                    revocation: result.signer.flatMap { revocation.evaluate($0) }
                 )
                 records = archive.add(document)
                 stage = .success(document, fresh: true)
@@ -537,6 +556,73 @@ final class ReaderModel {
         }
     }
 
+    // -----------------------------------------------------------------------
+    // Sperrlisten
+    // -----------------------------------------------------------------------
+
+    /// Ob die App die Sperrlisten von selbst auffrischen darf.
+    ///
+    /// Beim Einschalten wird gleich einmal geholt: wer den Schalter umlegt, will
+    /// nicht bis zum naechsten Start warten.
+    var revocationUpdatesEnabled: Bool {
+        get { settings.revocationUpdatesEnabled }
+        set {
+            settings.revocationUpdatesEnabled = newValue
+            if newValue { refreshRevocation(force: true) }
+        }
+    }
+
+    /// Wie viele Eintraege noch auf eine Sperrpruefung warten.
+    var pendingRevocationCount: Int {
+        records.filter(\.revocationPending).count
+    }
+
+    /// Das Ausgabedatum der juengsten vorliegenden Liste.
+    var newestRevocationList: Date? { revocation.newestListIssuedAt }
+
+    /// Frischt die Sperrlisten auf und holt die offenen Pruefungen nach.
+    ///
+    /// - Parameter force: von Hand angefordert. Dann wird der Abstand ignoriert
+    ///   und auch dann geholt, wenn die vorhandene Liste noch gilt - eine
+    ///   ausdrueckliche Anforderung ist die eine Einwilligung, die es hier gibt.
+    ///
+    /// Ohne `force` geschieht nichts, wenn die Auffrischung abgeschaltet ist,
+    /// wenn der letzte Versuch weniger als sechs Stunden her ist oder wenn die
+    /// vorhandene Liste noch nicht ueberholt ist. Der Abstand ist der Grund, dass
+    /// ein Wechsel in den Vordergrund nicht jedes Mal eine Anfrage ausloest.
+    func refreshRevocation(force: Bool = false) {
+        guard revocationTask == nil else { return }
+        if !force {
+            guard settings.revocationUpdatesEnabled else { return }
+            if let last = settings.revocationLastAttempt,
+               Date().timeIntervalSince(last) < ReaderModel.revocationMinimumInterval {
+                return
+            }
+            // Eine Liste, die noch gilt, und keine offene Pruefung: es gibt
+            // nichts zu holen, also wird nicht gefragt.
+            guard revocation.needsRefresh() || pendingRevocationCount > 0 else { return }
+        }
+
+        revocationRefreshing = true
+        revocationNotice = nil
+        settings.revocationLastAttempt = Date()
+
+        let downloader = RevocationDownloader(store: revocation)
+        revocationTask = Task { [archive, revocation] in
+            let outcome = await downloader.refresh()
+            if case .updated = outcome {
+                records = archive.catchUpRevocation(using: revocation)
+            }
+            revocationNotice = RevocationNotice(outcome)
+            revocationRefreshing = false
+            revocationTask = nil
+        }
+    }
+
+    /// Sechs Stunden. Eine Sperrliste dieser Stelle gilt dreissig Tage; oefter zu
+    /// fragen bringt nichts und faellt nur auf.
+    static let revocationMinimumInterval: TimeInterval = 6 * 3600
+
     /// Die Farbwelt, die gerade gilt.
     ///
     /// Liegt ein gelesenes Dokument auf dem Schirm, gilt dessen Art und nicht die
@@ -548,6 +634,28 @@ final class ReaderModel {
             return DocumentMode.of(document.data)
         }
         return documentMode
+    }
+}
+
+/// Was von einem Abruf zu berichten ist.
+///
+/// Eine eigene Aufzaehlung und nicht die des Abrufers: die Oberflaeche soll
+/// nicht wissen, was ein `Rejection` ist.
+enum RevocationNotice: Equatable {
+    case updated(Date)
+    case unchanged
+    case unreachable
+    case unusable
+    case noSource
+
+    init(_ outcome: RevocationDownloader.Outcome) {
+        switch outcome {
+        case .updated(let date): self = .updated(date)
+        case .unchanged: self = .unchanged
+        case .unreachable: self = .unreachable
+        case .rejected: self = .unusable
+        case .noSource: self = .noSource
+        }
     }
 }
 

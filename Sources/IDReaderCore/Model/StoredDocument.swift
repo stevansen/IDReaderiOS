@@ -38,18 +38,44 @@ public struct StoredDocument: Sendable, Equatable, Identifiable {
     /// gesetzt; ein frisch gelesener Datensatz hat ihn noch nicht.
     public var identityDigest: String?
 
+    /// Der Dokumentsignierer, gegen den die Sperrliste laeuft.
+    ///
+    /// Nur bei einer Chip-Lesung vorhanden: eine Fahrerlaubnis aus einem Foto hat
+    /// keinen Signierer, und ein Datensatz aus einem aelteren Archiv keinen
+    /// vermerkten.
+    public var signer: SignerReference?
+
+    /// Was der letzte Abgleich mit einer Sperrliste ergeben hat.
+    ///
+    /// `nil` heisst **offen**, nicht „nicht gesperrt": zum Zeitpunkt des Lesens
+    /// lag keine Liste vor. Der Abgleich wird nachgeholt, sobald eine da ist -
+    /// siehe ``RevocationStore``.
+    public var revocation: RevocationCheck?
+
     public init(
         data: DocumentData,
         storedAt: Int64,
         cardId: String?,
         can: String,
-        identityDigest: String? = nil
+        identityDigest: String? = nil,
+        signer: SignerReference? = nil,
+        revocation: RevocationCheck? = nil
     ) {
         self.data = data
         self.storedAt = storedAt
         self.cardId = cardId
         self.can = can
         self.identityDigest = identityDigest
+        self.signer = signer
+        self.revocation = revocation
+    }
+
+    /// Ob fuer diesen Datensatz eine Sperrpruefung noch aussteht.
+    ///
+    /// Nur bei Chip-Lesungen mit vermerktem Signierer: sonst ist nichts zu
+    /// pruefen, und „steht aus" waere eine Ankuendigung, die nie eingeloest wird.
+    public var revocationPending: Bool {
+        signer != nil && revocation == nil
     }
 
     /// Kennung des Datensatzes.

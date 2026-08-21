@@ -65,13 +65,28 @@ enum DemoData {
                 // Heute, vor einer Stunde - damit die Tagesgruppe „Heute" heißt.
                 storedAt: now - 3_600_000,
                 cardId: nil,
-                can: "482913"
+                can: "482913",
+                // Geprüft: so sieht der Regelfall aus.
+                signer: SignerReference(
+                    serialHex: "4A1F0B", issuerDigest: "demo-issuer"
+                ),
+                revocation: RevocationCheck(
+                    outcome: .notRevoked,
+                    checkedAt: Date().addingTimeInterval(-3_600),
+                    listIssuedAt: Date().addingTimeInterval(-6 * 86_400),
+                    listExpiresAt: Date().addingTimeInterval(24 * 86_400)
+                )
             ),
             StoredDocument(
                 data: passport,
                 storedAt: now - 7_200_000,
                 cardId: nil,
-                can: ""
+                can: "",
+                // Offen: gelesen, als keine Liste vorlag. Der Fall, um den es bei
+                // der Sperrprüfung eigentlich geht.
+                signer: SignerReference(
+                    serialHex: "7C22D9", issuerDigest: "demo-issuer-2"
+                )
             ),
             StoredDocument(
                 data: licence,

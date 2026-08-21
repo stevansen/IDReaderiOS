@@ -105,9 +105,14 @@ Drei Sätze, und sie sind der Grund, warum sie so gebaut ist, wie sie gebaut ist
   trägt gar keins — kein graues, kein durchgestrichenes —, sondern den Vorbehalt
   in Worten. Ein durchgestrichenes Siegel liest sich als „durchgefallen", und
   hier gab es nie eine Prüfung.
-* **Nichts verlässt das Gerät von selbst.** Kein Netzzugriff im Quelltext, ein
-  Prüfschritt, der das durchsetzt, und ein Archiv, das sich nach 30 Tagen selbst
+* **Nichts Personenbezogenes verlässt das Gerät von selbst.** Genau ein
+  Netzzugriff, und der holt eine öffentliche Sperrliste, ohne etwas über das
+  Dokument mitzuteilen — abschaltbar, und ein Prüfschritt beim Bauen hält ihn auf
+  diese eine Datei begrenzt. Dazu ein Archiv, das sich nach 30 Tagen selbst
   löscht.
+* **Vier Felder werden angezeigt und nicht aufbewahrt** — Wohnsitz, Steuernummer,
+  Beruf, Telefon. Abschaltbar, vorbelegt eingeschaltet, und beim Abschalten fragt
+  die App nach dem Grund.
 
 Was die App **nicht** entscheiden kann — die Rechtsgrundlage, die Unterrichtung
 der betroffenen Person, die Aufbewahrungsdauer —, sagt sie beim ersten Start und

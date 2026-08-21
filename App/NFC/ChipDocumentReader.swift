@@ -1,6 +1,18 @@
 import Foundation
 import IDReaderCore
 
+/// Was ein Lesevorgang hergibt.
+///
+/// Zwei Dinge, und das zweite gehoert ausdruecklich **nicht** in
+/// ``DocumentData``: der Dokumentsignierer ist keine Angabe ueber die Person,
+/// sondern ueber die Stelle, die das Dokument signiert hat. Er steht in keiner
+/// Ausgabe und in keinem Bericht - er ist nur da, damit die Sperrpruefung spaeter
+/// nachzuholen ist.
+struct ChipReadResult {
+    let data: DocumentData
+    let signer: SignerReference?
+}
+
 /// Was die App vom Chip braucht.
 ///
 /// `@MainActor`: CoreNFC gibt seine Objekte - Sitzung und Tag - nicht als
@@ -29,7 +41,7 @@ protocol ChipDocumentReader {
         key: AccessKey,
         readPhoto: Bool,
         onProgress: @escaping (ReadStep) -> Void
-    ) async throws -> DocumentData
+    ) async throws -> ChipReadResult
 
     /// Bricht eine laufende Uebertragung ab.
     func abort()

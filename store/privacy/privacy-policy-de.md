@@ -13,11 +13,16 @@ mussten sich ändern, und alle drei betreffen Zusagen:
    nicht — `NSCameraUsageDescription` ist unvermeidlich. Der Satz „verlangt keine
    Kamera-Berechtigung" wäre hier falsch, und zwar an genau der Stelle, an der die
    Erklärung ein Versprechen gibt.
-2. **„Keine Internetberechtigung"** gibt es auf iOS nicht als Begriff. Die Zusage
-   bleibt dieselbe, ihre Begründung ist eine andere.
+2. **„Keine Internetberechtigung"** gibt es auf iOS nicht als Begriff — und die
+   Zusage selbst gilt nicht mehr unverändert: seit der Sperrprüfung ruft die App
+   eine öffentliche Sperrliste ab. Das ist die Änderung, die diesem Text am
+   meisten abverlangt, und sie hat einen eigenen Abschnitt bekommen. Ein Text, der
+   weiter „kein Netzzugriff" sagte, wäre nicht bloß veraltet, sondern falsch.
 3. **Der Führerschein** kam nach der letzten Fassung dieses Textes dazu. Er hat
    keinen Chip; seine Angaben stammen aus einer Texterkennung, und das ist eine
    andere Art von Datum.
+4. **Die Datenminimierung** kam später dazu: vier Felder werden angezeigt und
+   nicht aufbewahrt, abschaltbar, vorbelegt eingeschaltet.
 
 Wer diesen Text ändert, muss die veröffentlichte Seite anpassen und die
 italienische und englische Fassung daneben.
@@ -149,17 +154,40 @@ lassen sie sich jederzeit in der App löschen.
 
 Im App-Umschalter erscheint kein Abbild des zuletzt gezeigten Datensatzes.
 
-### Keine Übertragung
+### Der einzige Netzzugriff: die Sperrliste
 
-Die App **greift nicht auf das Netz zu**. In ihrem Quelltext gibt es keine
-Netzverbindung, und ein Prüfschritt beim Bauen bricht ab, wenn eine hinzukommt.
-Sie überträgt nichts — weder an die Entwickler noch an Dritte. Es gibt kein
-Analysewerkzeug, keine Werbung und kein Tracking.
+Die App überträgt **keine personenbezogenen Daten** — weder an die Entwickler noch
+an Dritte. Es gibt kein Analysewerkzeug, keine Werbung und kein Tracking, und
+keinen Server der Entwickler, mit dem die App spricht.
 
-Auch die Echtheitsprüfung läuft vollständig offline gegen Zertifikate, die in der
-App mitgeliefert werden; es wird kein Verzeichnis und keine Sperrliste abgefragt.
-Die verwendeten Programmbibliotheken sind Teil der App und sprechen ebenfalls
-nicht nach außen.
+Einen Netzzugriff macht sie, und nur diesen einen: sie ruft die **öffentliche
+Sperrliste** (Certificate Revocation List) bei der Stelle ab, die sie ausgibt —
+für italienische Dokumente das Innenministerium. Die Adresse dafür steht in den
+mitgelieferten Zertifikaten. Dazu gilt:
+
+- **Es geht nichts über das Dokument hinaus.** Abgerufen wird eine öffentliche
+  Datei, so wie man eine Webseite lädt. Keine Angabe aus dem Dokument, keine
+  Gerätekennung, keine Mitteilung darüber, dass überhaupt gelesen wurde.
+- **Nie während eines Lesevorgangs.** Abgerufen wird beim Starten der App und
+  wenn Sie es in den Einstellungen anfordern. Der Zeitpunkt einer Anfrage wäre
+  sonst selbst eine Mitteilung.
+- **Der Abgleich läuft offline.** Die Liste wird als Ganzes geholt und danach auf
+  dem Gerät verglichen. Deshalb eine Sperrliste und nicht OCSP: bei OCSP ginge zu
+  jedem geprüften Dokument eine eigene Anfrage hinaus.
+- **Abschaltbar.** In den Einstellungen. Abgeschaltet greift die App auf nichts
+  zu; bereits geholte Listen bleiben nutzbar, neue kommen keine dazu.
+- Was der Betreiber der Verteilstelle dabei wie bei jedem Abruf sieht, ist die
+  IP-Adresse des Geräts und der Zeitpunkt.
+
+**Was die Sperrliste aussagt:** ob das Zertifikat, mit dem das Dokument signiert
+wurde, zurückgezogen ist. **Nicht**, ob dieses Dokument als verloren oder
+gestohlen gemeldet ist — solche Fahndungsbestände stehen keiner öffentlichen App
+offen. Am Datensatz steht, wann geprüft wurde und welche Liste dabei vorlag.
+
+Die Echtheitsprüfung selbst läuft weiter vollständig auf dem Gerät, gegen
+mitgelieferte Zertifikate. Die verwendeten Programmbibliotheken sprechen nicht
+nach außen; ein Prüfschritt beim Bauen bricht ab, wenn außerhalb der einen dafür
+vorgesehenen Stelle ein Netzzugriff hinzukommt.
 
 ### Wann Daten die App verlassen
 
@@ -208,4 +236,4 @@ dem Bediener obliegt und dass 30 Tage eine Vorgabe und kein Befund sind.
 
 Diese Erklärung beschreibt den Stand vom 21. August 2026 und gilt ab
 Version 1.8 der iOS-Fassung. Bei Änderungen am Verhalten der App wird sie
-angepasst.
+angepasst — zuletzt für die Datenminimierung und für den Abruf der Sperrliste.

@@ -74,6 +74,16 @@ struct IDReaderApp: App {
                         PrivacyCurtain(strings: model.strings)
                     }
                 }
+                // Die Sperrlisten werden hier aufgefrischt und nirgends sonst:
+                // beim Wechsel in den Vordergrund, mit Abstand, und nie waehrend
+                // eines Lesevorgangs. Der Zeitpunkt einer Anfrage waere sonst
+                // selbst eine Mitteilung - „hier wurde eben ein Ausweis
+                // gelesen". Was das Modell daraus macht, entscheidet es selbst;
+                // abgeschaltet passiert nichts.
+                .onChange(of: scenePhase) { _, phase in
+                    if phase == .active { model.refreshRevocation() }
+                }
+                .task { model.refreshRevocation() }
         }
     }
 }

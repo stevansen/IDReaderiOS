@@ -1,5 +1,6 @@
 /* IDReader - en. Erzeugt aus dem Android-Original; siehe docs/ANDROID-TO-IOS.md. */
 
+
 "action_back" = "Back";
 "action_back_to_photo" = "Photo";
 "action_backspace" = "Delete last digit";
@@ -143,7 +144,7 @@
 "notice_decision_text" = "Whether you may read a document is something only you can know. The app reads what you hold up to it.";
 "notice_decision_title" = "You decide";
 "notice_lead" = "Three things, then you are set.";
-"notice_local_text" = "The app has no internet access. What you read is kept encrypted, clears itself after %d days, and goes out only when you share it.";
+"notice_local_text" = "What is read stays encrypted in the archive, deletes itself after %d days and leaves only when you share it. The one thing the app fetches from the network is the authority's public revocation list — nothing about the document goes out with it, and you can switch it off.";
 "notice_local_title" = "Everything stays on your phone";
 "notice_person_text" = "Say briefly what you are doing before you read someone's document. The app cannot say it for you.";
 "notice_person_title" = "A word to the person";
@@ -173,6 +174,18 @@
 "result_retention_hint" = "Kept encrypted on this device for %d days.";
 "result_valid_until" = "valid until %@";
 "retention_minimised_hint" = "Residence, codice fiscale, profession and telephone are shown but not kept. Note them now if you need them.";
+"revocation_checked_at" = "Checked on %@";
+"revocation_heading" = "Revocation list";
+"revocation_list_date" = "List of %@";
+"revocation_list_stale" = "That list was already out of date when the check ran.";
+"revocation_no_list" = "No list available for this issuer";
+"revocation_not_revoked" = "Signer not revoked";
+"revocation_pending" = "Not checked yet";
+"revocation_pending_count_one" = "%d record still waits to be checked";
+"revocation_pending_count_other" = "%d records still wait to be checked";
+"revocation_pending_hint" = "No list was available when the document was read. The check is caught up as soon as one is.";
+"revocation_revoked" = "Signer revoked";
+"revocation_scope" = "What is checked is the certificate the document was signed with — not whether this document has been reported lost or stolen. Records of that kind are not open to a public app.";
 "scan_caption_can" = "The CAN is read from the photograph.";
 "scan_caption_mrz" = "The MRZ is read from the photograph.";
 "settings_language" = "Language";
@@ -184,6 +197,16 @@
 "settings_retain_all_warning_body" = "Keeping data you do not need is not something an app can justify for you. Whoever switches this on must be able to name the purpose the extra fields serve, and answer for it - data minimisation is an obligation on the controller, not a setting in a program.\n\nIf a report asks for these fields, that is a reason. 'It might come in useful' is not.";
 "settings_retain_all_warning_title" = "You need a reason for this";
 "settings_retention" = "Retention";
+"settings_revocation" = "Revocation lists";
+"settings_revocation_no_list" = "No list fetched yet";
+"settings_revocation_no_source" = "None of the bundled certificates names a distribution point.";
+"settings_revocation_refresh" = "Fetch now";
+"settings_revocation_unchanged" = "No newer list.";
+"settings_revocation_unreachable" = "Not reachable. Try again later.";
+"settings_revocation_unusable" = "What arrived was not usable and was discarded.";
+"settings_revocation_updated" = "Fetched the list of %@.";
+"settings_revocation_updates" = "Fetch revocation lists";
+"settings_revocation_updates_hint" = "The only network access this app makes. A public file is fetched from the authority that issues it — at launch and when you ask for it here, never during a read. Nothing about the document goes out, and nothing about the fact that one was read. Switched off, the app is entirely offline; lists already held stay usable, no new ones arrive.";
 "share_chooser_title" = "Share card data";
 "share_clip_label" = "CIE data";
 "share_copied" = "Copied to the clipboard.";

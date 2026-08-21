@@ -41,6 +41,9 @@ struct ResultScreen: View {
                     if fresh && data.provenance == .chip {
                         minimisationNotice
                     }
+                    if data.provenance == .chip {
+                        revocationCard
+                    }
                     retentionNotice
                 }
                 .padding(.horizontal, 16)
@@ -205,6 +208,90 @@ struct ResultScreen: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(palette.tertiaryContainer, in: .rect(cornerRadius: 14))
         .foregroundStyle(palette.onTertiaryContainer)
+    }
+
+    /// Was die Sperrpruefung ergeben hat, und wann.
+    ///
+    /// ## Warum drei Zeilen und nicht ein Siegel
+    ///
+    /// Ein Zeichen waere zu wenig. „Geprueft" allein sagt nichts: eine Pruefung
+    /// von heute gegen eine Liste von vor zwei Jahren ist etwas anderes als eine
+    /// von vor zwei Wochen gegen die Liste von damals. Also stehen beide Daten da,
+    /// und die Bewertung bleibt bei dem, der hinsieht.
+    ///
+    /// Und darunter, immer, der Satz, was hier ueberhaupt geprueft wird. Wer
+    /// „Sperrliste" liest, denkt zuerst an einen als gestohlen gemeldeten Ausweis;
+    /// geprueft wird das Signierzertifikat. Diesen Irrtum stehen zu lassen waere
+    /// schlimmer, als die Pruefung ganz weggelassen zu haben.
+    @ViewBuilder private var revocationCard: some View {
+        let check = document.revocation
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(spacing: 8) {
+                Image(systemName: revocationSymbol).font(.system(size: 13))
+                Text(strings[.revocationHeading]).font(AppType.cardHeading)
+                Spacer(minLength: 0)
+            }
+            Text(revocationVerdict).font(.subheadline)
+
+            if let check {
+                Text(strings.format(.revocationCheckedAt, formatted(check.checkedAt)))
+                    .font(.footnote)
+                    .foregroundStyle(palette.onSurfaceVariant)
+                if check.outcome != .noListForIssuer {
+                    Text(strings.format(.revocationListDate, formatted(check.listIssuedAt)))
+                        .font(.footnote)
+                        .foregroundStyle(palette.onSurfaceVariant)
+                }
+                if check.usedStaleList(at: Date()) {
+                    Text(strings[.revocationListStale])
+                        .font(.footnote)
+                        .foregroundStyle(palette.onSurfaceVariant)
+                }
+            } else if document.signer != nil {
+                Text(strings[.revocationPendingHint])
+                    .font(.footnote)
+                    .foregroundStyle(palette.onSurfaceVariant)
+            }
+
+            Text(strings[.revocationScope])
+                .font(.caption)
+                .foregroundStyle(palette.onSurfaceVariant)
+                .padding(.top, 2)
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(palette.surfaceContainerLowest, in: .rect(cornerRadius: 14))
+        .overlay {
+            RoundedRectangle(cornerRadius: 14)
+                .stroke(palette.outlineVariant, lineWidth: 1)
+                .allowsHitTesting(false)
+        }
+    }
+
+    private var revocationVerdict: String {
+        guard let check = document.revocation else {
+            return strings[.revocationPending]
+        }
+        switch check.outcome {
+        case .revoked: return strings[.revocationRevoked]
+        case .notRevoked: return strings[.revocationNotRevoked]
+        case .noListForIssuer: return strings[.revocationNoList]
+        }
+    }
+
+    private var revocationSymbol: String {
+        switch document.revocation?.outcome {
+        case .revoked: "xmark.seal"
+        case .notRevoked: "checkmark.seal"
+        default: "clock"
+        }
+    }
+
+    private func formatted(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.dateFormat = "dd.MM.yyyy"
+        return formatter.string(from: date)
     }
 
     private var retentionNotice: some View {

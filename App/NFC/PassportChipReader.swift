@@ -42,7 +42,7 @@ final class PassportChipReader: ChipDocumentReader {
         key: AccessKey,
         readPhoto: Bool,
         onProgress: @escaping (ReadStep) -> Void
-    ) async throws -> DocumentData {
+    ) async throws -> ChipReadResult {
         let reader = PassportReader()
         self.reader = reader
         defer { self.reader = nil }
@@ -85,7 +85,10 @@ final class PassportChipReader: ChipDocumentReader {
         model.verifyPassport(masterListURL: trustBundle)
 
         onProgress(.done)
-        return documentData(from: model)
+        return ChipReadResult(
+            data: documentData(from: model),
+            signer: PassportChipReader.signer(from: model)
+        )
     }
 
     func abort() {
@@ -239,6 +242,30 @@ final class PassportChipReader: ChipDocumentReader {
     /// SecurityInfos aus DG14, dessen Hash gegen das SOD geprueft wird. Wer
     /// stattdessen fragt, ob DG14 lesbar war, laesst eine Kopie durch, die DG14
     /// einfach weglaesst.
+    /// Der Dokumentsignierer, so wie die Sperrpruefung ihn braucht.
+    ///
+    /// ## Warum das Zertifikat noch einmal gelesen wird
+    ///
+    /// Die Bibliothek hat `getSerialNumber()`, und die ist hier unbrauchbar: sie
+    /// laeuft ueber `ASN1_INTEGER_get`, das eine `long` zurueckgibt. Eine
+    /// Seriennummer eines Dokumentsignierers ist bis zu zwanzig Byte lang - dabei
+    /// kommt -1 heraus, und eine Sperrliste gegen -1 abzugleichen ist keine
+    /// Pruefung, sondern eine, die immer „nicht gesperrt" sagt.
+    ///
+    /// Also wird das Zertifikat als PEM abgeholt - die einzige vollstaendige
+    /// Ausgabe, die die Bibliothek hergibt - und im Paket selbst gelesen. Kein
+    /// weiterer Eingriff in fremden Code.
+    static func signer(from model: NFCPassportModel) -> SignerReference? {
+        guard let certificate = model.documentSigningCertificate else { return nil }
+        // Kein Fehlerfall, der jemanden aufhalten sollte: ohne lesbares
+        // Zertifikat entfaellt die Sperrpruefung fuer diesen Datensatz, und die
+        // Oberflaeche sagt das dann auch.
+        guard let identity = try? CertificateReader.identity(
+            ofPEM: certificate.certToPEM()
+        ) else { return nil }
+        return SignerReference(identity)
+    }
+
     static func authenticity(from model: NFCPassportModel) -> Authenticity {
         let hashes = model.dataGroupHashes
         let checked = hashes.keys.compactMap(number(of:)).sorted()

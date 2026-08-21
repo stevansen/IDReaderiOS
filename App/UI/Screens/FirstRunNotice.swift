@@ -235,6 +235,8 @@ struct SettingsScreen: View {
 
                     retentionCard
 
+                    revocationCard
+
                     Text(strings.format(.menuVersion, "\(AppInfo.version) (\(AppInfo.build))"))
                         .font(.footnote)
                         .foregroundStyle(palette.onSurfaceVariant)
@@ -254,6 +256,116 @@ struct SettingsScreen: View {
         } message: {
             Text(strings[.settingsRetainAllWarningBody])
         }
+    }
+
+    /// Die Sperrlisten.
+    ///
+    /// Der einzige Schalter der App, der Netzverkehr betrifft, und deshalb der
+    /// einzige, der erklaert werden muss statt nur benannt: was hinausgeht, wann,
+    /// und was nicht. „Jetzt holen" bleibt bedienbar, auch wenn die Auffrischung
+    /// aus ist - eine ausdrueckliche Anforderung ist die eine Einwilligung, die es
+    /// hier gibt, und wer sie erteilt, soll sie nicht erst ueber einen Schalter
+    /// erteilen muessen.
+    @ViewBuilder private var revocationCard: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            Text(strings[.settingsRevocation])
+                .font(AppType.cardHeading)
+                .padding(.horizontal, 16)
+                .padding(.top, 12)
+                .padding(.bottom, 4)
+
+            Toggle(isOn: Binding(
+                get: { model.revocationUpdatesEnabled },
+                set: { model.revocationUpdatesEnabled = $0 }
+            )) {
+                Text(strings[.settingsRevocationUpdates]).font(.body)
+            }
+            .padding(.horizontal, 16)
+            .frame(minHeight: 52)
+
+            Divider()
+                .overlay(palette.outlineVariant)
+                .padding(.horizontal, 16)
+
+            HStack(spacing: 12) {
+                Text(revocationState)
+                    .font(.footnote)
+                    .foregroundStyle(palette.onSurfaceVariant)
+                Spacer(minLength: 0)
+                Button {
+                    model.refreshRevocation(force: true)
+                } label: {
+                    if model.revocationRefreshing {
+                        ProgressView().controlSize(.small)
+                    } else {
+                        Text(strings[.settingsRevocationRefresh]).font(AppType.actionSmall)
+                    }
+                }
+                .buttonStyle(.plain)
+                .disabled(model.revocationRefreshing)
+                .padding(.horizontal, 14)
+                .frame(minHeight: 40)
+                .foregroundStyle(palette.onSecondaryContainer)
+                .background(palette.secondaryContainer, in: .capsule)
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 10)
+
+            Text(strings[.settingsRevocationUpdatesHint])
+                .font(.footnote)
+                .foregroundStyle(palette.onSurfaceVariant)
+                .padding(.horizontal, 16)
+                .padding(.bottom, 12)
+
+            Text(strings[.revocationScope])
+                .font(.caption)
+                .foregroundStyle(palette.onSurfaceVariant)
+                .padding(.horizontal, 16)
+                .padding(.bottom, 12)
+        }
+        .background(palette.surfaceContainerLowest, in: .rect(cornerRadius: 20))
+        .overlay {
+            RoundedRectangle(cornerRadius: 20)
+                .stroke(palette.outlineVariant, lineWidth: 1)
+                .allowsHitTesting(false)
+        }
+    }
+
+    /// Ein Satz zum Stand: erst die Meldung des letzten Versuchs, sonst das
+    /// Datum der vorliegenden Liste, sonst dass keine da ist. Dazu, wenn welche
+    /// offen sind, wie viele.
+    private var revocationState: String {
+        var parts: [String] = []
+        switch model.revocationNotice {
+        case .updated(let date):
+            parts.append(strings.format(.settingsRevocationUpdated, formatted(date)))
+        case .unchanged:
+            parts.append(strings[.settingsRevocationUnchanged])
+        case .unreachable:
+            parts.append(strings[.settingsRevocationUnreachable])
+        case .unusable:
+            parts.append(strings[.settingsRevocationUnusable])
+        case .noSource:
+            parts.append(strings[.settingsRevocationNoSource])
+        case nil:
+            if let issued = model.newestRevocationList {
+                parts.append(strings.format(.revocationListDate, formatted(issued)))
+            } else {
+                parts.append(strings[.settingsRevocationNoList])
+            }
+        }
+        let pending = model.pendingRevocationCount
+        if pending > 0 {
+            parts.append(strings.plural(.revocationPendingCount, pending))
+        }
+        return parts.joined(separator: " ")
+    }
+
+    private func formatted(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.dateFormat = "dd.MM.yyyy"
+        return formatter.string(from: date)
     }
 
     /// Die Aufbewahrung.

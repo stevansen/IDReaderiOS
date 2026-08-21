@@ -1,6 +1,6 @@
 # Stand
 
-Stand vom **20. August 2026**, nach dem Einbau von PACE mit CAN. Quelle: `cauer71/AndroidDev`, `apps/cie-reader`,
+Stand vom **21. August 2026**, nach der Datenminimierung und der Sperrprüfung. Quelle: `cauer71/AndroidDev`, `apps/cie-reader`,
 Commit `7ab0d20`, Version 1.8 / versionCode 11.
 
 ## Fertig und geprüft
@@ -25,13 +25,14 @@ Commit `7ab0d20`, Version 1.8 / versionCode 11.
 | Urteilsbildung aus den vier Teilprüfungen | portiert | `PassportChipReader.authenticity(from:)` |
 | CSCA-Vertrauensanker als PEM-Bündel für die Kettenprüfung | erzeugt | 2 Tests |
 | Datenschutz-Gegenstücke (Sicherung, Dateischutz, App-Umschalter, Zwischenablage, Netzprüfung) | gebaut | `Scripts/check-no-network.sh` |
+| Sperrprüfung: CRL lesen, Signatur prüfen, ablegen, offline abgleichen, offene Prüfungen nachholen, Datum am Datensatz | gebaut, **gegen die echte italienische CRL durchlaufen** | 29 Tests; im Simulator geholt, geprüft und angezeigt |
 
 **Fassung 1.8 (Build 1) liegt seit dem 21. August 2026 in App Store Connect**
 (Delivery `10e2826e-8bae-4b29-a954-eb089e6a5f9b`), signiert mit
 `Apple Distribution`, für TestFlight freigegeben. Damit ist der Weg auf ein Gerät
 offen — der Nachweis am Gerät selbst ist Punkt 1 unten.
 
-74 Tests, `swift test`, alle grün. Die App baut ohne eine einzige Warnung im
+103 Tests, `swift test`, alle grün. Die App baut ohne eine einzige Warnung im
 eigenen Code (`xcodebuild -scheme IDReader -sdk iphonesimulator`) und läuft im
 Simulator.
 
@@ -74,6 +75,17 @@ In der Reihenfolge, in der es sich lohnt:
 7. **Die Wiedererkennung einer aufgelegten Karte** entfällt dauerhaft — iOS hat
    keinen Dauerlesemodus. Kein offener Punkt, sondern eine Festlegung; hier
    aufgeführt, damit niemand sie sucht.
+8. **Drei CSCA ohne Verteilstelle.** Sechs der neun hinterlegten Zertifikate
+   nennen eine Adresse für ihre Sperrliste, drei nicht. Wer von einem der drei
+   signiert wurde, ist nicht zu prüfen; der Datensatz sagt dann „für diesen
+   Aussteller liegt keine Liste vor". Ob es die drei Listen woanders gibt, ist
+   nicht nachgesehen — die BSI-Masterliste enthält Zertifikate, keine CRLs.
+9. **Die Sperrprüfung am echten Dokument.** Der Weg ist gegen die echte
+   italienische CRL durchlaufen (geholt, Signatur geprüft, abgelegt, verglichen),
+   aber der Signierer kam dabei aus Beispieldaten. Am Gerät zu sehen bleibt, dass
+   ein echtes Dokumentsignierer-Zertifikat den Ausstellerabdruck einer der sechs
+   Listen trifft — trifft es keinen, steht überall „keine Liste für diesen
+   Aussteller", und das sähe wie ein Fehler aus, wäre aber die Zuordnung.
 
 ## Nicht übernommen, mit Absicht
 

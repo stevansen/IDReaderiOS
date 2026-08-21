@@ -56,8 +56,10 @@ liegt bei Apple — nachzulesen in `ThirdParty/NFCPassportReaderCAN/Sources/`,
 * Keine eigenen oder abgewandelten Verfahren. Jeder Algorithmus ist veröffentlicht
   und von IETF, NIST oder ISO genormt; die Protokolle sind ICAO 9303 und
   BSI TR-03110.
-* Keine Netzverbindung, also auch kein TLS und keine HTTPS-Aufrufe — geprüft von
-  `Scripts/check-no-network.sh`.
+* Kein eigenes TLS. Die App ruft die öffentliche Sperrliste über HTTPS ab, und
+  die Transportverschlüsselung dafür ist die von `URLSession`, also Apples eigene —
+  im Bundle liegt kein TLS-Code, und OpenSSL ist daran nicht beteiligt. Der Abruf
+  steht in genau einer Datei, und `Scripts/check-no-network.sh` setzt das durch.
 * Keine Ver- oder Entschlüsselung für Dritte, keine Schlüsselverwaltung, kein VPN,
   kein Kopierschutz.
 

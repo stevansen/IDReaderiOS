@@ -5,17 +5,37 @@ angepasst, wo iOS andere Mittel hat. Keine Rechtsberatung.
 
 ## Was die App tut, damit die unangenehmen Fragen kurze Antworten haben
 
-**Nichts verlässt das Gerät von selbst.** Es gibt keinen Netzzugriff im
-Quelltext — auch nicht in der fremden Lesebibliothek unter `ThirdParty/`, die das
-Skript unten mitprüft. Das ist dort keine Nebensache: die Bibliothek nimmt für die
-Kettenprüfung eine `URL`, und eine `URL` kann auch ins Netz zeigen. Übergeben wird
-ihr das mitgelieferte PEM-Bündel auf der Platte.
+**Ein Netzzugriff, an einer benannten Stelle.** Bis zur Sperrprüfung stand hier,
+es gebe keinen. Jetzt gibt es genau einen:
+[`App/Revocation/RevocationDownloader.swift`](../App/Revocation/RevocationDownloader.swift)
+holt die öffentliche Sperrliste der Ausweisbehörde. Was dabei hinausgeht, ist die
+Anfrage — kein Datum aus einem Dokument, keine Gerätekennung, keine Angabe
+darüber, dass überhaupt gelesen wurde. Geholt wird beim Starten und auf
+ausdrückliche Anforderung, **nie während eines Lesevorgangs**: der Zeitpunkt einer
+Anfrage wäre sonst selbst eine Mitteilung. Abschaltbar in den Einstellungen; aus
+ist die App vollständig offline.
+
+Genau deshalb CRL und nicht OCSP. Bei OCSP geht die Seriennummer des gerade
+geprüften Zertifikats mit hinaus, also ein Hinweis darauf, welches Dokument
+jemand in der Hand hält. Eine CRL wird als Ganzes geholt und danach **offline**
+abgeglichen — auch beim zwanzigsten Dokument an einem Tag ohne Empfang.
+
+Was hereinkommt, gilt erst nach Prüfung: die Signatur der Liste gegen dieselben
+neun CSCA-Zertifikate, die die Passive Authentication verankern. Eine
+untergeschobene leere Liste würde sonst jeden gesperrten Signierer wieder gültig
+aussehen lassen — und die App würde dazu „geprüft am, Liste vom" anzeigen.
+
+Alles Übrige bleibt ohne Netz, auch die fremde Lesebibliothek unter `ThirdParty/`.
+Das ist dort keine Nebensache: die Bibliothek nimmt für die Kettenprüfung eine
+`URL`, und eine `URL` kann auch ins Netz zeigen. Übergeben wird ihr das
+mitgelieferte PEM-Bündel auf der Platte.
+
 Unter Android trug diese Zusage das Manifest, das die `INTERNET`-Berechtigung
-ausdrücklich wieder entfernte — weil eine Bibliothek sie stillschweigend
-hinzufügen könnte und damit eine Aussage im Store-Eintrag aufheben würde, ohne
-dass irgendwo im Code steht, dass etwas übertragen wird. iOS kennt keine solche
-Berechtigung. Also übernimmt `Scripts/check-no-network.sh` die Rolle: er sucht
-nach allem, womit sich senden ließe, und schlägt fehl, wenn er etwas findet.
+ausdrücklich wieder entfernte. iOS kennt keine solche Berechtigung. Also übernimmt
+`Scripts/check-no-network.sh` die Rolle, und in seiner heutigen Fassung setzt er
+die engere und darum überprüfbare Zusage durch: Netzzugriff **nur** in dieser
+einen Datei, und dort ohne festen Rechnernamen — die Adresse kommt aus den
+Zertifikaten.
 
 **Vier Felder werden angezeigt und nicht aufbewahrt.** Wohnsitz, Steuernummer,
 Beruf und Telefon. Die Frage dahinter: braucht ein Anwendungsfall dieses Feld,
@@ -47,6 +67,24 @@ niemand eine Begründung.
 Der Schalter wirkt **ab jetzt**: was schon weggelassen wurde, ist weg und kommt
 nicht zurück. Der Personenabdruck entsteht in beiden Stellungen, damit die Regel
 „ein Eintrag pro Person" nicht von einer Einstellung abhängt.
+
+**Die Sperrprüfung sagt, was sie prüft.** Geprüft wird das Zertifikat, mit dem
+das Dokument signiert wurde — nicht, ob dieses Dokument als verloren oder
+gestohlen gemeldet ist. Wer „Sperrliste" liest, denkt zuerst an das Zweite;
+solche Fahndungsbestände (für Reisedokumente die SLTD von Interpol) stehen keiner
+öffentlichen App offen. Dieser Satz steht deshalb im Ergebnis, im Archiv und in
+den Einstellungen, und nicht nur hier.
+
+Am Datensatz steht **wann** geprüft wurde und **welche Liste** dabei vorlag. Zwei
+Angaben statt einer, weil „geprüft" allein nichts aussagt: eine Prüfung von heute
+gegen eine Liste von vor zwei Jahren ist etwas anderes als eine von vor zwei
+Wochen gegen die Liste von damals. Die Bewertung bleibt bei dem, der hinsieht.
+
+Lag beim Lesen keine Liste vor — kein Empfang, Auffrischung aus —, bleibt die
+Prüfung **offen** und wird nachgeholt, sobald eine da ist. „Offen" sieht nie aus
+wie „nicht gesperrt". Aufbewahrt werden dafür zwei Angaben über den Signierer:
+seine Seriennummer und der Abdruck seines Ausstellernamens. Beide sagen nichts
+über die Person — ein Signierer signiert zehntausende Dokumente.
 
 **Was gespeichert wird, und wie lange.** Datensätze liegen mit AES-256-GCM
 verschlüsselt, der Schlüssel im Schlüsselbund mit

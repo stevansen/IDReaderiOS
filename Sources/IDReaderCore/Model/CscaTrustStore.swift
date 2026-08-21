@@ -16,10 +16,21 @@ import Foundation
 /// python scripts/extract-csca.py DE_ML_*.ml IT Sources/IDReaderCore/Resources/csca
 /// ```
 ///
-/// Bewusst **nicht** umgesetzt: Sperrlistenabfrage (CRL/OCSP). Die braeuchte
-/// Netzzugriff, und den hat diese App nicht. Ein abgelaufener *Dokumentsignierer*
-/// gilt ebenfalls bewusst nicht als Fehlschlag - Signierer laufen nach Monaten
-/// ab, waehrend die Karten, die sie signiert haben, zehn Jahre gueltig bleiben.
+/// Diese Zertifikate tragen noch eine zweite Aufgabe: sechs von ihnen nennen eine
+/// Verteilstelle fuer die Sperrliste, und dieselben neun pruefen deren Signatur -
+/// siehe ``RevocationStore`` und ``RevocationListVerifier``. Frueher stand hier,
+/// eine Sperrlistenabfrage sei bewusst nicht umgesetzt, weil sie Netzzugriff
+/// braeuchte. Sie ist es jetzt, und der Netzzugriff dafuer ist die eine Ausnahme,
+/// die die App macht - benannt in `App/Revocation/RevocationDownloader.swift`.
+///
+/// **OCSP** waere weiter nicht in Ordnung: dort geht die Seriennummer des gerade
+/// geprueften Zertifikats mit hinaus, und damit ein Hinweis darauf, welches
+/// Dokument jemand in der Hand hat. Eine CRL wird als Ganzes geholt und danach
+/// offline abgeglichen.
+///
+/// Ein abgelaufener *Dokumentsignierer* gilt bewusst nicht als Fehlschlag -
+/// Signierer laufen nach Monaten ab, waehrend die Karten, die sie signiert haben,
+/// zehn Jahre gueltig bleiben.
 public enum CscaTrustStore {
 
     /// Die Zertifikate als DER-Bytes, in der Reihenfolge ihrer Dateinamen.

@@ -1,5 +1,6 @@
 /* IDReader - de. Erzeugt aus dem Android-Original; siehe docs/ANDROID-TO-IOS.md. */
 
+
 "action_back" = "Zurück";
 "action_back_to_photo" = "Foto";
 "action_backspace" = "Letzte Ziffer löschen";
@@ -143,7 +144,7 @@
 "notice_decision_text" = "Ob Sie ein Dokument lesen dürfen, wissen nur Sie. Die App liest, was Sie ihr hinhalten.";
 "notice_decision_title" = "Sie entscheiden";
 "notice_lead" = "Drei Dinge, dann kann es losgehen.";
-"notice_local_text" = "Die App hat keinen Internetzugang. Gelesenes liegt verschlüsselt im Archiv, löscht sich nach %d Tagen von selbst und geht nur hinaus, wenn Sie es teilen.";
+"notice_local_text" = "Gelesenes liegt verschlüsselt im Archiv, löscht sich nach %d Tagen von selbst und geht nur hinaus, wenn Sie es teilen. Aus dem Netz holt die App nur die öffentliche Sperrliste der Ausweisbehörde — nichts über das Dokument geht dabei hinaus, und abschalten können Sie es.";
 "notice_local_title" = "Alles bleibt auf Ihrem Gerät";
 "notice_person_text" = "Sagen Sie kurz, was Sie tun, bevor Sie ein Dokument lesen. Die App kann das nicht für Sie.";
 "notice_person_title" = "Ein Satz an Ihr Gegenüber";
@@ -173,6 +174,18 @@
 "result_retention_hint" = "Bleibt %d Tage verschlüsselt auf diesem Gerät.";
 "result_valid_until" = "gültig bis %@";
 "retention_minimised_hint" = "Wohnsitz, Steuernummer, Beruf und Telefon werden angezeigt, aber nicht aufbewahrt. Wer sie braucht, notiert sie jetzt.";
+"revocation_checked_at" = "Geprüft am %@";
+"revocation_heading" = "Sperrliste";
+"revocation_list_date" = "Liste vom %@";
+"revocation_list_stale" = "Diese Liste war zum Zeitpunkt der Prüfung überholt.";
+"revocation_no_list" = "Für diesen Aussteller liegt keine Liste vor";
+"revocation_not_revoked" = "Signierer nicht gesperrt";
+"revocation_pending" = "Noch nicht geprüft";
+"revocation_pending_count_one" = "%d Eintrag wartet noch auf die Prüfung";
+"revocation_pending_count_other" = "%d Einträge warten noch auf die Prüfung";
+"revocation_pending_hint" = "Beim Lesen lag keine Liste vor. Die Prüfung wird nachgeholt, sobald eine da ist.";
+"revocation_revoked" = "Signierer gesperrt";
+"revocation_scope" = "Geprüft wird das Zertifikat, mit dem das Dokument signiert wurde — nicht, ob dieses Dokument als verloren oder gestohlen gemeldet ist. Solche Fahndungsbestände stehen keiner öffentlichen App offen.";
 "scan_caption_can" = "Die CAN wird aus dem Foto gelesen.";
 "scan_caption_mrz" = "Die MRZ wird aus dem Foto gelesen.";
 "settings_language" = "Sprache";
@@ -184,6 +197,16 @@
 "settings_retain_all_warning_body" = "Daten zu behalten, die man nicht braucht, kann eine App nicht für Sie rechtfertigen. Wer das einschaltet, muss den Zweck benennen können, dem die zusätzlichen Felder dienen, und dafür einstehen - Datenminimierung ist eine Pflicht des Verantwortlichen und kein Schalter in einem Programm.\n\nWenn ein Bericht diese Felder verlangt, ist das ein Grund. „Könnte man mal brauchen“ ist keiner.";
 "settings_retain_all_warning_title" = "Dafür brauchen Sie einen Grund";
 "settings_retention" = "Aufbewahrung";
+"settings_revocation" = "Sperrlisten";
+"settings_revocation_no_list" = "Noch keine Liste geholt";
+"settings_revocation_no_source" = "Kein hinterlegtes Zertifikat nennt eine Verteilstelle.";
+"settings_revocation_refresh" = "Jetzt holen";
+"settings_revocation_unchanged" = "Keine neuere Liste.";
+"settings_revocation_unreachable" = "Nicht erreichbar. Später erneut versuchen.";
+"settings_revocation_unusable" = "Was ankam, war nicht verwendbar und wurde verworfen.";
+"settings_revocation_updated" = "Liste vom %@ geholt.";
+"settings_revocation_updates" = "Sperrlisten aus dem Netz holen";
+"settings_revocation_updates_hint" = "Der einzige Netzzugriff dieser App. Geholt wird eine öffentliche Datei bei der Stelle, die sie ausgibt — beim Starten und wenn Sie es hier anfordern, nie während eines Lesevorgangs. Es geht nichts über das Dokument hinaus und nichts darüber, dass gelesen wurde. Abgeschaltet ist die App vollständig offline; vorhandene Listen bleiben nutzbar, neue kommen keine dazu.";
 "share_chooser_title" = "Ausweisdaten teilen";
 "share_clip_label" = "CIE-Daten";
 "share_copied" = "In die Zwischenablage kopiert.";

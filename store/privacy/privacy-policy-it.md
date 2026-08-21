@@ -147,18 +147,41 @@ possono essere cancellati nell'app in qualsiasi momento.
 
 Nel commutatore delle app non compare alcuna immagine dell'ultimo record mostrato.
 
-### Nessuna trasmissione
+### L'unico accesso alla rete: la lista di revoca
 
-L'app **non accede alla rete**. Nel suo codice non esiste alcuna connessione di
-rete, e un controllo in fase di compilazione fallisce se ne compare una. Non
-trasmette nulla — né agli sviluppatori né a terzi. Non esiste alcuno strumento di
-analisi, nessuna pubblicità e nessun tracciamento.
+L'app non trasmette **alcun dato personale** — né agli sviluppatori né a terzi.
+Non c'è alcuno strumento di analisi, nessuna pubblicità e nessun tracciamento, e
+nessun server degli sviluppatori con cui l'app comunichi.
 
-Anche la verifica di autenticità avviene completamente offline, con i certificati
-inclusi nell'app; non viene consultato alcun elenco né alcuna lista di revoca. Le
-librerie utilizzate fanno parte dell'app e nemmeno esse comunicano verso
-l'esterno.
+Un accesso alla rete lo fa, e soltanto questo: scarica la **lista di revoca
+pubblica** dei certificati presso l'ente che la pubblica — per i documenti
+italiani il Ministero dell'Interno. L'indirizzo è indicato nei certificati
+inclusi nell'app. Al riguardo:
 
+- **Non esce nulla sul documento.** Viene scaricato un file pubblico, come si
+  carica una pagina web. Nessun dato del documento, nessun identificativo del
+  dispositivo, nessuna indicazione che sia stata fatta una lettura.
+- **Mai durante una lettura.** Lo scaricamento avviene all'avvio dell'app e
+  quando lo richiedete nelle impostazioni. Altrimenti il momento della richiesta
+  sarebbe esso stesso un'informazione.
+- **Il confronto avviene offline.** La lista viene scaricata per intero e
+  confrontata sul dispositivo. Per questo una lista di revoca e non OCSP: con
+  OCSP uscirebbe una richiesta per ogni singolo documento verificato.
+- **Si può disattivare.** Nelle impostazioni. Disattivato, l'app non accede a
+  nulla; le liste già scaricate restano utilizzabili, non ne arrivano di nuove.
+- Quello che il gestore del punto di distribuzione vede, come per qualsiasi
+  scaricamento, è l'indirizzo IP del dispositivo e l'orario.
+
+**Cosa dice la lista di revoca:** se il certificato con cui il documento è stato
+firmato è stato ritirato. **Non** se questo documento è stato segnalato come
+perduto o rubato — banche dati di quel tipo non sono accessibili a un'app
+pubblica. Su ogni record è indicato quando è stata fatta la verifica e quale lista
+era disponibile.
+
+La verifica di autenticità in sé continua a svolgersi interamente sul
+dispositivo, con i certificati inclusi. Le librerie utilizzate non comunicano
+verso l'esterno; un controllo in fase di compilazione fallisce se un accesso alla
+rete compare al di fuori dell'unico punto previsto.
 ### Quando i dati escono dall'app
 
 Solo quando l'utente li esporta esplicitamente, e solo verso la destinazione che
@@ -206,4 +229,5 @@ valore predefinito e non un accertamento.
 ### Modifiche
 
 Questa informativa descrive lo stato al 21 agosto 2026 e vale dalla versione 1.8
-della release iOS. Sarà aggiornata in caso di modifiche al comportamento dell'app.
+della release iOS. Sarà aggiornata in caso di modifiche al comportamento dell'app —
+da ultimo per la minimizzazione dei dati e per lo scaricamento della lista di revoca.

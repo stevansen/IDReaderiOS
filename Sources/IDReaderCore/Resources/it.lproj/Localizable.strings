@@ -1,5 +1,6 @@
 /* IDReader - it. Erzeugt aus dem Android-Original; siehe docs/ANDROID-TO-IOS.md. */
 
+
 "action_back" = "Indietro";
 "action_back_to_photo" = "Foto";
 "action_backspace" = "Cancella l'ultima cifra";
@@ -143,7 +144,7 @@
 "notice_decision_text" = "Se può leggere un documento lo sa soltanto lei. L'app legge quello che le viene mostrato.";
 "notice_decision_title" = "Decide lei";
 "notice_lead" = "Tre cose e si parte.";
-"notice_local_text" = "L'app non ha accesso a internet. Quello che legge resta cifrato, si cancella da sé dopo %d giorni ed esce solo se lo condivide lei.";
+"notice_local_text" = "Quanto letto resta cifrato nell'archivio, si cancella da sé dopo %d giorni ed esce solo se lo condividete. Dalla rete l'app scarica solo la lista di revoca pubblica dell'ente emittente — non esce nulla sul documento, e potete disattivarla.";
 "notice_local_title" = "Tutto resta sul suo telefono";
 "notice_person_text" = "Dica brevemente che cosa sta facendo prima di leggere il documento di qualcuno. L'app non può farlo al suo posto.";
 "notice_person_title" = "Due parole a chi ha davanti";
@@ -173,6 +174,18 @@
 "result_retention_hint" = "Conservati cifrati su questo dispositivo per %d giorni.";
 "result_valid_until" = "valida fino al %@";
 "retention_minimised_hint" = "Residenza, codice fiscale, professione e telefono vengono mostrati ma non conservati. Chi ne ha bisogno li annoti adesso.";
+"revocation_checked_at" = "Verificato il %@";
+"revocation_heading" = "Lista di revoca";
+"revocation_list_date" = "Lista del %@";
+"revocation_list_stale" = "Quella lista era già scaduta al momento della verifica.";
+"revocation_no_list" = "Per questo emittente non è disponibile alcuna lista";
+"revocation_not_revoked" = "Firmatario non revocato";
+"revocation_pending" = "Non ancora verificato";
+"revocation_pending_count_one" = "%d record attende ancora la verifica";
+"revocation_pending_count_other" = "%d record attendono ancora la verifica";
+"revocation_pending_hint" = "Alla lettura non era disponibile alcuna lista. La verifica viene recuperata appena ne arriva una.";
+"revocation_revoked" = "Firmatario revocato";
+"revocation_scope" = "Viene verificato il certificato con cui il documento è stato firmato — non se questo documento è stato segnalato come perduto o rubato. Banche dati di quel tipo non sono accessibili a un'app pubblica.";
 "scan_caption_can" = "Il CAN viene letto dalla fotografia.";
 "scan_caption_mrz" = "La MRZ viene letta dalla fotografia.";
 "settings_language" = "Lingua";
@@ -184,6 +197,16 @@
 "settings_retain_all_warning_body" = "Conservare dati di cui non si ha bisogno non è qualcosa che un'app possa giustificare al posto suo. Chi lo attiva deve poter indicare la finalità cui servono i campi aggiuntivi, e risponderne - la minimizzazione dei dati è un obbligo del titolare, non un interruttore in un programma.\n\nSe un rapporto richiede questi campi, è un motivo. «Potrebbe servire» non lo è.";
 "settings_retain_all_warning_title" = "Per questo serve un motivo";
 "settings_retention" = "Conservazione";
+"settings_revocation" = "Liste di revoca";
+"settings_revocation_no_list" = "Nessuna lista ancora scaricata";
+"settings_revocation_no_source" = "Nessuno dei certificati inclusi indica un punto di distribuzione.";
+"settings_revocation_refresh" = "Scarica ora";
+"settings_revocation_unchanged" = "Nessuna lista più recente.";
+"settings_revocation_unreachable" = "Non raggiungibile. Riprovare più tardi.";
+"settings_revocation_unusable" = "Quanto è arrivato non era utilizzabile ed è stato scartato.";
+"settings_revocation_updated" = "Scaricata la lista del %@.";
+"settings_revocation_updates" = "Scaricare le liste di revoca";
+"settings_revocation_updates_hint" = "L'unico accesso alla rete di questa app. Viene scaricato un file pubblico dall'ente che lo pubblica — all'avvio e quando lo si richiede qui, mai durante una lettura. Non esce nulla sul documento né sul fatto che sia stata fatta una lettura. Disattivata, l'app è completamente offline: le liste già presenti restano utilizzabili, non ne arrivano di nuove.";
 "share_chooser_title" = "Condividi i dati della carta";
 "share_clip_label" = "Dati CIE";
 "share_copied" = "Copiato negli appunti.";

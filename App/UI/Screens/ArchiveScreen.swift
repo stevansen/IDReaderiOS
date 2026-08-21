@@ -172,6 +172,9 @@ struct ArchiveScreen: View {
                     Text(record.data.documentNumber)
                         .font(AppType.monoRowValue)
                         .foregroundStyle(palette.onSurfaceVariant)
+                    if record.data.provenance == .chip {
+                        revocationLine(record)
+                    }
                 }
 
                 Spacer(minLength: 0)
@@ -195,6 +198,47 @@ struct ArchiveScreen: View {
     }
 
     // -----------------------------------------------------------------------
+
+    /// Eine Zeile zur Sperrpruefung, so knapp wie eine Archivzeile es zulaesst.
+    ///
+    /// Das Datum steht dabei, nicht bloss ein Haken: gefragt war, **wann** gegen
+    /// die Sperrlisten geprueft wurde, und ein Haken ohne Datum beantwortet das
+    /// nicht. Ausstehend bekommt kein Datum, sondern das Wort - es gibt keins.
+    @ViewBuilder private func revocationLine(_ record: StoredDocument) -> some View {
+        HStack(spacing: 4) {
+            switch record.revocation?.outcome {
+            case .revoked:
+                Image(systemName: "xmark.seal").font(.system(size: 10))
+                Text(strings[.revocationRevoked])
+            case .notRevoked:
+                Image(systemName: "checkmark.seal").font(.system(size: 10))
+                Text(
+                    strings.format(
+                        .revocationCheckedAt,
+                        checkDate(record.revocation?.checkedAt)
+                    )
+                )
+            case .noListForIssuer:
+                Image(systemName: "questionmark.circle").font(.system(size: 10))
+                Text(strings[.revocationNoList])
+            case nil:
+                Image(systemName: "clock").font(.system(size: 10))
+                Text(strings[.revocationPending])
+            }
+        }
+        .font(AppType.microLabel)
+        .lineLimit(1)
+        .foregroundStyle(
+            record.revocation?.outcome == .revoked ? palette.error : palette.onSurfaceVariant
+        )
+    }
+
+    private func checkDate(_ date: Date?) -> String {
+        guard let date else { return "" }
+        return date.formatted(
+            .dateTime.day().month().year().locale(Locale(identifier: strings.resolved))
+        )
+    }
 
     private struct Group {
         let title: String

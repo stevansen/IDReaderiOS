@@ -9,7 +9,7 @@ Umgeschaltet wird oben im Kopfbereich; jede Art hat eigenen Bildschirm und eigen
 Ohne das Dokument in der Hand lässt sich nichts auslesen.
 
 DEN SCHLÜSSEL FOTOGRAFIEREN
-Beim Reisepass gehen dabei die drei Prüfziffern der maschinenlesbaren Zone auf — die Erkennung ist bestätigt, bevor das Dokument aufgelegt wird. Die CAN hat keine Prüfziffer; ob sie stimmt, zeigt der Lesevorgang. Eintippen bleibt möglich.
+Beim Reisepass gehen dabei die drei Prüfziffern der maschinenlesbaren Zone auf — die Erkennung ist bestätigt, bevor das Dokument aufgelegt wird. Eintippen bleibt möglich.
 
 ANGEZEIGTE DATEN
 Name, Geburtsdatum und -ort, Geschlecht, Staatsangehörigkeit, Dokumentnummer, Ausstellungs- und Ablaufdatum, ausstellende Stelle. Wohnadresse und Steuernummer, sofern das Dokument sie führt.
@@ -19,7 +19,7 @@ In Südtirol stehen Orte und Straßen zweisprachig auf der Karte. Gezeigt wird d
 Wohnadresse, Steuernummer, Beruf und Telefon werden angezeigt und nicht ins Archiv übernommen; beim Datensatz steht dann „gelesen, nicht gespeichert". Abschaltbar in den Einstellungen, vorbelegt eingeschaltet.
 
 ECHTHEITSPRÜFUNG
-Vollständig offline, gegen mitgelieferte Zertifikate. Keine Sperrlistenabfrage.
+Gegen mitgelieferte Zertifikate, auf dem Gerät gerechnet.
 • Passive Authentifizierung: die Prüfsummen der gelesenen Datengruppen gegen das signierte Sicherheitsobjekt der Karte, dieses gegen das Dokumentenzertifikat und dieses gegen die italienische Wurzelinstanz.
 • Chip-Authentifizierung: die Karte weist nach, dass der Chip das Original ist und nicht eine Kopie der Daten.
 
@@ -33,16 +33,16 @@ Ein solcher Datensatz trägt kein Siegel — kein graues, kein durchgestrichenes
 LICHTBILD
 Der schnelle Lesemodus lässt es weg, der vollständige nimmt es mit.
 
-Auf der italienischen Karte liegt es als JPEG 2000 vor, und iOS bringt dafür keinen Decoder mit; die App zeigt dann das erkannte Format an. An dem Decoder wird gearbeitet.
+Auf der italienischen Karte liegt es als JPEG 2000 vor; iOS bringt keinen Decoder mit, die App zeigt dann das erkannte Format an. Am Decoder wird gearbeitet.
 
 ARCHIV
 Gelesene Dokumente bleiben 30 Tage auf dem Gerät und löschen sich dann selbst. Pro Person bleibt ein Eintrag. Mehrere lassen sich gemeinsam ausgeben, als Text oder als JSON.
 
 DATENSCHUTZ
-• Kein Netzzugriff. Im Quelltext gibt es keine Netzverbindung, und ein Prüfschritt beim Bauen setzt das durch.
+• Ein Netzzugriff, und nur einer: die öffentliche Sperrliste der Ausweisbehörde. Nichts über das Dokument geht dabei hinaus, nie während eines Lesevorgangs, abschaltbar. Ein Prüfschritt beim Bauen hält es dabei.
 • Die Daten liegen nur auf dem Gerät, verschlüsselt mit AES-256 und einem Schlüssel im Schlüsselbund, der das Gerät nicht verlässt.
 • Kein Analysewerkzeug, keine Werbung, kein Tracking. Nichts wird erhoben.
-• Zum Fotografieren braucht die App die Kamera-Berechtigung; auf iOS ist das nicht zu vermeiden. Die Aufnahme geht nie in die Fotobibliothek und nie auf die Platte, und die Texterkennung läuft auf dem Gerät.
+• Zum Fotografieren braucht die App die Kamera-Berechtigung. Die Aufnahme geht nie in die Fotobibliothek und nie auf die Platte, und die Texterkennung läuft auf dem Gerät.
 • Daten gehen nur bei einer ausdrücklichen Ausgabe hinaus, das Lichtbild allein per E-Mail.
 
 WER ENTSCHEIDET

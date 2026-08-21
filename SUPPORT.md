@@ -43,9 +43,14 @@ der widerspricht. Halten Sie jedes Feld gegen das Dokument.
 
 ### Was die App nicht tut
 
-Sie überträgt nichts. Es gibt keinen Netzzugriff, kein Analysewerkzeug, keine
-Werbung, kein Tracking. Gelesene Daten liegen verschlüsselt auf dem Gerät und
-löschen sich nach 30 Tagen.
+Sie überträgt keine personenbezogenen Daten. Es gibt kein Analysewerkzeug, keine
+Werbung, kein Tracking und keinen Server der Entwickler. Gelesene Daten liegen
+verschlüsselt auf dem Gerät und löschen sich nach 30 Tagen.
+
+Einen Netzzugriff gibt es, und nur diesen einen: die App holt die öffentliche
+Sperrliste der Ausweisbehörde, um zu prüfen, ob das Signierzertifikat eines
+Dokuments zurückgezogen ist. Dabei geht nichts über das Dokument hinaus, und in
+den Einstellungen lässt es sich abschalten.
 
 ---
 
@@ -82,8 +87,14 @@ each field against the document.
 
 ### What the app does not do
 
-It transmits nothing. There is no network access, no analytics, no advertising, no
-tracking. Data read stays encrypted on the device and deletes itself after 30 days.
+It transmits no personal data. There is no analytics, no advertising, no tracking
+and no server of the developers'. Data read stays encrypted on the device and
+deletes itself after 30 days.
+
+There is one network access, and only one: the app fetches the authority's public
+revocation list to check whether a document's signing certificate has been
+withdrawn. Nothing about the document goes out with it, and it can be switched off
+in the settings.
 
 ---
 
@@ -122,6 +133,11 @@ Confronti ogni campo con il documento.
 
 ### Cosa l'app non fa
 
-Non trasmette nulla. Nessun accesso alla rete, nessuno strumento di analisi,
-nessuna pubblicità, nessun tracciamento. I dati letti restano cifrati sul
-dispositivo e si cancellano dopo 30 giorni.
+Non trasmette alcun dato personale. Nessuno strumento di analisi, nessuna
+pubblicità, nessun tracciamento, nessun server degli sviluppatori. I dati letti
+restano cifrati sul dispositivo e si cancellano dopo 30 giorni.
+
+Un accesso alla rete c'è, e soltanto questo: l'app scarica la lista di revoca
+pubblica dell'ente emittente per verificare se il certificato di firma di un
+documento è stato ritirato. Non esce nulla sul documento, e nelle impostazioni si
+può disattivare.

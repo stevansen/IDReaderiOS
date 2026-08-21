@@ -32,11 +32,16 @@ public enum StoredDocumentCodec {
     /// dieselbe Aenderung bekommen; bis dahin sind die Formate 8 und 9 nicht
     /// gegenseitig lesbar.
     ///
+    /// 10 seit der Sperrpruefung: der Datensatz merkt sich, gegen welchen
+    /// Signierer zu pruefen ist und was der letzte Abgleich ergab. Ohne beides
+    /// waere die Pruefung nicht nachzuholen, und genau das Nachholen ist ihr
+    /// Sinn - beim Lesen ist oft kein Netz da.
+    ///
     /// Eine Erhoehung verwirft das vorhandene Archiv - siehe ``decodeAll(_:)``.
     /// Das ist bewusst in Kauf genommen: ein Feld nachtraeglich als optional zu
     /// lesen waere moeglich, wuerde aber bedeuten, dass gespeicherte Scans
     /// dauerhaft ohne es dastehen.
-    public static let version = 9
+    public static let version = 10
 
     public static func encodeAll(_ documents: [StoredDocument]) throws -> Data {
         let root: [String: Any] = [
@@ -120,13 +125,36 @@ public enum StoredDocumentCodec {
         data["photo"] = encode(d.photo)
         data["droppedFields"] = d.droppedFields.map(\.rawValue)
 
-        return [
+        var record: [String: Any] = [
             "storedAt": document.storedAt,
             "cardId": document.cardId ?? NSNull(),
             "can": document.can,
             "identityDigest": document.identityDigest ?? NSNull(),
             "data": data,
         ]
+        if let signer = document.signer {
+            record["signer"] = [
+                "serialHex": signer.serialHex,
+                "issuerDigest": signer.issuerDigest,
+            ]
+        } else {
+            record["signer"] = NSNull()
+        }
+        if let check = document.revocation {
+            // Millisekunden als ganze Zahl, wie `storedAt`: eine Fliesskommazahl
+            // durch JSON zu schicken kostet Stellen, und danach ist der geladene
+            // Wert nicht mehr gleich dem gespeicherten.
+            var entry: [String: Any] = [
+                "outcome": check.outcome.rawValue,
+                "checkedAt": millis(check.checkedAt),
+                "listIssuedAt": millis(check.listIssuedAt),
+            ]
+            entry["listExpiresAt"] = check.listExpiresAt.map(millis) ?? NSNull()
+            record["revocation"] = entry
+        } else {
+            record["revocation"] = NSNull()
+        }
+        return record
     }
 
     private static func decode(
@@ -182,8 +210,50 @@ public enum StoredDocumentCodec {
             storedAt: storedAt,
             cardId: string(record, "cardId"),
             can: string(record, "can") ?? "",
-            identityDigest: string(record, "identityDigest")
+            identityDigest: string(record, "identityDigest"),
+            signer: decodeSigner(record["signer"] as? [String: Any]),
+            revocation: decodeRevocation(record["revocation"] as? [String: Any])
         )
+    }
+
+    // -----------------------------------------------------------------------
+    // Sperrpruefung
+    // -----------------------------------------------------------------------
+
+    private static func decodeSigner(_ raw: [String: Any]?) -> SignerReference? {
+        guard let raw,
+              let serial = raw["serialHex"] as? String,
+              let issuer = raw["issuerDigest"] as? String
+        else { return nil }
+        return SignerReference(serialHex: serial, issuerDigest: issuer)
+    }
+
+    /// Ein Abgleich wird nur uebernommen, wenn er vollstaendig dasteht.
+    ///
+    /// Fehlt etwas, gilt die Pruefung als **nicht gelaufen** und wird nachgeholt.
+    /// Die Gegenrichtung - halb gelesen und trotzdem als Ergebnis ausgegeben -
+    /// waere eine Anzeige, die mehr behauptet, als bekannt ist.
+    private static func decodeRevocation(_ raw: [String: Any]?) -> RevocationCheck? {
+        guard let raw,
+              let outcome = (raw["outcome"] as? String).flatMap(RevocationOutcome.init(rawValue:)),
+              let checkedAt = (raw["checkedAt"] as? NSNumber)?.int64Value,
+              let listIssuedAt = (raw["listIssuedAt"] as? NSNumber)?.int64Value
+        else { return nil }
+        let expires = (raw["listExpiresAt"] as? NSNumber)?.int64Value
+        return RevocationCheck(
+            outcome: outcome,
+            checkedAt: date(fromMillis: checkedAt),
+            listIssuedAt: date(fromMillis: listIssuedAt),
+            listExpiresAt: expires.map(date(fromMillis:))
+        )
+    }
+
+    private static func millis(_ date: Date) -> Int64 {
+        Int64((date.timeIntervalSince1970 * 1000).rounded())
+    }
+
+    private static func date(fromMillis value: Int64) -> Date {
+        Date(timeIntervalSince1970: Double(value) / 1000)
     }
 
     // -----------------------------------------------------------------------

@@ -47,7 +47,12 @@ public struct AppSettings: @unchecked Sendable {
     ///
     /// Reine Sprach- oder Satzbaukorrekturen sind kein Grund; eine geaenderte
     /// Aussage ist einer.
-    public static let noticeVersion = 1
+    ///
+    /// 2 seit der Sperrpruefung. Bis dahin stand da „Die App hat keinen
+    /// Internetzugang" - jetzt holt sie eine oeffentliche Sperrliste. Das ist die
+    /// Art Aenderung, fuer die diese Zahl da ist: wer Fassung 1 bestaetigt hat,
+    /// hat einen Satz bestaetigt, der nicht mehr gilt.
+    public static let noticeVersion = 2
 
     // -----------------------------------------------------------------------
 
@@ -94,6 +99,44 @@ public struct AppSettings: @unchecked Sendable {
     public var retainsAllFields: Bool {
         get { defaults.bool(forKey: Key.retainAllFields) }
         nonmutating set { defaults.set(newValue, forKey: Key.retainAllFields) }
+    }
+
+    /// Ob die App die Sperrlisten von selbst auffrischen darf.
+    ///
+    /// ## Der einzige Netzzugriff dieser App
+    ///
+    /// Vorbelegt **eingeschaltet**, weil eine Sperrpruefung, die nie eine Liste
+    /// bekommt, keine ist. Abschalten macht die App wieder vollstaendig
+    /// offline; die vorhandenen Listen bleiben nutzbar, neue kommen keine dazu,
+    /// und die Datensaetze sagen dann „nicht geprueft" statt etwas zu behaupten.
+    ///
+    /// Was hinausgeht: eine Anfrage nach einer oeffentlichen Datei bei der Stelle,
+    /// die sie ausgibt. Kein Datum aus einem Dokument, keine Kennung, keine
+    /// Angabe darueber, dass ueberhaupt gelesen wurde. Was der Betreiber
+    /// trotzdem sieht, ist die Adresse des Geraets und der Zeitpunkt - deshalb
+    /// wird nie waehrend oder unmittelbar nach einem Lesevorgang geholt, sondern
+    /// nur beim Starten und auf ausdrueckliche Anforderung.
+    public var revocationUpdatesEnabled: Bool {
+        get {
+            // `object(forKey:)` und nicht `bool`: der fehlende Wert muss `true`
+            // ergeben, und `bool(forKey:)` gibt fuer nichts `false`.
+            defaults.object(forKey: Key.revocationUpdates) as? Bool ?? true
+        }
+        nonmutating set { defaults.set(newValue, forKey: Key.revocationUpdates) }
+    }
+
+    /// Wann zuletzt versucht wurde, eine Liste zu holen - gelungen oder nicht.
+    ///
+    /// Haelt den Abstand ein: ohne Netz soll nicht bei jedem Wechsel in den
+    /// Vordergrund ein neuer Versuch anlaufen.
+    public var revocationLastAttempt: Date? {
+        get {
+            let value = defaults.double(forKey: Key.revocationLastAttempt)
+            return value > 0 ? Date(timeIntervalSince1970: value) : nil
+        }
+        nonmutating set {
+            defaults.set(newValue?.timeIntervalSince1970 ?? 0, forKey: Key.revocationLastAttempt)
+        }
     }
 
     /// Gewaehlte Sprache.
@@ -163,5 +206,7 @@ public struct AppSettings: @unchecked Sendable {
         static let noticeAt = "notice_at"
         static let language = "language"
         static let retainAllFields = "retain_all_fields"
+        static let revocationUpdates = "revocation_updates"
+        static let revocationLastAttempt = "revocation_last_attempt"
     }
 }

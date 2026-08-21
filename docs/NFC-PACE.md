@@ -173,7 +173,11 @@ diese Bibliothek zu nehmen statt selbst zu schreiben:
 Womit geprüft wird, geben wir mit: das PEM-Bündel der neun italienischen CSCA aus
 `Sources/IDReaderCore/Resources/csca/`. Fehlt es, wird gelesen und nicht geprüft —
 und das Ergebnis sagt das dann auch, statt ein Siegel zu malen, das nichts belegt.
-Sperrlistenabfrage (CRL/OCSP) bleibt bewusst aus: sie bräuchte Netz.
+Die **Sperrlistenabfrage** ist inzwischen dabei, und zwar als CRL: die Liste wird
+als Ganzes geholt und danach offline abgeglichen. OCSP bleibt draußen — dort ginge
+die Seriennummer des gerade geprüften Zertifikats mit hinaus. Siehe
+[DATA-PROTECTION.md](DATA-PROTECTION.md); geprüft wird der Dokumentsignierer, nicht
+ob ein Dokument als gestohlen gemeldet ist.
 
 ## Und JPEG 2000
 
