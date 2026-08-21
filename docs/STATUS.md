@@ -25,6 +25,11 @@ Commit `7ab0d20`, Version 1.8 / versionCode 11.
 | CSCA-Vertrauensanker als PEM-Bündel für die Kettenprüfung | erzeugt | 2 Tests |
 | Datenschutz-Gegenstücke (Sicherung, Dateischutz, App-Umschalter, Zwischenablage, Netzprüfung) | gebaut | `Scripts/check-no-network.sh` |
 
+**Fassung 1.8 (Build 1) liegt seit dem 21. August 2026 in App Store Connect**
+(Delivery `10e2826e-8bae-4b29-a954-eb089e6a5f9b`), signiert mit
+`Apple Distribution`, für TestFlight freigegeben. Damit ist der Weg auf ein Gerät
+offen — der Nachweis am Gerät selbst ist Punkt 1 unten.
+
 64 Tests, `swift test`, alle grün. Die App baut ohne eine einzige Warnung im
 eigenen Code (`xcodebuild -scheme IDReader -sdk iphonesimulator`) und läuft im
 Simulator.
@@ -33,8 +38,8 @@ Simulator.
 
 In der Reihenfolge, in der es sich lohnt:
 
-1. **Der Nachweis am Gerät.** Eine echte CIE 3.0 an ein iPhone halten und die
-   vier Phasen durchlaufen sehen. Ohne das gilt der Leseweg als gebaut, nicht als
+1. **Der Nachweis am Gerät.** Der Build steht in TestFlight; jetzt eine echte
+   CIE 3.0 an ein iPhone halten und die vier Phasen durchlaufen sehen. Ohne das gilt der Leseweg als gebaut, nicht als
    geprüft — die Android-Fassung ist gegen ein echtes Dokument auf zwei Geräten
    vermessen, und weniger ist hier keine Grundlage. Zu prüfen sind besonders: der
    schnelle Weg ohne Lichtbild, das grüne Siegel bei einer echten Karte, und dass
