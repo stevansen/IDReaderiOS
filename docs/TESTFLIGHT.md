@@ -19,39 +19,33 @@ Auf diesem Rechner geprüft:
 
 ## Was noch fehlt, und warum es nur Sie tun können
 
-### 1. Die Bundle-Kennung festlegen
+### 1. Die App-ID mit der NFC-Berechtigung anlegen
 
-Sie steht derzeit auf **`com.ciereader.IDReader`**, und das ist ein Platzhalter
-von mir. **Diese Entscheidung ist praktisch endgültig:** sobald in App Store
-Connect ein App-Eintrag damit besteht, lässt sich die Kennung nicht mehr ändern —
-eine andere Kennung ist eine andere App, mit eigenem Eintrag und eigenen Testern.
-
-Zu bedenken: die Android-Fassung heißt `com.ciereader.app`. Wenn die App für die
-Provinz betrieben wird, gehört sie vielleicht in deren Namensraum. Geändert wird
-sie an einer Stelle, in `IDReader.xcodeproj` (`PRODUCT_BUNDLE_IDENTIFIER`, zweimal
-— Debug und Release).
-
-### 2. Die App-ID mit der NFC-Berechtigung anlegen
+Die Bundle-Kennung ist **`com.ciereader.ios`** — festgelegt und im Projekt
+gesetzt, in der Familie der Android-Fassung (`com.ciereader.app`), mit `.ios` als
+Platz für weitere Apple-Plattformen unter demselben Namen. Ab dem ersten
+App-Eintrag in App Store Connect ist sie nicht mehr zu ändern.
 
 Im Entwicklerportal, unter *Certificates, Identifiers & Profiles → Identifiers*:
 eine App-ID mit dieser Kennung, und darin **NFC Tag Reading** einschalten.
 
 Ohne diese Berechtigung lässt sich das Ziel nicht signieren — das ist keine
-Fußnote, sondern der Grund, warum ein Bau sonst mit „No profiles for …" abbricht.
+Fußnote, sondern der Grund, warum ein Bau sonst mit
+„No profiles for 'com.ciereader.ios' were found" abbricht.
 
 Xcode kann die App-ID auch selbst anlegen (`-allowProvisioningUpdates`), aber nur
 mit einem angemeldeten Apple-ID-Konto oder einem API-Schlüssel mit ausreichender
 Rolle. Auf diesem Rechner ist kein Xcode-Konto angemeldet.
 
-### 3. Den App-Eintrag in App Store Connect anlegen
+### 2. Den App-Eintrag in App Store Connect anlegen
 
-*Meine Apps → Neue App*: Plattform iOS, die Bundle-Kennung von oben, ein Name
+*Meine Apps → Neue App*: Plattform iOS, `com.ciereader.ios`, ein Name
 („IDReader"), Primärsprache. Ohne diesen Eintrag nimmt Apple keinen Upload an.
 
 Der Name muss App-Store-weit eindeutig sein. „IDReader" ist womöglich vergeben;
 dann geht auch ein Name mit Zusatz — für einen Test spielt er keine Rolle.
 
-### 4. Die Issuer-ID heraussuchen
+### 3. Die Issuer-ID heraussuchen
 
 *Benutzer und Zugriff → Integrationen → App Store Connect API*. Sie sieht aus wie
 `69a6de70-xxxx-xxxx-xxxx-xxxxxxxxxxxx` und ist kein Geheimnis, nur eine Kennung —
@@ -139,8 +133,28 @@ Für den Test nicht nötig, für den Store schon:
   müssen in der App erreichbar sein. Es gibt noch keinen Ort dafür — siehe
   [`../THIRD-PARTY-NOTICES.md`](../THIRD-PARTY-NOTICES.md).
 
-**Und eine Überlegung, die vor den Store gehört:** wenn die App für eine Behörde
-betrieben wird, ist die öffentliche Verteilung vielleicht der falsche Weg. Apple
-Business Manager mit einer *Custom App* verteilt an eine benannte Organisation,
-ohne Store-Eintrag, ohne Beta-Prüfung und ohne dass jemand sie zufällig lädt und
-Ausweise liest. Für ein Werkzeug, das genau das tut, ist das die nähere Form.
+## Öffentlich verteilt: was das heißt
+
+Die App geht als Werkzeug an jeden, der sie lädt. Das ist keine neue Haltung,
+sondern die der Android-Fassung: deren erster Bildschirm nennt **die
+Verantwortung und nicht die Norm**, gerade weil die App nicht wissen kann, unter
+welchen Regeln ein bestimmter Leser arbeitet. Auf iOS bleibt das so, und der
+Hinweis beim ersten Start ist auch hier die Antwort darauf.
+
+Praktisch folgt daraus dreierlei:
+
+* **App Review wird nach der NFC-Nutzung fragen** — wozu die App Chips liest und
+  was mit den Daten passiert. Die Antwort ist kurz und steht schon geschrieben:
+  nichts verlässt das Gerät, das Archiv löscht sich nach 30 Tagen,
+  `Scripts/check-no-network.sh` setzt das durch. Verweisen kann man auf
+  [DATA-PROTECTION.md](DATA-PROTECTION.md).
+* **Die Datenschutzerklärung im Netz ist Pflicht**, nicht optional. Vorlage:
+  `apps/cie-reader/store/privacy-policy-{de,en,it}.md` im Android-Repository —
+  zu überarbeiten, weil auf iOS die **Kamera-Berechtigung** dazukommt.
+* **Externe Tester bedeuten Beta-Prüfung.** Für den ersten Test aus dem eigenen
+  Team fällt sie weg; sobald jemand von außen dazukommt, prüft Apple den ersten
+  Build einer Fassung.
+
+Die Datenschutzangaben im Eintrag („App Privacy") sind dagegen schnell erledigt:
+**Data Not Collected.** `App/PrivacyInfo.xcprivacy` sagt dasselbe, und beides ist
+richtig, weil die App keinen Netzzugriff hat.
