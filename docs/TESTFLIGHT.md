@@ -16,6 +16,13 @@ Auf diesem Rechner geprüft:
 | Datenschutzangabe `PrivacyInfo.xcprivacy` | ✓ |
 | Gerätebau für arm64, Release | ✓ ohne Warnung |
 | Fassung / Build | 1.8 / 1 |
+| App-ID `com.ciereader.ios` mit **NFC Tag Reading** | ✓ — am signierten Bundle geprüft |
+| Verteilungsfertige `.ipa` | ✓ 4,2 MB, `Apple Distribution`, `get-task-allow = false`, `beta-reports-active = true` |
+| OpenSSL im Bundle | ✓ 3.6.3, arm64, brainpoolP256r1 vorhanden |
+
+Der Archivlauf hat die Berechtigung dabei selbst bestätigt: ohne **NFC Tag
+Reading** an der App-ID wäre er an der Signatur gescheitert, und die fertige
+`.ipa` trägt `com.apple.developer.nfc.readersession.formats = ["TAG"]`.
 
 ## Was noch fehlt, und warum es nur Sie tun können
 
@@ -39,11 +46,30 @@ Rolle. Auf diesem Rechner ist kein Xcode-Konto angemeldet.
 
 ### 2. Den App-Eintrag in App Store Connect anlegen
 
-*Meine Apps → Neue App*: Plattform iOS, `com.ciereader.ios`, ein Name
-(„IDReader"), Primärsprache. Ohne diesen Eintrag nimmt Apple keinen Upload an.
+*Meine Apps → Neue App*. Ohne diesen Eintrag nimmt Apple keinen Upload an.
 
-Der Name muss App-Store-weit eindeutig sein. „IDReader" ist womöglich vergeben;
-dann geht auch ein Name mit Zusatz — für einen Test spielt er keine Rolle.
+| Feld | Wert |
+|---|---|
+| Plattform | iOS |
+| Bundle-Kennung | `com.ciereader.ios` |
+| SKU | `CIEREADER-IOS-001` |
+| Name | „IDReader" |
+| Primärsprache | Deutsch |
+
+Zur **SKU**: sie ist nur intern, kein Nutzer sieht sie je — aber sie ist
+**endgültig**, wie die Bundle-Kennung. `CIEREADER` hält die Verbindung zur
+Android-Fassung, `IOS` trennt von einem möglichen Mac- oder iPad-Eintrag, und
+`001` ist die Reserve: eine falsch gesetzte Bundle-Kennung lässt sich nicht
+ändern, ein neuer Eintrag braucht dann eine neue SKU, und `-002` ist besser als
+sich etwas ausdenken zu müssen.
+
+Bewusst nicht die Bundle-Kennung als SKU, obwohl das verbreitet ist: App Store
+Connect zeigt beide Felder in Berichten, und bei gleichem Wert sieht man nicht
+mehr, welches man vor sich hat.
+
+Der **Name** muss App-Store-weit eindeutig sein. „IDReader" ist womöglich
+vergeben; dann geht ein Zusatz wie „IDReader CIE" — für einen Test spielt er
+keine Rolle, und ändern lässt er sich später.
 
 ### 3. Die Issuer-ID heraussuchen
 
