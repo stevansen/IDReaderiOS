@@ -135,6 +135,14 @@ Stated as facts, not conclusions.
 * **Distribution.** Apple App Store, free of charge, to the general public, with
   no purchaser screening and no customisation for any customer. The functionality
   is identical for every user.
+* **The source code is public and openly licensed.** The complete source,
+  including everything cryptographic, is at
+  `https://github.com/stevansen/IDReaderiOS` under the Apache License 2.0, with
+  no registration, no fee and no access control. This has been the case since
+  21 August 2026 — before that the repository was readable but unlicensed. It is
+  raised here because the treatment of encryption source code that is publicly
+  available differs from that of code which is not, and section 7 below asks
+  which treatment applies. It is a fact, not a conclusion.
 * **All algorithms are published standards.** Nothing proprietary, nothing
   non-standard: FIPS 197 (AES), FIPS 46-3 (DES/3DES), FIPS 180-4 (SHA-2),
   NIST SP 800-38B / RFC 4493 (CMAC), NIST SP 800-56A (ECDH), RFC 5639 (brainpool
@@ -185,6 +193,16 @@ current regulatory text, which this document was written without.
    with reporting. *To verify against 15 CFR 742.15 and its supplements.*
 3. **Encryption Registration.** Whether a one-time registration producing an ERN is
    required before relying on a licence exception. *To verify.*
+3a. **The effect of the public, openly licensed source.** Publicly available
+   encryption *source code* is treated differently from code that is not
+   published, and the notification obligations differ accordingly — this may
+   simplify the route or change it entirely. Note the distinction that matters
+   here: the source is publicly available, while the **binary** in the App Store
+   is a compiled object that Apple distributes. Whether one, both, or neither
+   falls under the publicly-available treatment is *to verify* against
+   15 CFR 734.7, 734.3(b)(3) and 742.15(b), and under EU Regulation 2021/821
+   against the general note on publicly available software. Do not assume that
+   open-sourcing the code removes an obligation.
 4. **Recurring obligation.** If self-classification applies, an annual report is
    generally required rather than a one-time filing. Deadline and recipients *to
    verify* — do not take a remembered date from this document.
@@ -208,12 +226,15 @@ Everything above is verifiable in the source:
 | PACE, including the CAN password | `ThirdParty/NFCPassportReaderCAN/Sources/PACEHandler.swift` |
 | Negotiable cipher and digest per ICAO | `ThirdParty/NFCPassportReaderCAN/Sources/DataGroups/PACEInfo.swift` |
 | Trust anchors, public keys only | `Sources/IDReaderCore/Resources/csca/` |
+| Licence of the source, and when it changed | `LICENSE`, `docs/LICENCE-CHOICE.md` |
 | Network code confined to one file, and no hard-coded host | `Scripts/check-no-network.sh` |
 | The single network operation | `App/Revocation/RevocationDownloader.swift` |
 | Revocation-list signature verification (Apple `Security`) | `Sources/IDReaderCore/Revocation/RevocationListVerifier.swift` |
 | The modifications to the vendored library | `ThirdParty/NFCPassportReaderCAN/UPSTREAM.patch` |
 
-Prepared 21 August 2026, for version 1.8 (build 1), and revised the same day for
-the revocation check, which added the network operation described in section 4. It
-must be revised again if the cryptographic functionality changes — in particular if
+Prepared 21 August 2026, for version 1.8 (build 1), and revised the same day
+twice: for the revocation check, which added the network operation described in
+section 4, and for the move to the Apache License 2.0, which made the
+cryptographic source publicly available under an open licence. It must be revised
+again if the cryptographic functionality changes — in particular if
 a JPEG 2000 decoder or any further third-party library is added.

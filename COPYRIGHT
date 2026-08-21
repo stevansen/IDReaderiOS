@@ -68,8 +68,38 @@ Attribution requirement
 -----------------------
 
 Any published build, store listing or documentation must name both holders.
+Under the licence this is no longer only a request: Apache-2.0 section 4 makes
+the copyright notice and the NOTICE file travel with every redistribution.
+
 "CIEreader" and "IDReader" are the names the two applications go by; neither is
-a registered trade mark as of this file's date.
+a registered trade mark as of this file's date. Apache-2.0 section 6 grants no
+rights in them, which is deliberate — a fork may take the code and weaken the
+authenticity checks, and in that case it must not carry the name that stands for
+the checks.
 
 The bundled Italian CSCA certificates are public documents of the Italian
 state, redistributed unchanged; see THIRD-PARTY-NOTICES.md.
+
+Licence, and who may change it
+------------------------------
+
+The code is under the **Apache License 2.0** — see LICENSE. Chosen on
+21 August 2026; the reasoning, the alternatives that were rejected and why, are
+recorded in docs/LICENCE-CHOICE.md.
+
+The two holders hold this work JOINTLY AND IN EQUAL SHARES. Neither may, alone,
+change the licence, grant an exclusive licence, or assign the copyright.
+Consent given for one release does not extend to any later one. Apache-2.0 is
+irrevocable for what has been published under it: a later change of licence
+binds only later versions, and cannot take back what is already out.
+
+**Still to be recorded here:** Christian Auer's consent to Apache-2.0. Stefan
+Hellweger's is given by making this change. Until the second one is written down,
+the licence in this repository is what a reader will rely on, and it is only
+half agreed — which is a reason to settle it, not a reason to publish a version
+without it.
+
+The Android original (cauer71/AndroidDev) carries no licence as of this date.
+This port is derivative work; two different licence positions for one work are a
+mess waiting to be discovered by someone who needs the answer. The same change
+belongs there.

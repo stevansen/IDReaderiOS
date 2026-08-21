@@ -1,17 +1,25 @@
 # Welche Lizenz für diese App
 
-Eine Empfehlung, keine Entscheidung. Entscheiden müssen sie **beide
-Rechteinhaber gemeinsam** — [`../COPYRIGHT`](../COPYRIGHT) hält fest, warum, und
-[`../LICENSE`](../LICENSE) sagt, dass niemand allein umstellen darf. Keine
-Rechtsberatung.
+**Entschieden: Apache-Lizenz 2.0.** Umgestellt am 21. August 2026 — siehe
+[`../LICENSE`](../LICENSE) und [`../NOTICE`](../NOTICE). Dieses Papier bleibt
+stehen, weil eine Lizenzwahl ohne ihre Begründung in einem Jahr wie eine Laune
+aussieht. Keine Rechtsberatung.
 
-## Der Stand heute
+**Offen ist noch eine Zustimmung.** [`../COPYRIGHT`](../COPYRIGHT) hält fest,
+dass keiner der beiden Rechteinhaber allein umstellen darf. Stefan Hellwegers
+Zustimmung liegt in dieser Änderung; Christian Auers gehört schriftlich in
+`COPYRIGHT` nachgetragen. Bis dahin steht im Repository eine Lizenz, auf die
+sich ein Leser verlässt und die nur halb vereinbart ist — ein Grund, das zu
+erledigen, nicht ein Grund, es zurückzunehmen: eine erteilte Apache-Lizenz lässt
+sich für das Veröffentlichte nicht mehr einsammeln.
 
-Der Quelltext ist **öffentlich**, aber nicht **offen**: das Repository ist
-lesbar, `LICENSE` gewährt keine Rechte. Das ist ein gültiger Zustand mit einem
-Namen — *source-available* —, und es ist der einzige, aus dem alle anderen noch
-erreichbar sind. Eine erteilte Lizenz lässt sich nicht zurücknehmen; eine noch
-nicht erteilte jederzeit erteilen. Wer unsicher ist, wartet richtig.
+## Der Stand davor
+
+Der Quelltext war **öffentlich**, aber nicht **offen**: das Repository lesbar,
+`LICENSE` gewährte keine Rechte. Ein gültiger Zustand mit einem Namen —
+*source-available* — und der einzige, aus dem alle anderen noch erreichbar
+waren. Genau deshalb war die Reihenfolge richtig: erst die Wahl begründen, dann
+sie treffen.
 
 ## Was die Wahl einschränkt
 
@@ -38,7 +46,7 @@ Vier Umstände, und drei davon schließen etwas aus:
    verhindert das. Marken- und Namensrecht schon eher — deshalb ist es kein
    Nebenpunkt, dass die Lizenz keine Namensrechte mitgibt.
 
-## Empfehlung: Apache-2.0
+## Die Wahl: Apache-2.0
 
 Für den Quelltext, in beiden Repositories, mit `NOTICE` daneben.
 
@@ -84,24 +92,18 @@ keine Rückfrage auslöst.
 | GPL-3.0 / AGPL-3.0 | Siehe Punkt 1. Für eine Store-App ein Widerspruch, den man dauerhaft erklären müsste. |
 | Creative-Commons-Lizenzen | Nicht für Quelltext gedacht; CC selbst rät davon ab. |
 | Eine eigene Lizenz | Niemand kennt sie, jede Prüfstelle liest sie von vorn, und Fehler darin fallen erst auf, wenn es darauf ankommt. |
-| Weiter „alle Rechte vorbehalten" | Keine schlechte Wahl, solange niemand mitarbeiten soll. Aber ein öffentliches Repository ohne Lizenz lädt zu Beiträgen ein, die niemand annehmen kann. |
+| Weiter „alle Rechte vorbehalten" | War keine schlechte Wahl, solange niemand mitarbeiten sollte. Aber ein öffentliches Repository ohne Lizenz lädt zu Beiträgen ein, die niemand annehmen kann. |
 
-## Wenn Apache-2.0 gewählt wird: die Handgriffe
+## Die Handgriffe, und was daraus wurde
 
-1. Christian Auer stimmt schriftlich zu — eine Zeile im Repository oder im
-   Ticket genügt, aber sie muss existieren. `LICENSE` verlangt das ausdrücklich,
-   und `COPYRIGHT` sagt, warum.
-2. `LICENSE` wird durch den unveränderten Apache-2.0-Text ersetzt. **Nicht
-   umschreiben** — eine geänderte Apache-Lizenz ist keine Apache-Lizenz mehr.
-3. Der heutige Inhalt von `LICENSE`, soweit er mehr sagt als die Lizenz — die
-   gemeinsame Inhaberschaft, der Hinweis auf das abgeleitete Werk, der
-   Haftungsausschluss für die Ausweislesung —, wandert nach `NOTICE` und
-   `COPYRIGHT`.
-4. Dateikopf: Apache-2.0 verlangt keinen, aber ein einheitlicher Zweizeiler
-   erleichtert die Herkunft. Ohne Jahreszahlen, die veralten.
-5. Dieselbe Änderung in `cauer71/AndroidDev` — siehe Punkt 3 der
-   Einschränkungen.
-6. `THIRD-PARTY-NOTICES.md` bleibt, wie es ist. Die Lizenz des eigenen Codes
-   ändert nichts an denen der fremden.
+| | |
+|---|---|
+| **1. Christian Auers Zustimmung** | **Offen.** Eine Zeile in `COPYRIGHT` oder im Ticket genügt, aber sie muss existieren. |
+| **2. `LICENSE` ersetzen** | Erledigt, mit dem **unveränderten** Text. Nicht abgeschrieben, sondern aus einer echten Apache-2.0-Auslieferung im Abhängigkeitsbaum übernommen (`OpenSSL-Package/LICENSE`) und Abschnitt für Abschnitt gegengelesen. Eine umgeschriebene Apache-Lizenz wäre keine mehr. |
+| **3. Den Rest umziehen** | Erledigt. Was das alte `LICENSE` mehr sagte als eine Lizenz, steht jetzt dort, wo es hingehört: die gemeinsame Inhaberschaft und die Regel zum Umlizenzieren in `COPYRIGHT`, die Herkunft und der Satz „ein Urteil ‚echt' heißt nicht, dass die Person vor Ihnen die des Dokuments ist" in `NOTICE`. Letzteres mit Absicht in `NOTICE`: Abschnitt 4(d) lässt diese Datei mitreisen, den Rest des Repositories nicht. |
+| **4. Lizenzkopf in jede Datei** | **Bewusst nicht.** Apache-2.0 verlangt keinen. Die Dateien hier beginnen mit dem Dokumentkommentar, der erklärt, *warum* sie so aussehen — das ist der eigentliche Wert im Quelltext, und ein Rechtsblock davor schiebt ihn unter die erste Bildschirmseite. Welche Dateien aus der Android-Fassung stammen, steht ohnehin genauer in `COPYRIGHT`, als ein Kopf es sagen könnte. |
+| **5. Dieselbe Änderung in `cauer71/AndroidDev`** | **Offen**, und nicht von hier aus zu machen. Siehe Punkt 3 der Einschränkungen. |
+| **6. `THIRD-PARTY-NOTICES.md`** | Unverändert. Die Lizenz des eigenen Codes ändert nichts an denen der fremden. |
+| **7. Ausfuhrunterlagen** | Nachgetragen: dass der Quelltext jetzt öffentlich lizenziert ist, ist für die Einordnung von Verschlüsselungssoftware kein Nebenpunkt. Siehe [EXPORT-COMPLIANCE-DOSSIER.md](EXPORT-COMPLIANCE-DOSSIER.md), Abschnitt 6. |
 
-Stand: 21. August 2026. Offen, weil noch niemand zugestimmt hat.
+Stand: 21. August 2026.

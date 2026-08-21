@@ -25,6 +25,7 @@ Commit `7ab0d20`, Version 1.8 / versionCode 11.
 | Urteilsbildung aus den vier Teilprüfungen | portiert | `PassportChipReader.authenticity(from:)` |
 | CSCA-Vertrauensanker als PEM-Bündel für die Kettenprüfung | erzeugt | 2 Tests |
 | Datenschutz-Gegenstücke (Sicherung, Dateischutz, App-Umschalter, Zwischenablage, Netzprüfung) | gebaut | `Scripts/check-no-network.sh` |
+| Lizenz: Apache-2.0 | umgestellt, **Christians Zustimmung fehlt noch** | [LICENCE-CHOICE.md](LICENCE-CHOICE.md) |
 | Sperrprüfung: CRL lesen, Signatur prüfen, ablegen, offline abgleichen, offene Prüfungen nachholen, Datum am Datensatz | gebaut, **gegen die echte italienische CRL durchlaufen** | 29 Tests; im Simulator geholt, geprüft und angezeigt |
 
 **Fassung 1.8 (Build 1) liegt seit dem 21. August 2026 in App Store Connect**
@@ -70,8 +71,12 @@ In der Reihenfolge, in der es sich lohnt:
    Handgriffe: Name und Mailadresse des Verantwortlichen ausfüllen — der Generator
    bricht bis dahin ab — und Pages einschalten. Das App-Zeichen ist ein Entwurf
    aus `Scripts/make-app-icon.swift`.
-6. **Die Anerkennungen für MIT und Apache-2.0** müssen in der App erreichbar
-   sein. Es gibt noch keinen Ort dafür.
+6. **Die Anerkennungen müssen in der App erreichbar sein** — die fremden (MIT für
+   NFCPassportReader, Apache-2.0 für OpenSSL) und seit der Umstellung auch die
+   eigene: die App steht selbst unter Apache-2.0, und Abschnitt 4(d) will
+   `NOTICE` beim Empfänger sehen. „In der Quelltextform oder der Dokumentation"
+   genügt dafür, und beides liegt im öffentlichen Repository — aber ein Ort in
+   der App wäre der ehrlichere. Es gibt noch keinen.
 7. **Die Wiedererkennung einer aufgelegten Karte** entfällt dauerhaft — iOS hat
    keinen Dauerlesemodus. Kein offener Punkt, sondern eine Festlegung; hier
    aufgeführt, damit niemand sie sucht.

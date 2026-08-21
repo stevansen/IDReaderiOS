@@ -128,10 +128,12 @@ bleibt. Bei einer kostenlosen App ist die nächste Frage sonst immer, womit sie
 stattdessen bezahlt wird; hier lautet die Antwort: mit nichts. Dasselbe sagen die
 Datenschutzangaben — **Data Not Collected** — und `App/PrivacyInfo.xcprivacy`.
 
-Nicht zu verwechseln: **kostenlos ist nicht dasselbe wie offen.** Der Quelltext
-steht weiterhin unter „alle Rechte vorbehalten"
-([`../LICENSE`](../LICENSE)); wer die App gratis lädt, bekommt sie nicht
-lizenziert. Das sind zwei Entscheidungen, und nur die erste ist getroffen.
+Beides ist inzwischen entschieden, und in dieselbe Richtung: der Quelltext steht
+unter der **Apache-Lizenz 2.0** ([`../LICENSE`](../LICENSE)). Was die Lizenz
+nicht mitgibt, sind die Namensrechte — Abschnitt 6 —, und das ist der Punkt, an
+dem „frei" und „beliebig" auseinandergehen: ein Fork darf den Code nehmen und
+nicht „IDReader" heißen. Begründung in
+[LICENCE-CHOICE.md](LICENCE-CHOICE.md).
 
 ## Öffentlich verteilt: was das heißt
 

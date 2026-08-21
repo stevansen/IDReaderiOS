@@ -1,10 +1,53 @@
 IDReader for iOS
-Copyright (c) 2026 Christian Auer and Stefan Hellweger.
+Copyright 2026 Christian Auer and Stefan Hellweger
 
-A port of the Android application CIEreader (cauer71/AndroidDev,
-apps/cie-reader) to Apple platforms. Reads the Italian electronic identity card
-CIE 3.0 and the ePassport over NFC, and the Italian driving licence from a
-photograph.
+Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+this file except in compliance with the License. You may obtain a copy of the
+License in the LICENSE file next to this one, or at
 
-See LICENSE for terms, COPYRIGHT for authorship and provenance, and
-THIRD-PARTY-NOTICES.md for the components this software depends on.
+    https://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software distributed
+under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+CONDITIONS OF ANY KIND, either express or implied. See the License for the
+specific language governing permissions and limitations under the License.
+
+--------------------------------------------------------------------------------
+
+Origin
+------
+
+A port to Apple platforms of the Android application "CIEreader"
+(cauer71/AndroidDev, apps/cie-reader), by the same two authors. The data model,
+the three parsers, the archive format, the export field names and all
+user-facing wording come from there. See COPYRIGHT for what was carried over and
+what was written for this platform.
+
+Names
+-----
+
+"IDReader" and "CIEreader" are the names these two applications go by. Section 6
+of the License does not grant permission to use them. Take the code; give your
+build its own name.
+
+What this software is not
+-------------------------
+
+It reads identity documents and reports whether the chip's signatures check out.
+It is not a legal instrument and gives no legal advice. Whoever deploys it is the
+controller of the personal data it processes and answers for the lawfulness of
+that processing — see the first-run notice inside the app and
+docs/DATA-PROTECTION.md.
+
+A judgement of "genuine" says that the cryptography checked out. It does not say
+that the person in front of you is the person in the document.
+
+Third-party components
+----------------------
+
+This software incorporates or depends on components under their own licences,
+listed in THIRD-PARTY-NOTICES.md. Nothing in this file restricts the rights those
+licences grant.
+
+The bundled Italian CSCA certificates are public documents of the Italian state,
+redistributed unchanged.

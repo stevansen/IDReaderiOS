@@ -103,12 +103,17 @@ Entscheidungen samt Begründung in
 >
 > Die App ist eine Zusammenarbeit von **Christian Auer** und **Stefan
 > Hellweger**. Erzeuge `LICENSE`, `COPYRIGHT`, `NOTICE` und
-> `THIRD-PARTY-NOTICES.md` mit gemeinschaftlichem Copyright zu gleichen Teilen,
-> ohne Lizenzgewährung nach außen (der Android-Ursprung trägt bis heute keine
-> Lizenz — eine Portierung darf großzügiger sein als das Original), und mit dem
-> ausdrücklichen Vorbehalt, dass eine Umlizenzierung die Zustimmung beider
-> braucht. Halte in `COPYRIGHT` fest, dass die Android-Historie nur einen Autor
-> nennt, und warum trotzdem zwei genannt sind.
+> `THIRD-PARTY-NOTICES.md` mit gemeinschaftlichem Copyright zu gleichen Teilen
+> und mit dem ausdrücklichen Vorbehalt, dass eine Umlizenzierung die Zustimmung
+> beider braucht. Halte in `COPYRIGHT` fest, dass die Android-Historie nur einen
+> Autor nennt, und warum trotzdem zwei genannt sind.
+>
+> Beginne **ohne** Lizenzgewährung nach außen — der Android-Ursprung trägt keine,
+> und eine erteilte Lizenz nimmt man nicht zurück. Trage dann in einem eigenen
+> Papier die Wahl zusammen, mit dem, was sie einschränkt: der App Store schließt
+> die GPL-Familie praktisch aus, die mitgelieferten Bibliotheken sind MIT und
+> Apache-2.0, und der Name der App ist wertvoller als der Code. Empfiehl, und
+> lasse den Menschen entscheiden.
 >
 > ### Womit ich nicht zufrieden bin
 >

@@ -11,18 +11,21 @@ Mechanik ist die von Apple. Was dabei anders werden musste, steht in
 [`docs/ANDROID-TO-IOS.md`](docs/ANDROID-TO-IOS.md) — mit Begründung, nicht als
 Liste.
 
-© 2026 Christian Auer und Stefan Hellweger. Alle Rechte vorbehalten; siehe
-[`LICENSE`](LICENSE) und [`COPYRIGHT`](COPYRIGHT). Welche Lizenz stattdessen in
-Frage kommt und was dafür zu tun wäre, steht in
-[`docs/LICENCE-CHOICE.md`](docs/LICENCE-CHOICE.md) — empfohlen wird Apache-2.0,
-entschieden ist nichts.
+© 2026 Christian Auer und Stefan Hellweger. Lizenziert unter der
+**Apache-Lizenz 2.0** — siehe [`LICENSE`](LICENSE), [`NOTICE`](NOTICE) und
+[`COPYRIGHT`](COPYRIGHT). Warum diese und nicht eine andere, steht in
+[`docs/LICENCE-CHOICE.md`](docs/LICENCE-CHOICE.md).
 
-**Öffentlich lesbar heißt nicht lizenziert.** Dieses Repository ist offen, damit
-nachprüfbar ist, was die App tut — die Zusagen in der Datenschutzerklärung sind
-sonst nur Behauptungen. Eine Lizenz ist damit nicht erteilt. Was GitHubs
-Nutzungsbedingungen jedem Nutzer ohnehin zugestehen (Ansehen und Forken innerhalb
-von GitHub), bleibt davon unberührt; alles andere braucht die Zustimmung **beider**
-Rechteinhaber.
+**Der Code ist frei, der Name nicht.** Abschnitt 6 der Lizenz gibt keine
+Namensrechte mit, und das ist Absicht: wer diesen Code forkt, kann die
+Echtheitsprüfung entschärfen und das Ergebnis trotzdem „geprüft" nennen. Keine
+Lizenz verhindert das — aber ein solcher Fork darf nicht „IDReader" heißen.
+Nehmen Sie den Code und geben Sie Ihrem Bau einen eigenen Namen.
+
+Das Repository ist ohnehin offen, damit nachprüfbar ist, was die App tut — die
+Zusagen in der Datenschutzerklärung sind sonst nur Behauptungen. Wer sie prüfen
+will, braucht dafür seit jeher keine Lizenz; wer den Code benutzen will, hat
+jetzt eine.
 
 Hilfe für Benutzer: [`SUPPORT.md`](SUPPORT.md), dreisprachig.
 
