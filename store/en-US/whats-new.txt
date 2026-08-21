@@ -1,3 +1,5 @@
 First release for iPhone.
 
-Ported from the Android version CIEreader, with the same behaviour, the same wording and the same archive format. Everything platform-specific was rebuilt: the interface, the text recognition and the encryption of the archive.
+Ported from the Android version CIEreader, with the same behaviour and the same wording. Everything platform-specific was rebuilt: the interface, the text recognition and the encryption of the archive.
+
+The archive keeps less than the Android version: residence, codice fiscale, profession and telephone are shown and not stored. This can be switched off in the settings, and is on by default.

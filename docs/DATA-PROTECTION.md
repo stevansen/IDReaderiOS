@@ -35,6 +35,19 @@ abgeleitet ist und das Gerät nicht verlässt. Dieselbe Person wird wiedererkann
 und eine Steuernummer steht nirgends mehr. Ein nackter Hash hätte das nicht
 geleistet: sechzehn Stellen mit starrem Aufbau sind durchzuprobieren.
 
+**Abschaltbar ist es, vorbelegt nicht.** In den Einstellungen steht ein Schalter
+„Alle Felder aufbewahren". Aus ist er, und aus bleibt er, solange ihn niemand
+umlegt — die Vorgabe ist die Aussage. Wer ihn einschaltet, bekommt vorher eine
+Rückfrage, die keine Formalität ist: sie sagt, dass Daten zu behalten, die man
+nicht braucht, eine App nicht für ihn rechtfertigen kann, dass er den Zweck der
+zusätzlichen Felder benennen können muss und dafür einsteht. „Könnte mal nützlich
+sein" ist keiner. Beim Ausschalten fragt nichts — zurück zur Vorgabe braucht
+niemand eine Begründung.
+
+Der Schalter wirkt **ab jetzt**: was schon weggelassen wurde, ist weg und kommt
+nicht zurück. Der Personenabdruck entsteht in beiden Stellungen, damit die Regel
+„ein Eintrag pro Person" nicht von einer Einstellung abhängt.
+
 **Was gespeichert wird, und wie lange.** Datensätze liegen mit AES-256-GCM
 verschlüsselt, der Schlüssel im Schlüsselbund mit
 `kSecAttrAccessibleWhenUnlockedThisDeviceOnly`: er wird nie gesichert, nie auf ein

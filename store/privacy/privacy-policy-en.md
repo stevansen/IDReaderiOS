@@ -104,6 +104,31 @@ and in every export, the caveat that nothing here has been checked. Everything
 else in this policy applies to these fields as well: they stay on the device,
 encrypted, and delete themselves after 30 days.
 
+### What is shown and not kept
+
+Four items are shown for as long as the record is on screen and are **not written
+to the archive**: residence, codice fiscale, profession and telephone. The question
+behind this is whether any use case still needs the field once the document is out
+of your hand; for these four the answer is no. Whoever needs an address reads it
+once and writes it down.
+
+The record remembers **which** of these fields the document carried, not their
+contents. That is why it later says "read, not stored" rather than "not in the
+document" — the latter would be a statement about the document that is not true.
+
+So that the same person stays a single entry even after a document is reissued, a
+**digest** is derived from the codice fiscale using a key derived from the archive
+key, which never leaves the device. The codice fiscale itself is not stored and
+cannot be recovered from the digest.
+
+This minimisation can be **switched off** in the settings ("Retain every field");
+the four fields are then stored and exported along with the rest. It is **on by
+default**, and when switching it off the app points out that whoever keeps
+everything must be able to name the purpose the extra fields serve and answer for
+it — data minimisation is an obligation on the controller, not a setting in a
+program. The change takes effect from the next read; what was already left out is
+gone.
+
 ### Where the data stays
 
 The data read stays **on the device only**. It is encrypted with AES-256; the key

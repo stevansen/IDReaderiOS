@@ -178,6 +178,12 @@
 "settings_language" = "Sprache";
 "settings_language_hint" = "Gilt nur für diese App. Alles andere auf dem Gerät behält seine Sprache.";
 "settings_language_system" = "Systemsprache";
+"settings_retain_all" = "Alle Felder aufbewahren";
+"settings_retain_all_confirm" = "Trotzdem einschalten";
+"settings_retain_all_hint" = "Aus, und die Richtung der Vorgabe ist die Aussage: Wohnsitz, Steuernummer, Beruf und Telefon werden angezeigt, aber nicht behalten, weil kein Anwendungsfall sie braucht, wenn das Dokument aus der Hand ist. Eingeschaltet bleiben sie - im Archiv und in jedem Export. Gilt ab jetzt; was schon weggelassen wurde, ist weg.";
+"settings_retain_all_warning_body" = "Daten zu behalten, die man nicht braucht, kann eine App nicht für Sie rechtfertigen. Wer das einschaltet, muss den Zweck benennen können, dem die zusätzlichen Felder dienen, und dafür einstehen - Datenminimierung ist eine Pflicht des Verantwortlichen und kein Schalter in einem Programm.\n\nWenn ein Bericht diese Felder verlangt, ist das ein Grund. „Könnte man mal brauchen“ ist keiner.";
+"settings_retain_all_warning_title" = "Dafür brauchen Sie einen Grund";
+"settings_retention" = "Aufbewahrung";
 "share_chooser_title" = "Ausweisdaten teilen";
 "share_clip_label" = "CIE-Daten";
 "share_copied" = "In die Zwischenablage kopiert.";

@@ -79,6 +79,23 @@ public struct AppSettings: @unchecked Sendable {
         nonmutating set { defaults.set(newValue.rawValue, forKey: Key.exportFormat) }
     }
 
+    /// Ob **alle** gelesenen Felder aufbewahrt werden.
+    ///
+    /// Vorgabe ist `false`, und die Richtung der Vorgabe ist die Aussage: Wohnsitz,
+    /// Steuernummer, Beruf und Telefon werden angezeigt und nicht behalten, weil
+    /// kein Anwendungsfall sie braucht, nachdem das Dokument aus der Hand ist.
+    ///
+    /// Wer sie braucht - weil ein Bericht danach fragt, den die App nicht kennt -
+    /// schaltet das hier um. Dann liegen sie im Archiv und gehen in jeden Export
+    /// mit, und die Verantwortung dafuer liegt bei dem, der umgeschaltet hat.
+    ///
+    /// Rueckwirkend gilt es nicht. Was einmal weggelassen wurde, ist weg; ein
+    /// Umschalten wirkt auf das, was danach gelesen wird.
+    public var retainsAllFields: Bool {
+        get { defaults.bool(forKey: Key.retainAllFields) }
+        nonmutating set { defaults.set(newValue, forKey: Key.retainAllFields) }
+    }
+
     /// Gewaehlte Sprache.
     public var language: AppLanguage {
         get { AppLanguage(tag: defaults.string(forKey: Key.language)) }
@@ -145,5 +162,6 @@ public struct AppSettings: @unchecked Sendable {
         static let noticeVersion = "notice_version"
         static let noticeAt = "notice_at"
         static let language = "language"
+        static let retainAllFields = "retain_all_fields"
     }
 }

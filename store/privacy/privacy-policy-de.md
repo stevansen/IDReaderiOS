@@ -109,6 +109,31 @@ in der App und in jeder Ausgabe den Vorbehalt, dass hier nichts geprüft ist. Au
 für diese Angaben gilt alles Übrige dieser Erklärung: sie bleiben auf dem Gerät,
 verschlüsselt, und löschen sich nach 30 Tagen.
 
+### Was angezeigt und nicht aufbewahrt wird
+
+Vier Angaben werden gezeigt, solange der Datensatz auf dem Bildschirm steht, und
+**nicht in das Archiv übernommen**: Wohnsitz, Steuernummer, Beruf und Telefon. Die
+Frage dahinter ist, ob ein Anwendungsfall das Feld noch braucht, nachdem das
+Dokument aus der Hand ist; für diese vier ist die Antwort nein. Wer eine Anschrift
+braucht, sieht sie einmal und schreibt sie ab.
+
+Der Datensatz merkt sich, **welche** dieser Felder das Dokument geführt hat, nicht
+deren Inhalt. Deshalb steht später „gelesen, nicht gespeichert" und nicht „nicht
+im Dokument" — letzteres wäre eine Aussage über das Dokument, die nicht zutrifft.
+
+Damit dieselbe Person auch nach einer Neuausstellung ein Eintrag bleibt, wird aus
+der Steuernummer ein **Abdruck** gebildet, mit einem aus dem Archivschlüssel
+abgeleiteten Schlüssel, der das Gerät nicht verlässt. Die Steuernummer selbst wird
+dabei nicht gespeichert und ist aus dem Abdruck nicht zurückzurechnen.
+
+In den Einstellungen lässt sich diese Minimierung **abschalten** („Alle Felder
+aufbewahren"); dann werden die vier Felder mitgespeichert und mit ausgegeben.
+Vorbelegt ist sie **eingeschaltet**, und beim Abschalten weist die App darauf hin,
+dass wer alles aufbewahrt, den Zweck der zusätzlichen Felder benennen können muss
+und dafür einsteht — Datenminimierung ist eine Pflicht des Verantwortlichen und
+keine Einstellung in einem Programm. Die Änderung wirkt ab dem nächsten
+Lesevorgang; bereits weggelassene Angaben sind gelöscht.
+
 ### Wo die Daten bleiben
 
 Die gelesenen Daten liegen **ausschließlich auf dem Gerät**. Sie werden mit

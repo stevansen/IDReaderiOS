@@ -1,7 +1,7 @@
 IDReader liest die Daten aus dem Chip eines Ausweisdokuments über NFC und prüft, ob das Dokument echt ist. Unterstützt werden die italienische elektronische Identitätskarte (CIE 3.0) und Reisepässe nach ICAO 9303. Der italienische Führerschein hat keinen Chip und wird aus einem Foto erfasst.
 
 DREI DOKUMENTARTEN
-Umgeschaltet wird oben im Kopfbereich. Jede Art hat ihren eigenen Bildschirm und ihre eigene Farbe, damit sichtbar bleibt, was gerade gelesen wird.
+Umgeschaltet wird oben im Kopfbereich; jede Art hat eigenen Bildschirm und eigene Farbe, damit sichtbar bleibt, was gerade gelesen wird.
 • Identitätskarte: die sechsstellige CAN, unten rechts auf der Vorderseite
 • Reisepass: Passnummer, Geburtsdatum und Ablaufdatum von der Datenseite
 • Führerschein: die Vorderseite, fotografiert
@@ -16,6 +16,8 @@ Name, Geburtsdatum und -ort, Geschlecht, Staatsangehörigkeit, Dokumentnummer, A
 
 In Südtirol stehen Orte und Straßen zweisprachig auf der Karte. Gezeigt wird die Hälfte, die zur eingestellten Sprache passt.
 
+Wohnadresse, Steuernummer, Beruf und Telefon werden angezeigt und nicht ins Archiv übernommen; beim Datensatz steht dann „gelesen, nicht gespeichert". Abschaltbar in den Einstellungen, vorbelegt eingeschaltet.
+
 ECHTHEITSPRÜFUNG
 Vollständig offline, gegen mitgelieferte Zertifikate. Keine Sperrlistenabfrage.
 • Passive Authentifizierung: die Prüfsummen der gelesenen Datengruppen gegen das signierte Sicherheitsobjekt der Karte, dieses gegen das Dokumentenzertifikat und dieses gegen die italienische Wurzelinstanz.
@@ -26,12 +28,12 @@ Alle Teilprüfungen müssen aufgehen. Sonst gibt es kein Siegel.
 DER FÜHRERSCHEIN IST ETWAS ANDERES
 Kein Chip, keine maschinenlesbare Zone, keine Prüfziffer. Die Angaben stammen aus der Texterkennung eines Fotos, und nichts daran ist bestätigt. Deshalb sind alle Felder frei bearbeitbar: die Erkennung kann sich verlesen, und nur der Mensch mit dem Dokument in der Hand bemerkt das.
 
-Ein solcher Datensatz trägt kein Siegel — kein graues, kein durchgestrichenes, sondern den Vorbehalt in Worten. Ein durchgestrichenes Siegel hieße „Prüfung nicht bestanden", und hier gab es nie eine Prüfung.
+Ein solcher Datensatz trägt kein Siegel — kein graues, kein durchgestrichenes, sondern den Vorbehalt in Worten.
 
 LICHTBILD
-Der schnelle Lesemodus lässt es weg, der vollständige nimmt es mit; es ist die größte Datenmenge auf dem Chip.
+Der schnelle Lesemodus lässt es weg, der vollständige nimmt es mit.
 
-Noch eine Einschränkung: auf der italienischen Karte liegt es als JPEG 2000 vor, und iOS bringt dafür keinen Decoder mit. Die App zeigt dann das erkannte Format an, statt stillschweigend nichts zu zeigen. An dem Decoder wird gearbeitet.
+Auf der italienischen Karte liegt es als JPEG 2000 vor, und iOS bringt dafür keinen Decoder mit; die App zeigt dann das erkannte Format an. An dem Decoder wird gearbeitet.
 
 ARCHIV
 Gelesene Dokumente bleiben 30 Tage auf dem Gerät und löschen sich dann selbst. Pro Person bleibt ein Eintrag. Mehrere lassen sich gemeinsam ausgeben, als Text oder als JSON.

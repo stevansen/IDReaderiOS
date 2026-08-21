@@ -16,6 +16,8 @@ Nome, data e luogo di nascita, sesso, cittadinanza, numero del documento, date d
 
 In Alto Adige luoghi e vie sono stampati in due lingue. Viene mostrata la metà corrispondente alla lingua impostata.
 
+Residenza, codice fiscale, professione e telefono sono mostrati e non scritti nell'archivio; nel record si legge allora «letto, non conservato». Disattivabile nelle impostazioni, attivo per impostazione predefinita.
+
 VERIFICA DI AUTENTICITÀ
 Completamente offline, con i certificati inclusi nell'app. Nessuna consultazione delle liste di revoca.
 • Autenticazione passiva: le impronte dei gruppi di dati letti contro l'oggetto di sicurezza firmato della carta, questo contro il certificato del firmatario e questo contro l'autorità radice italiana.
@@ -26,10 +28,10 @@ Tutte le verifiche devono riuscire. Altrimenti non c'è alcun sigillo.
 LA PATENTE È DIVERSA
 Nessun chip, nessuna zona a lettura ottica, nessuna cifra di controllo. I dati provengono dal riconoscimento del testo di una fotografia e nulla di essi è confermato. Per questo tutti i campi sono modificabili: il riconoscimento può sbagliare, e solo chi ha il documento in mano se ne accorge.
 
-Un record così non porta alcun sigillo — né grigio né barrato, ma la riserva scritta a parole. Un sigillo barrato significherebbe "verifica non superata", e qui non c'è mai stata una verifica.
+Un record così non porta alcun sigillo — né grigio né barrato, ma la riserva scritta a parole.
 
 LA FOTOGRAFIA
-La lettura rapida la esclude, quella completa la include; è il gruppo di dati più grande sul chip.
+La lettura rapida la esclude, quella completa la include.
 
 Una limitazione per ora: sulla carta italiana è in JPEG 2000, e iOS non ha un decodificatore. L'app mostra allora il formato rilevato invece di non mostrare nulla in silenzio. Il decodificatore è in lavorazione.
 

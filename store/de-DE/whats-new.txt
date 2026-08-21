@@ -1,3 +1,5 @@
 Erste Fassung für iPhone.
 
-Portiert aus der Android-Fassung CIEreader, mit demselben Verhalten, demselben Wortlaut und demselben Archivformat. Neu gebaut wurde alles, was die Plattform betrifft: die Oberfläche, die Texterkennung und die Verschlüsselung des Archivs.
+Portiert aus der Android-Fassung CIEreader, mit demselben Verhalten und demselben Wortlaut. Neu gebaut wurde alles, was die Plattform betrifft: die Oberfläche, die Texterkennung und die Verschlüsselung des Archivs.
+
+Das Archiv behält weniger als die Android-Fassung: Wohnadresse, Steuernummer, Beruf und Telefon werden angezeigt und nicht gespeichert. Abschaltbar in den Einstellungen, vorbelegt eingeschaltet.

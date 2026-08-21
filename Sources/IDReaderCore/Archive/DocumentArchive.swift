@@ -30,6 +30,13 @@ public final class DocumentArchive: @unchecked Sendable {
     /// Diagnose fuer den Aufrufer - nie Inhalte, nur Fehlerarten.
     public var log: ((String) -> Void)?
 
+    /// Ob **alle** Felder aufbewahrt werden, statt vier davon nur anzuzeigen.
+    ///
+    /// Vorgabe ist `false`. Die Einstellung kommt von aussen (siehe
+    /// ``AppSettings/retainsAllFields``); der Archivspeicher kennt sie nicht von
+    /// sich aus, sondern befolgt sie.
+    public var retainsAllFields = false
+
     public init(file: URL, keys: ArchiveKeyStore) {
         self.file = file
         self.crypto = ArchiveCrypto(keys: keys)
@@ -138,11 +145,16 @@ public final class DocumentArchive: @unchecked Sendable {
     /// abgebrochenes Speichern waere ein verlorener Lesevorgang.
     private func minimised(_ document: StoredDocument) -> StoredDocument {
         var copy = document
+
+        // Der Abdruck wird in jedem Fall gebildet, auch wenn alles aufbewahrt
+        // wird: sonst haengt die Regel "ein Eintrag pro Person" an einer
+        // Einstellung, und ein Umschalten wuerde die Liste durcheinanderbringen.
         if copy.identityDigest == nil,
            let cf = document.data.codiceFiscale?.trimmingCharacters(in: .whitespaces),
            !cf.isEmpty {
             copy.identityDigest = try? crypto.identityDigest(for: cf)
         }
+        guard !retainsAllFields else { return copy }
         copy.data = document.data.minimisedForStorage()
         return copy
     }

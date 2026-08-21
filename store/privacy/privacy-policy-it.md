@@ -107,6 +107,31 @@ riporta, nell'app e in ogni esportazione, la riserva che qui nulla è stato
 verificato. Per questi dati vale tutto il resto di questa informativa: restano sul
 dispositivo, cifrati, e si cancellano dopo 30 giorni.
 
+### Cosa viene mostrato e non conservato
+
+Quattro dati sono mostrati finché il record è sullo schermo e **non vengono scritti
+nell'archivio**: residenza, codice fiscale, professione e telefono. La domanda alla
+base è se un caso d'uso abbia ancora bisogno del campo dopo che il documento è
+tornato al titolare; per questi quattro la risposta è no. Chi ha bisogno di un
+indirizzo lo legge una volta e lo trascrive.
+
+Il record ricorda **quali** di questi campi il documento riportava, non il loro
+contenuto. Per questo più tardi si legge «letto, non conservato» e non «non nel
+documento»: quest'ultima sarebbe un'affermazione sul documento che non è vera.
+
+Perché la stessa persona resti un'unica voce anche dopo il rilascio di un nuovo
+documento, dal codice fiscale si ricava un'**impronta**, con una chiave derivata
+da quella dell'archivio che non lascia il dispositivo. Il codice fiscale stesso non
+viene conservato e non è ricavabile dall'impronta.
+
+Questa minimizzazione si può **disattivare** nelle impostazioni («Conservare tutti
+i campi»): in tal caso i quattro campi vengono conservati ed esportati. È
+**attiva per impostazione predefinita**, e al momento di disattivarla l'app
+avverte che chi conserva tutto deve poter indicare la finalità dei campi
+aggiuntivi e risponderne — la minimizzazione dei dati è un obbligo del titolare,
+non un'impostazione di un programma. La modifica vale dalla lettura successiva;
+quanto già omesso è cancellato.
+
 ### Dove restano i dati
 
 I dati letti restano **esclusivamente sul dispositivo**. Sono cifrati con AES-256;

@@ -3,10 +3,11 @@ import Foundation
 /// Wandelt Datensaetze in JSON und zurueck.
 ///
 /// Eigenhaendig statt mit `Codable`, damit das Format sichtbar bleibt - und weil
-/// es **dasselbe** Format ist wie im Android-Original, Feldname fuer Feldname.
-/// Wer ein Archiv von dort entschluesselt bekommt, kann es hier lesen; das war
-/// beim Portieren die einzige Stelle, an der sich das ohne Aufwand einrichten
-/// liess, und es ist die Stelle, an der es am meisten wert ist.
+/// es Feldname fuer Feldname aus dem Android-Original stammt. Bis Fassung 8 war
+/// es bitgleich; Fassung 9 ist es nicht mehr, weil der Durchgang zur
+/// Datenminimierung vier Felder herausgenommen hat. Die Feldnamen der uebrigen
+/// bleiben, damit die beiden Fassungen wieder zusammenfinden, sobald die
+/// Android-Seite dieselbe Aenderung bekommt.
 ///
 /// Beim Lesen wird jeder Datensatz einzeln abgesichert: ein beschaedigter Eintrag
 /// soll nicht das ganze Archiv unlesbar machen, sondern nur selbst wegfallen.

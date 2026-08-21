@@ -12,8 +12,9 @@ Commit `7ab0d20`, Version 1.8 / versionCode 11.
 | `MrzScan` — Prüfziffern nach ICAO 9303 | portiert | 4 Tests |
 | `CanScan` — sechs Ziffern, Eindeutigkeit | portiert | 8 Tests |
 | `BilingualText` — zweisprachige Orte | portiert | 4 Tests |
-| Archivformat (JSON, Version 8) | **bitgleich zur Android-Fassung** | 4 Tests |
+| Archivformat (JSON, Version 9) | **nicht mehr bitgleich zur Android-Fassung** — vier Felder fallen weg, ein Personenabdruck kommt hinzu | 4 Tests |
 | Archiv (AES-256-GCM, Schlüsselbund, ein Eintrag pro Person, 30 Tage) | portiert | 8 Tests |
+| Datenminimierung: Wohnsitz, Steuernummer, Beruf, Telefon werden angezeigt und nicht gespeichert; abschaltbar, vorbelegt an | gebaut | 6 Tests, Schalter und Rückfrage im Simulator durchlaufen |
 | Export: lesbarer Text, JSON, HTML für Mail | portiert | 10 Tests |
 | Lokalisierung en / de / it, 208 Einträge je Sprache | vollständig übernommen | 9 Tests, darunter „kein Schlüssel fehlt" je Sprache |
 | Die sechs Farbschemata | Wert für Wert übernommen | am Gerät gesehen |
@@ -30,7 +31,7 @@ Commit `7ab0d20`, Version 1.8 / versionCode 11.
 `Apple Distribution`, für TestFlight freigegeben. Damit ist der Weg auf ein Gerät
 offen — der Nachweis am Gerät selbst ist Punkt 1 unten.
 
-64 Tests, `swift test`, alle grün. Die App baut ohne eine einzige Warnung im
+74 Tests, `swift test`, alle grün. Die App baut ohne eine einzige Warnung im
 eigenen Code (`xcodebuild -scheme IDReader -sdk iphonesimulator`) und läuft im
 Simulator.
 
@@ -81,4 +82,5 @@ In der Reihenfolge, in der es sich lohnt:
 * Die Meldung „NFC ist ausgeschaltet". iOS hat keinen Schalter dafür. Der Text
   bleibt im Katalog, damit die drei Sprachfassungen deckungsgleich bleiben.
 * `StoredDocument.cardId` wird nicht mehr gefüllt (siehe Punkt 7), bleibt aber im
-  Format — ein unter Android geschriebenes Archiv soll lesbar sein.
+  Format — die Feldnamen sollen zur Android-Fassung passen, auch wenn Format 9
+  nicht mehr bitgleich zu ihr ist.

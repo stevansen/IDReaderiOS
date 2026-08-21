@@ -16,6 +16,8 @@ Name, date and place of birth, sex, nationality, document number, dates of issue
 
 In South Tyrol places and streets are printed in two languages. The half matching the chosen language is shown.
 
+Residence, codice fiscale, profession and telephone are shown and not written to the archive; the record then says "read, not stored". This can be switched off in the settings, and is on by default.
+
 AUTHENTICITY CHECK
 Entirely offline, against certificates bundled with the app. No revocation lookup.
 • Passive Authentication: the hashes of the data groups read against the card's signed security object, that against the document signer certificate, and that against the Italian root authority.
@@ -29,7 +31,7 @@ No chip, no machine readable zone, no check digit. The fields come from text rec
 Such a record carries no seal — not a grey one, not a struck-out one, but the caveat in words. A struck seal would read as "failed the check", and here there never was a check.
 
 THE PHOTOGRAPH
-The fast read leaves it out, the full read takes it along; it is the largest data group on the chip.
+The fast read leaves it out, the full read takes it along.
 
 One limitation for now: on the Italian card it is JPEG 2000, and iOS has no decoder for it. The app then shows the detected format instead of silently showing nothing. A decoder is being worked on.
 

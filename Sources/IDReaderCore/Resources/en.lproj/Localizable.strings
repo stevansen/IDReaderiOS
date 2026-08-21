@@ -178,6 +178,12 @@
 "settings_language" = "Language";
 "settings_language_hint" = "Applies to this app only. Everything else on the device keeps its own language.";
 "settings_language_system" = "System language";
+"settings_retain_all" = "Retain every field";
+"settings_retain_all_confirm" = "Switch on anyway";
+"settings_retain_all_hint" = "Off by default, and the default is the statement: residence, codice fiscale, profession and telephone are shown but not kept, because no use case needs them once the document is out of your hand. Switching this on keeps them too - in the archive and in every export. It applies from now on; what was already left out is gone.";
+"settings_retain_all_warning_body" = "Keeping data you do not need is not something an app can justify for you. Whoever switches this on must be able to name the purpose the extra fields serve, and answer for it - data minimisation is an obligation on the controller, not a setting in a program.\n\nIf a report asks for these fields, that is a reason. 'It might come in useful' is not.";
+"settings_retain_all_warning_title" = "You need a reason for this";
+"settings_retention" = "Retention";
 "share_chooser_title" = "Share card data";
 "share_clip_label" = "CIE data";
 "share_copied" = "Copied to the clipboard.";

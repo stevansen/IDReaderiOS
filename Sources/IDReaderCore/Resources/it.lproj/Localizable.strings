@@ -178,6 +178,12 @@
 "settings_language" = "Lingua";
 "settings_language_hint" = "Vale solo per questa app. Tutto il resto sul dispositivo mantiene la sua lingua.";
 "settings_language_system" = "Lingua di sistema";
+"settings_retain_all" = "Conservare tutti i campi";
+"settings_retain_all_confirm" = "Attiva comunque";
+"settings_retain_all_hint" = "Disattivato, e la direzione dell'impostazione predefinita è l'affermazione: residenza, codice fiscale, professione e telefono vengono mostrati ma non conservati, perché nessun caso d'uso ne ha bisogno quando il documento non è più in mano. Attivandolo restano - nell'archivio e in ogni esportazione. Vale da adesso; quanto già omesso è perduto.";
+"settings_retain_all_warning_body" = "Conservare dati di cui non si ha bisogno non è qualcosa che un'app possa giustificare al posto suo. Chi lo attiva deve poter indicare la finalità cui servono i campi aggiuntivi, e risponderne - la minimizzazione dei dati è un obbligo del titolare, non un interruttore in un programma.\n\nSe un rapporto richiede questi campi, è un motivo. «Potrebbe servire» non lo è.";
+"settings_retain_all_warning_title" = "Per questo serve un motivo";
+"settings_retention" = "Conservazione";
 "share_chooser_title" = "Condividi i dati della carta";
 "share_clip_label" = "Dati CIE";
 "share_copied" = "Copiato negli appunti.";

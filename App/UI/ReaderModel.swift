@@ -117,6 +117,7 @@ final class ReaderModel {
         self.canReadChips = reader.isAvailable
         self.language = settings.language
         self.strings = Strings(language: settings.language)
+        archive.retainsAllFields = settings.retainsAllFields
         self.records = archive.load()
     }
 
@@ -521,6 +522,19 @@ final class ReaderModel {
     var exportFormat: ExportFormat {
         get { settings.exportFormat }
         set { settings.exportFormat = newValue }
+    }
+
+    /// Ob alle Felder aufbewahrt werden. Vorgabe ist nein.
+    ///
+    /// Die Einstellung wird sofort an das Archiv weitergegeben und nicht erst beim
+    /// naechsten Start: wer sie umschaltet, tut es meistens, weil der naechste
+    /// Lesevorgang sie braucht.
+    var retainsAllFields: Bool {
+        get { settings.retainsAllFields }
+        set {
+            settings.retainsAllFields = newValue
+            archive.retainsAllFields = newValue
+        }
     }
 
     /// Die Farbwelt, die gerade gilt.

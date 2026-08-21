@@ -156,6 +156,7 @@ struct SettingsScreen: View {
     let onBack: () -> Void
 
     @Environment(\.palette) private var palette
+    @State private var warningShown = false
     private var strings: Strings { model.strings }
 
     var body: some View {
@@ -232,6 +233,8 @@ struct SettingsScreen: View {
                             .stroke(palette.outlineVariant, lineWidth: 1)
                     }
 
+                    retentionCard
+
                     Text(strings.format(.menuVersion, "\(AppInfo.version) (\(AppInfo.build))"))
                         .font(.footnote)
                         .foregroundStyle(palette.onSurfaceVariant)
@@ -243,5 +246,65 @@ struct SettingsScreen: View {
         }
         .background(palette.background)
         .foregroundStyle(palette.onSurface)
+        .alert(strings[.settingsRetainAllWarningTitle], isPresented: $warningShown) {
+            Button(strings[.actionCancel], role: .cancel) {}
+            Button(strings[.settingsRetainAllConfirm]) {
+                model.retainsAllFields = true
+            }
+        } message: {
+            Text(strings[.settingsRetainAllWarningBody])
+        }
+    }
+
+    /// Die Aufbewahrung.
+    ///
+    /// Ein Schalter, der den Datenschutz **schwaecht**, und deshalb einer, der
+    /// nicht einfach umgeht: beim Einschalten kommt eine Rueckfrage, die den Grund
+    /// verlangt. Beim Ausschalten nicht - zurueck zur Vorgabe braucht niemand eine
+    /// Begruendung.
+    @ViewBuilder private var retentionCard: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            Text(strings[.settingsRetention])
+                .font(AppType.cardHeading)
+                .padding(.horizontal, 16)
+                .padding(.top, 12)
+                .padding(.bottom, 4)
+
+            Toggle(isOn: Binding(
+                get: { model.retainsAllFields },
+                set: { wanted in
+                    if wanted {
+                        // Nicht sofort setzen: erst die Frage nach dem Grund.
+                        warningShown = true
+                    } else {
+                        model.retainsAllFields = false
+                    }
+                }
+            )) {
+                Text(strings[.settingsRetainAll]).font(.body)
+            }
+            .padding(.horizontal, 16)
+            .frame(minHeight: 52)
+
+            Divider()
+                .overlay(palette.outlineVariant)
+                .padding(.horizontal, 16)
+
+            Text(strings[.settingsRetainAllHint])
+                .font(.footnote)
+                .foregroundStyle(palette.onSurfaceVariant)
+                .padding(.horizontal, 16)
+                .padding(.top, 10)
+                .padding(.bottom, 12)
+        }
+        .background(palette.surfaceContainerLowest, in: .rect(cornerRadius: 20))
+        .overlay {
+            // Der Rahmen ist Zierrat und soll keine Beruehrung annehmen. Er tat
+            // es hier nicht, aber ueber einem Schalter will man sich darauf
+            // nicht verlassen.
+            RoundedRectangle(cornerRadius: 20)
+                .stroke(palette.outlineVariant, lineWidth: 1)
+                .allowsHitTesting(false)
+        }
     }
 }
