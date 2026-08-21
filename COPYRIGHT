@@ -47,8 +47,10 @@ Carried over substantially unchanged, and therefore derived work:
     `RecordProvenance`, `AccessKey`, `StoredDocument`);
   * the three parsers (`LicenceScan`, `MrzScan`, `CanScan`) including the
     reasoning in their comments, which is the actual value in them;
-  * the archive file format — same JSON keys, same version number 8, same
-    envelope of IV length, IV, ciphertext;
+  * the archive file format — same JSON keys, same envelope of IV length, IV,
+    ciphertext. The version number has since moved on: 8 was byte-for-byte the
+    Android format, 9 is not, because the data-minimisation pass took four
+    fields out of storage. The keys that remain are still the original's;
   * the export text and its JSON field names, which a downstream report
     importer depends on;
   * all user-facing wording in English, German and Italian;
