@@ -49,20 +49,32 @@ Es gibt keine. Zu entscheiden: eine Seite auf `github.io` wie bei der
 Android-Fassung, eine Mailadresse hinter einer eigenen Seite, oder ein öffentliches
 Repository. Ohne diese URL nimmt Apple die Fassung nicht zur Prüfung an.
 
-### Datenschutz-URL (Pflicht) — und Vorsicht damit
+### Datenschutz-URL (Pflicht)
 
-Die Android-Fassung verweist auf
-`https://cauer71.github.io/ciereader-privacy/`. **Diese Seite darf hier nicht
-unverändert verlinkt werden.** Sie sagt ausdrücklich, es erscheine keine
-Kamera-Berechtigung — was für die Android-Fassung stimmt und für diese falsch ist:
-auf iOS ist `NSCameraUsageDescription` unvermeidlich.
+Der **Text liegt fertig** in [`privacy/`](privacy/), in drei Sprachen. Was fehlt,
+ist eine Adresse, unter der er steht — und zwei Angaben darin.
 
-Eine Datenschutzerklärung, die an genau dem Punkt etwas Falsches behauptet, an dem
-sie ein Versprechen gibt, ist schlimmer als keine. Also entweder ein eigener
-Abschnitt für iOS auf derselben Seite oder eine eigene Seite. Der Quelltext der
-bestehenden liegt im Android-Repository unter
-`apps/cie-reader/store/privacy-policy-{de,en,it}.md`; was daran zu ändern ist,
-steht in [`../docs/DATA-PROTECTION.md`](../docs/DATA-PROTECTION.md).
+Die Seite der Android-Fassung (`https://cauer71.github.io/ciereader-privacy/`)
+darf **nicht unverändert** verlinkt werden: sie sagt ausdrücklich, es erscheine
+keine Kamera-Berechtigung. Für Android stimmt das, für iOS ist es falsch. Eine
+Datenschutzerklärung, die an genau dem Punkt etwas Falsches behauptet, an dem sie
+ein Versprechen gibt, ist schlimmer als keine. Also eine eigene Seite oder ein
+eigener Abschnitt für iOS auf derselben.
+
+Vor dem Veröffentlichen auszufüllen: die mit `<<…>>` markierten Stellen — Name und
+Mailadresse des Verantwortlichen. Die Android-Fassung nennt dort Christian Auer;
+wer es hier ist, hängt davon ab, unter welchem Konto die App liegt, und ist keine
+Entscheidung, die ein Textentwurf treffen kann.
+
+| Datei | |
+|---|---|
+| [`privacy/privacy-policy-de.md`](privacy/privacy-policy-de.md) | Deutsch |
+| [`privacy/privacy-policy-en.md`](privacy/privacy-policy-en.md) | Englisch |
+| [`privacy/privacy-policy-it.md`](privacy/privacy-policy-it.md) | Italienisch |
+
+Jede Datei beginnt mit einer Notiz, was gegenüber der Android-Fassung geändert
+wurde und warum — der Kopf ist nicht Teil des zu veröffentlichenden Textes, die
+Linie trennt.
 
 ### Die Ausfuhrmeldung
 

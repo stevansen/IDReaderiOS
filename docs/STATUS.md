@@ -60,11 +60,13 @@ In der Reihenfolge, in der es sich lohnt:
    ergibt ein Gewicht null.
 5. **Store-Material.** Texte in drei Sprachen und 15 Bildschirmfotos liegen in
    [`../store/`](../store/); die Längen sind gegen Apples Feldgrenzen geprüft. Es
-   fehlen zwei Pflichtangaben, die niemand erfinden kann: eine **Support-URL** und
-   eine **Datenschutz-URL**. Letztere ist der heiklere Punkt — die bestehende Seite
-   der Android-Fassung behauptet, es erscheine keine Kamera-Berechtigung, und das
-   ist auf iOS falsch. Siehe [`../store/README.md`](../store/README.md).
-   Das App-Zeichen ist ein Entwurf aus `Scripts/make-app-icon.swift`.
+   fehlt eine **Support-URL** und ein Ort, an dem die **Datenschutzerklärung**
+   steht — deren Text liegt fertig in [`../store/privacy/`](../store/privacy/), in
+   drei Sprachen, mit zwei auszufüllenden Stellen (Name und Mailadresse des
+   Verantwortlichen). Die Seite der Android-Fassung darf nicht unverändert
+   verlinkt werden: sie behauptet, es erscheine keine Kamera-Berechtigung, und das
+   ist auf iOS falsch. Das App-Zeichen ist ein Entwurf aus
+   `Scripts/make-app-icon.swift`.
 6. **Die Anerkennungen für MIT und Apache-2.0** müssen in der App erreichbar
    sein. Es gibt noch keinen Ort dafür.
 7. **Die Wiedererkennung einer aufgelegten Karte** entfällt dauerhaft — iOS hat
