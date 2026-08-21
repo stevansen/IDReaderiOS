@@ -159,6 +159,24 @@ Für den Test nicht nötig, für den Store schon:
   müssen in der App erreichbar sein. Es gibt noch keinen Ort dafür — siehe
   [`../THIRD-PARTY-NOTICES.md`](../THIRD-PARTY-NOTICES.md).
 
+## Preis: kostenlos
+
+Festgelegt. In App Store Connect unter *Preise und Verfügbarkeit* → **Kostenlos**,
+ohne In-App-Käufe. Für TestFlight ist das gleichgültig — Testbuilds sind für
+Tester immer kostenlos —, es greift erst beim Store.
+
+Bemerkenswert ist daran, dass die App das nicht nur behauptet, sondern **nicht
+anders kann**: es gibt kein StoreKit, keine Werbung, keine Messtechnik und keinen
+Netzzugriff, und `Scripts/check-no-network.sh` hält das so. Bei einer kostenlosen
+App ist die nächste Frage sonst immer, womit sie stattdessen bezahlt wird; hier
+lautet die Antwort: mit nichts. Dasselbe sagen die Datenschutzangaben — **Data Not
+Collected** — und `App/PrivacyInfo.xcprivacy`.
+
+Nicht zu verwechseln: **kostenlos ist nicht dasselbe wie offen.** Der Quelltext
+steht weiterhin unter „alle Rechte vorbehalten"
+([`../LICENSE`](../LICENSE)); wer die App gratis lädt, bekommt sie nicht
+lizenziert. Das sind zwei Entscheidungen, und nur die erste ist getroffen.
+
 ## Öffentlich verteilt: was das heißt
 
 Die App geht als Werkzeug an jeden, der sie lädt. Das ist keine neue Haltung,
