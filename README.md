@@ -12,7 +12,10 @@ Mechanik ist die von Apple. Was dabei anders werden musste, steht in
 Liste.
 
 © 2026 Christian Auer und Stefan Hellweger. Alle Rechte vorbehalten; siehe
-[`LICENSE`](LICENSE) und [`COPYRIGHT`](COPYRIGHT).
+[`LICENSE`](LICENSE) und [`COPYRIGHT`](COPYRIGHT). Welche Lizenz stattdessen in
+Frage kommt und was dafür zu tun wäre, steht in
+[`docs/LICENCE-CHOICE.md`](docs/LICENCE-CHOICE.md) — empfohlen wird Apache-2.0,
+entschieden ist nichts.
 
 **Öffentlich lesbar heißt nicht lizenziert.** Dieses Repository ist offen, damit
 nachprüfbar ist, was die App tut — die Zusagen in der Datenschutzerklärung sind
@@ -81,7 +84,8 @@ IDReaderiOS/
 │   └── NFCPassportReaderCAN/  PACE, Secure Messaging, Passive Auth, Chip Auth
 ├── Config/                    Info.plist, Berechtigungen
 ├── docs/                      STATUS, ANDROID-TO-IOS, NFC-PACE, DATA-PROTECTION,
-│                              TESTFLIGHT, EXPORT-COMPLIANCE (+ DOSSIER)
+│                              TESTFLIGHT, EXPORT-COMPLIANCE (+ DOSSIER),
+│                              LICENCE-CHOICE
 ├── store/                     Store-Texte in drei Sprachen und die Screenshots
 └── MIGRATION_PROMPT.md        der Prompt, mit dem sich das fortsetzen lässt
 ```
