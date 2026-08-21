@@ -14,6 +14,15 @@ Liste.
 © 2026 Christian Auer und Stefan Hellweger. Alle Rechte vorbehalten; siehe
 [`LICENSE`](LICENSE) und [`COPYRIGHT`](COPYRIGHT).
 
+**Öffentlich lesbar heißt nicht lizenziert.** Dieses Repository ist offen, damit
+nachprüfbar ist, was die App tut — die Zusagen in der Datenschutzerklärung sind
+sonst nur Behauptungen. Eine Lizenz ist damit nicht erteilt. Was GitHubs
+Nutzungsbedingungen jedem Nutzer ohnehin zugestehen (Ansehen und Forken innerhalb
+von GitHub), bleibt davon unberührt; alles andere braucht die Zustimmung **beider**
+Rechteinhaber.
+
+Hilfe für Benutzer: [`SUPPORT.md`](SUPPORT.md), dreisprachig.
+
 ---
 
 ## Der Stand in einem Satz

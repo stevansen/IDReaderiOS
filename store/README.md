@@ -43,16 +43,39 @@ warnt schon ab 95 Prozent, weil die Zählweise dort gelegentlich abweicht.
 
 ## Zwei Angaben, die noch fehlen — und eine, die falsch wäre
 
-### Support-URL (Pflicht)
+### Support-URL — erledigt
 
-Es gibt keine. Zu entscheiden: eine Seite auf `github.io` wie bei der
-Android-Fassung, eine Mailadresse hinter einer eigenen Seite, oder ein öffentliches
-Repository. Ohne diese URL nimmt Apple die Fassung nicht zur Prüfung an.
+```
+https://github.com/stevansen/IDReaderiOS/blob/main/SUPPORT.md
+```
 
-### Datenschutz-URL (Pflicht)
+Das Repository ist öffentlich, und [`SUPPORT.md`](../SUPPORT.md) ist dafür
+geschrieben: dreisprachig, benutzerseitig, mit den Fällen, die im Test tatsächlich
+zurückkommen — „Kein NFC verfügbar", „CAN stimmt nicht", das leere Lichtbild — und
+dem Verweis auf die Issues.
 
-Der **Text liegt fertig** in [`privacy/`](privacy/), in drei Sprachen. Was fehlt,
-ist eine Adresse, unter der er steht — und zwei Angaben darin.
+Wer lieber auf die Übersichtsseite verweist, nimmt
+`https://github.com/stevansen/IDReaderiOS`; Apple akzeptiert beides.
+
+### Datenschutz-URL — vorbereitet, zwei Handgriffe fehlen
+
+Der **Text liegt fertig** in [`privacy/`](privacy/), in drei Sprachen, und es gibt
+einen Weg, ihn zu veröffentlichen, seit das Repository öffentlich ist:
+
+```bash
+python3 Scripts/build-privacy-pages.py
+```
+
+Das Skript baut aus den Markdown-Dateien eigenständige HTML-Seiten nach
+`docs/privacy/` und **bricht ab, solange noch `<<…>>` im Text steht**. Danach in
+den Einstellungen des Repositories *Pages → Deploy from a branch → main → /docs*
+einschalten; die Adresse ist dann
+
+```
+https://stevansen.github.io/IDReaderiOS/privacy/
+```
+
+Es fehlen also zwei Handgriffe: die Platzhalter ausfüllen und Pages einschalten.
 
 Die Seite der Android-Fassung (`https://cauer71.github.io/ciereader-privacy/`)
 darf **nicht unverändert** verlinkt werden: sie sagt ausdrücklich, es erscheine
@@ -61,10 +84,9 @@ Datenschutzerklärung, die an genau dem Punkt etwas Falsches behauptet, an dem s
 ein Versprechen gibt, ist schlimmer als keine. Also eine eigene Seite oder ein
 eigener Abschnitt für iOS auf derselben.
 
-Vor dem Veröffentlichen auszufüllen: die mit `<<…>>` markierten Stellen — Name und
-Mailadresse des Verantwortlichen. Die Android-Fassung nennt dort Christian Auer;
-wer es hier ist, hängt davon ab, unter welchem Konto die App liegt, und ist keine
-Entscheidung, die ein Textentwurf treffen kann.
+Auszufüllen sind Name und Mailadresse des Verantwortlichen. Die Android-Fassung
+nennt dort Christian Auer; wer es hier ist, hängt davon ab, unter welchem Konto die
+App liegt, und ist keine Entscheidung, die ein Textentwurf treffen kann.
 
 | Datei | |
 |---|---|

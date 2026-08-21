@@ -11,7 +11,7 @@ Auf diesem Rechner geprüft:
 |---|---|
 | Entwicklerteam | `JF8N3J347R` (Stefan Hellweger) |
 | Verteilungszertifikat | `Apple Distribution: Stefan Hellweger (JF8N3J347R)` ✓ |
-| App-Store-Connect-Schlüssel | `AuthKey_D5BM7BM3H5.p8` in `~/.appstoreconnect/private_keys/` ✓ |
+| App-Store-Connect-Schlüssel | vorhanden in `~/.appstoreconnect/private_keys/` ✓ (Kennung steht nicht im Repository) |
 | App-Zeichen 1024×1024 | ✓ (Entwurf, siehe unten) |
 | Datenschutzangabe `PrivacyInfo.xcprivacy` | ✓ |
 | Gerätebau für arm64, Release | ✓ ohne Warnung |
@@ -71,11 +71,12 @@ Der **Name** muss App-Store-weit eindeutig sein. „IDReader" ist womöglich
 vergeben; dann geht ein Zusatz wie „IDReader CIE" — für einen Test spielt er
 keine Rolle, und ändern lässt er sich später.
 
-### 3. Die Issuer-ID heraussuchen
+### 3. Schlüssel- und Issuer-Kennung heraussuchen
 
-*Benutzer und Zugriff → Integrationen → App Store Connect API*. Sie sieht aus wie
-`69a6de70-xxxx-xxxx-xxxx-xxxxxxxxxxxx` und ist kein Geheimnis, nur eine Kennung —
-der eigentliche Schlüssel ist die `.p8`-Datei, und die liest `altool` selbst.
+*Benutzer und Zugriff → Integrationen → App Store Connect API*. Beide stehen dort;
+keine von beiden liegt im Repository, weil es öffentlich ist. Für sich allein sind
+sie nutzlos — der eigentliche Schlüssel ist die `.p8`-Datei, und die liest `altool`
+selbst.
 
 ## Dann läuft es in zwei Befehlen
 
@@ -84,7 +85,7 @@ Scripts/archive.sh
 ```
 
 ```bash
-ASC_ISSUER_ID=<Ihre-Issuer-ID> Scripts/upload.sh
+ASC_KEY_ID=<Schlüsselkennung> ASC_ISSUER_ID=<Issuer-ID> Scripts/upload.sh
 ```
 
 Das erste Skript prüft die Netzzusage, lässt die Tests laufen, archiviert und

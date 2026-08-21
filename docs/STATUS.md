@@ -60,13 +60,14 @@ In der Reihenfolge, in der es sich lohnt:
    ergibt ein Gewicht null.
 5. **Store-Material.** Texte in drei Sprachen und 15 Bildschirmfotos liegen in
    [`../store/`](../store/); die Längen sind gegen Apples Feldgrenzen geprüft. Es
-   fehlt eine **Support-URL** und ein Ort, an dem die **Datenschutzerklärung**
-   steht — deren Text liegt fertig in [`../store/privacy/`](../store/privacy/), in
-   drei Sprachen, mit zwei auszufüllenden Stellen (Name und Mailadresse des
-   Verantwortlichen). Die Seite der Android-Fassung darf nicht unverändert
-   verlinkt werden: sie behauptet, es erscheine keine Kamera-Berechtigung, und das
-   ist auf iOS falsch. Das App-Zeichen ist ein Entwurf aus
-   `Scripts/make-app-icon.swift`.
+   Die **Support-URL** ist erledigt, seit das Repository öffentlich ist:
+   [`../SUPPORT.md`](../SUPPORT.md), dreisprachig und benutzerseitig. Für die
+   **Datenschutzerklärung** liegt der Text in
+   [`../store/privacy/`](../store/privacy/) und ein Weg, ihn zu veröffentlichen
+   (`Scripts/build-privacy-pages.py` → GitHub Pages aus `/docs`); es fehlen zwei
+   Handgriffe: Name und Mailadresse des Verantwortlichen ausfüllen — der Generator
+   bricht bis dahin ab — und Pages einschalten. Das App-Zeichen ist ein Entwurf
+   aus `Scripts/make-app-icon.swift`.
 6. **Die Anerkennungen für MIT und Apache-2.0** müssen in der App erreichbar
    sein. Es gibt noch keinen Ort dafür.
 7. **Die Wiedererkennung einer aufgelegten Karte** entfällt dauerhaft — iOS hat
