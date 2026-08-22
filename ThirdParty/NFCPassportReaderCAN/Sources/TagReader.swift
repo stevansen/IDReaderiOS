@@ -152,8 +152,62 @@ public class TagReader {
         let instructionClass : UInt8 = isLast ? 0x00 : 0x10
         let INS_BSI_GENERAL_AUTHENTICATE : UInt8 = 0x86
         
-        let cmd : NFCISO7816APDU = NFCISO7816APDU(instructionClass: instructionClass, instructionCode: INS_BSI_GENERAL_AUTHENTICATE, p1Parameter: 0x00, p2Parameter: 0x00, data: commandData, expectedResponseLength: lengthExpected)
+        // GEAENDERT: Befehlsverkettung, wenn das Datenfeld nicht in ein kurzes
+        // APDU passt.
+        //
+        // ## Warum
+        //
+        // Bei PACE mit klassischem DH ueber 2048 Bit ist der oeffentliche
+        // Schluessel 256 Byte gross, das Datenfeld mit TLV-Huelle also 264 - mehr
+        // als die 255, die ein kurzes APDU traegt. CoreNFC macht daraus ein
+        // **erweitertes** APDU, und die italienischen Dokumente lehnen das ab.
+        //
+        // Vom Geraet, dreimal in Folge und mit beiden Dokumenten:
+        //
+        //     → 10 86 00 00 7C00                        Schritt 1
+        //     ← SW 9000 7C0A8008…                       antwortet, mit Daten
+        //     → 10 86 00 00 7C820104 8182010083…        Schritt 2, 264 Byte
+        //     ← SW 6C00                                 „null Bytes verfuegbar"
+        //     ↻ Wiederholung (Le=256 / Le=0 / kein Le)
+        //     ← SW 6985                                 jedes Mal
+        //
+        // Am `Le` liegt es also nicht - drei Fassungen davon sind durchprobiert.
+        // Schritt 1 mit `CLA 0x10` beantwortet der Chip mit Daten, das
+        // Verkettungsbit stoert ihn folglich nicht. Was ihn stoert, ist die
+        // **Laenge**: das erweiterte APDU nimmt er nicht an, und danach ist der
+        // PACE-Zustand verdorben - deshalb `6985` auf jede Wiederholung.
+        //
+        // Also gar kein erweitertes APDU mehr senden, sondern zerlegen: Stuecke
+        // von 255 Byte mit gesetztem Verkettungsbit, das letzte ohne. Nach
+        // ISO 7816-4 setzt der Chip sie zusammen und beantwortet das letzte.
         var response : ResponseAPDU
+        if commandData.count > 255 {
+            let stuecke = stride(from: 0, to: commandData.count, by: 255).map { start in
+                commandData.subdata(in: start ..< min(start + 255, commandData.count))
+            }
+            TagReader.trace?("⋯ Datenfeld \(commandData.count)B → \(stuecke.count) Stuecke, verkettet")
+            var letzte : ResponseAPDU? = nil
+            for (index, stueck) in stuecke.enumerated() {
+                let istLetztes = index == stuecke.count - 1
+                let kette = NFCISO7816APDU(
+                    // Verkettungsbit bei allen ausser dem letzten Stueck. Beim
+                    // letzten die Klasse des eigentlichen Befehls - nur daran
+                    // erkennt der Chip, dass die Kette zu Ende ist.
+                    instructionClass: istLetztes ? 0x00 : 0x10,
+                    instructionCode: INS_BSI_GENERAL_AUTHENTICATE,
+                    p1Parameter: 0x00,
+                    p2Parameter: 0x00,
+                    data: stueck,
+                    expectedResponseLength: istLetztes ? lengthExpected : -1
+                )
+                letzte = try await send( cmd: kette )
+            }
+            var zusammen = letzte!
+            zusammen.data = try unwrapDO( tag:0x7c, wrappedData: zusammen.data)
+            return zusammen
+        }
+
+        let cmd : NFCISO7816APDU = NFCISO7816APDU(instructionClass: instructionClass, instructionCode: INS_BSI_GENERAL_AUTHENTICATE, p1Parameter: 0x00, p2Parameter: 0x00, data: commandData, expectedResponseLength: lengthExpected)
         do {
             response = try await send( cmd: cmd )
             response.data = try unwrapDO( tag:0x7c, wrappedData:response.data)

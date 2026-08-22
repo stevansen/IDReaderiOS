@@ -389,6 +389,35 @@ verlangt.
 CoreNFC unterscheidet „Le = 0" und „kein Le" über `expectedResponseLength: -1`.
 Das ist die Falle, in die beide Versuche gelaufen sind.
 
+### Es liegt nicht am `Le` (Bau 15)
+
+Drei Fassungen der Wiederholung durchprobiert, mit **beiden** Dokumenten:
+
+| Bau | Wiederholung mit | Antwort |
+|---|---|---|
+| 12 | `Le = 256` | `6985` |
+| 14 | `Le = 0` | (übersprungen — wäre wieder 256/65536 gewesen) |
+| 15 | **kein Le-Feld** | `6985` |
+
+**Damit ist die Le-Spur zu Ende.** Und was übrig bleibt, ist eindeutig:
+
+* Schritt 1 mit `CLA 0x10` beantwortet der Chip **mit Daten**. Das
+  Verkettungsbit stört ihn also nicht.
+* Schritt 2 mit 264 Byte lehnt er ab. Danach ist der PACE-Zustand verdorben —
+  deshalb `6985` auf jede Wiederholung, unabhängig vom `Le`.
+
+Was ihn stört, ist die **Länge**. 264 Byte passen nicht in ein kurzes APDU (255),
+CoreNFC macht daraus ein erweitertes, und dieses Dokument nimmt es nicht an.
+`6C00` — „null Bytes verfügbar" — ist seine Art, das zu sagen.
+
+Behoben in Bau 16: **kein erweitertes APDU mehr.** Das Datenfeld wird in Stücke
+von 255 Byte zerlegt und verkettet gesendet — Verkettungsbit bei allen außer dem
+letzten. Nach ISO 7816-4 setzt der Chip sie zusammen und beantwortet das letzte.
+
+Dass das die richtige Lesart ist, ist noch nicht bewiesen. Aber es ist die
+einzige verbliebene, und das Protokoll zeigt jedes Stück einzeln — die Antwort
+auf das erste Stück sagt schon, ob der Chip verkettet.
+
 ### Was als nächstes zu prüfen ist
 
 Mit der berichtigten Statusprüfung nennt das Gerät das Statuswort des Chips.
