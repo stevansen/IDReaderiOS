@@ -177,6 +177,7 @@
 "result_document_type_passport" = "PASSAPORTO";
 "result_retention_hint" = "Kept encrypted on this device for %d days.";
 "result_valid_until" = "valid until %@";
+"retention_all_hint" = "Every field is kept – residence, codice fiscale, profession and telephone included. The switch for that is in the options, and the reason for it is yours.";
 "retention_minimised_hint" = "Residence, codice fiscale, profession and telephone are shown but not kept. Note them now if you need them.";
 "revocation_checked_at" = "Checked on %@";
 "revocation_heading" = "Revocation list";

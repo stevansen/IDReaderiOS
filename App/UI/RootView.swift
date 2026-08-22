@@ -137,6 +137,7 @@ struct RootView: View {
                 document: document,
                 fresh: fresh,
                 retentionDays: DocumentArchive.retentionDays,
+                retainsAllFields: model.retainsAllFields,
                 strings: strings,
                 onDone: model.reset,
                 onReread: { model.rereadStored(document) },

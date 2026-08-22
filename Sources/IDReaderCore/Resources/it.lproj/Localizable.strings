@@ -177,6 +177,7 @@
 "result_document_type_passport" = "PASSAPORTO";
 "result_retention_hint" = "Conservati cifrati su questo dispositivo per %d giorni.";
 "result_valid_until" = "valida fino al %@";
+"retention_all_hint" = "Tutti i campi vengono conservati – anche residenza, codice fiscale, professione e telefono. L’interruttore è nelle opzioni, e la motivazione è sua.";
 "retention_minimised_hint" = "Residenza, codice fiscale, professione e telefono vengono mostrati ma non conservati. Chi ne ha bisogno li annoti adesso.";
 "revocation_checked_at" = "Verificato il %@";
 "revocation_heading" = "Lista di revoca";

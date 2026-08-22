@@ -84,6 +84,13 @@ Der Schalter wirkt **ab jetzt**: was schon weggelassen wurde, ist weg und kommt
 nicht zurück. Der Personenabdruck entsteht in beiden Stellungen, damit die Regel
 „ein Eintrag pro Person" nicht von einer Einstellung abhängt.
 
+Und der Hinweis unter den Feldern folgt ihm. Er sagte bis Fassung 1.8 in **beiden**
+Stellungen „werden angezeigt, aber nicht aufbewahrt" — bei eingeschaltetem Schalter
+also das Gegenteil der Wahrheit, und zwar an der Stelle, an der die App über ihren
+eigenen Umgang mit den Daten Auskunft gibt. Jetzt steht dort, was tatsächlich
+passiert. Die dreizehnte Stelle, an der die App über sich spricht: eine
+Einstellung, die eine Zusage aufhebt, hebt auch den Satz auf, der sie ausspricht.
+
 **Die Sperrprüfung sagt, was sie prüft.** Geprüft wird das Zertifikat, mit dem
 das Dokument signiert wurde — nicht, ob dieses Dokument als verloren oder
 gestohlen gemeldet ist. Wer „Sperrliste" liest, denkt zuerst an das Zweite;

@@ -177,6 +177,7 @@
 "result_document_type_passport" = "PASSAPORTO";
 "result_retention_hint" = "Bleibt %d Tage verschlüsselt auf diesem Gerät.";
 "result_valid_until" = "gültig bis %@";
+"retention_all_hint" = "Alle Felder werden aufbewahrt – auch Wohnsitz, Steuernummer, Beruf und Telefon. Der Schalter dafür steht in den Optionen, und den Grund dafür tragen Sie.";
 "retention_minimised_hint" = "Wohnsitz, Steuernummer, Beruf und Telefon werden angezeigt, aber nicht aufbewahrt. Wer sie braucht, notiert sie jetzt.";
 "revocation_checked_at" = "Geprüft am %@";
 "revocation_heading" = "Sperrliste";

@@ -104,6 +104,7 @@ public enum StringKey: String, Sendable, CaseIterable {
     case valueMissing = "value_missing"
     case valueNotRetained = "value_not_retained"
     case retentionMinimisedHint = "retention_minimised_hint"
+    case retentionAllHint = "retention_all_hint"
     case genderMale = "gender_male"
     case genderFemale = "gender_female"
     case genderUnknown = "gender_unknown"

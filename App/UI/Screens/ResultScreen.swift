@@ -15,6 +15,13 @@ struct ResultScreen: View {
     /// Archiv - und eine aufbewahrte Kopie kann veraltet sein.
     let fresh: Bool
     let retentionDays: Int
+    /// Ob die Einstellung „Alle Felder aufbewahren" an ist.
+    ///
+    /// Steht hier, weil der Hinweis unter den Feldern eine **Zusage** ist und
+    /// keine Beschreibung: er sagt, was mit dem Wohnsitz gleich passiert. Ohne
+    /// diesen Wert sagte er es unabhaengig davon, was wirklich passiert - und
+    /// stand bei eingeschaltetem Schalter genau falsch da.
+    let retainsAllFields: Bool
     let strings: Strings
     let onDone: () -> Void
     let onReread: () -> Void
@@ -40,7 +47,7 @@ struct ResultScreen: View {
                     tiles
                     extras
                     if fresh && data.provenance == .chip {
-                        minimisationNotice
+                        retentionModeNotice
                     }
                     if data.provenance == .chip {
                         revocationCard
@@ -191,18 +198,24 @@ struct ResultScreen: View {
         ) { EmptyView() }
     }
 
-    /// Der Hinweis, dass vier Felder nur jetzt zu sehen sind.
+    /// Was mit den vier Feldern gleich passiert - und zwar in beiden Faellen.
     ///
-    /// Steht nur beim frisch gelesenen Datensatz, und dort ist er noetig: wer die
-    /// Anschrift braucht, hat genau diesen Augenblick, um sie abzuschreiben. Beim
-    /// Blick aus dem Archiv waere der Hinweis zu spaet und deshalb nur Ballast -
-    /// dort sagen die Felder selbst, was mit ihnen war.
-    private var minimisationNotice: some View {
+    /// Steht nur beim frisch gelesenen Datensatz, und dort ist er noetig: bei der
+    /// Vorgabe hat wer die Anschrift braucht genau diesen Augenblick, um sie
+    /// abzuschreiben. Beim Blick aus dem Archiv waere der Hinweis zu spaet und
+    /// deshalb nur Ballast - dort sagen die Felder selbst, was mit ihnen war.
+    ///
+    /// Ist „Alle Felder aufbewahren" an, bleiben sie, und dann ist **das** die
+    /// Auskunft, die hierher gehoert. Vorher stand hier ein fester Text, und der
+    /// war in diesem Fall das Gegenteil der Wahrheit: er versprach eine
+    /// Datenminimierung, die gerade nicht lief.
+    private var retentionModeNotice: some View {
         HStack(alignment: .top, spacing: 8) {
-            Image(systemName: "eye.slash")
+            Image(systemName: retainsAllFields ? "tray.and.arrow.down" : "eye.slash")
                 .font(.footnote)
                 .padding(.top, 2)
-            Text(strings[.retentionMinimisedHint]).font(.footnote)
+            Text(strings[retainsAllFields ? .retentionAllHint : .retentionMinimisedHint])
+                .font(.footnote)
             Spacer(minLength: 0)
         }
         .padding(12)
