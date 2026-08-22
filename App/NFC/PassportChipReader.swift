@@ -52,7 +52,15 @@ final class PassportChipReader: ChipDocumentReader {
         let trail = ReadTrail()
         reader.trackingDelegate = trail
         self.trail = trail
-        ReadLog.shared.beginn("\(key.isCan ? "Identitaetskarte" : "Reisepass"), \(key.shape)")
+        // Die Kopfzeile nennt die **Maske**, nicht das Dokument.
+        //
+        // Sie hiess bis Bau 19 „Identitaetskarte" oder „Reisepass", und das war
+        // eine Behauptung ueber etwas, das die App zu diesem Zeitpunkt nicht
+        // weiss: welches Dokument aufliegt, sagt erst die MRZ in DG1. Wer eine
+        // Identitaetskarte ueber die Passmaske mit ihrem MRZ-Schluessel liest -
+        // was geht -, bekam ein Protokoll, das „Reisepass" behauptete. Genau
+        // daran habe ich zwei Laeufe verwechselt.
+        ReadLog.shared.beginn("Maske \(key.isCan ? "Identitaetskarte" : "Reisepass"), \(key.shape)")
         defer { self.reader = nil }
 
         onProgress(.waitingForCard)
@@ -307,6 +315,12 @@ final class PassportChipReader: ChipDocumentReader {
 
     /// Schreibt auf, woran die Echtheitspruefung haengt.
     static func logAuthenticity(_ model: NFCPassportModel) {
+        // Was wirklich aufgelegen hat. Der Dokumentcode aus der MRZ ist die
+        // einzige belastbare Auskunft darueber, und sie kostet ein Zeichen:
+        // „ID", „P", „IP". Keine Personenangabe.
+        let code = model.documentType.trimmingCharacters(in: .whitespaces)
+        ReadLog.shared.add("· Dokument laut MRZ: \(code.isEmpty ? "keine Angabe" : code)")
+
         let hashes = model.dataGroupHashes
         let vorhanden = hashes.keys.compactMap(number(of:)).sorted()
         let falsch = hashes.filter { !$0.value.match }.keys.compactMap(number(of:)).sorted()
