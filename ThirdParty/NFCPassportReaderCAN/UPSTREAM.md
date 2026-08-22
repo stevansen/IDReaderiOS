@@ -347,3 +347,24 @@ beschrieben, was er tut.
          var errors : String = ""
          for (id,dgVal) in dataGroupsRead {
 ```
+
+## Was davon nach oben gehört
+
+Vier der Änderungen sind **Fehler in `AndyQ/NFCPassportReader`**, nicht
+Anpassungen an unseren Sonderfall. Sie gehören in einen Pull Request — nicht aus
+Höflichkeit: solange das ein Fork ist, trägt dieses Repository die Wartung, und
+`UPSTREAM.patch` wächst mit jeder fremden Fassung.
+
+| | Fehler | Allgemein? |
+|---|---|---|
+| 1 | `TagReader.send`: `if rep.sw1 != 0x90 && rep.sw2 != 0x00` — ein **Und** statt eines Oder. Jedes Statuswort mit `00` als zweitem Byte rutscht durch: `6D00`, `6A00`, `6E00`, `6900`, `6F00`. Der Aufrufer bekommt leere Daten statt eines Fehlers. | **ja**, trifft jedes Dokument |
+| 2 | `6C xx` wird nicht behandelt, nur `61 xx`. ISO 7816-4 verlangt die Wiederholung mit `Le = xx`. | **ja** |
+| 3 | `startReading` fängt den PACE-Fehler ab und verwirft ihn. Bei einem Zugang ohne BAC-Rückfall bleibt danach keine Auskunft übrig. | **ja** |
+| 4 | PACE Schritt 3 erzeugt bedingungslos ein `EC_KEY`. Bei DH gibt `EVP_PKEY_get0_EC_KEY` `NULL` → „Failed to generate EC key". Schritt 2 hat einen DH-Zweig, Schritt 3 hatte keinen. | ja, betrifft alle DH-Dokumente |
+| 5 | Erweiterte APDU über `NFCISO7816APDU(…, expectedResponseLength:)` werden von italienischen Dokumenten mit `6C00` abgewiesen; selbst gebaut gehen sie durch. | **Vorsicht** — hier ist unklar, ob CoreNFC oder der Chip abweicht. Als Beobachtung melden, nicht als Fehlerbehauptung. |
+
+Die Nummern 1 bis 3 sind klein, allgemein richtig und ohne unseren Sonderfall
+verständlich — die haben die besten Aussichten. Nummer 4 braucht die Begründung
+aus `docs/EU-EID-STANDARDS.md`. Nummer 5 ist eine Beobachtung, keine Diagnose:
+ich weiß nicht, welche Seite vom Standard abweicht, nur dass die selbst gebaute
+Form funktioniert.

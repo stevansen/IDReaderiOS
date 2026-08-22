@@ -470,9 +470,22 @@ Die vollständige Messreihe an dieser einen Stelle:
 | verkettet, letztes Stück `CLA 0x00` | `6A80` |
 | **selbst gebaut, Fall 4E** | **`9000` + 256 Byte** ✓ |
 
-### Was jetzt noch fehlt
+### Schritt 3, der DH-Zweig (Bau 18)
 
-PACE Schritt 3 und 4 sind in der Bibliothek **nur für EC** geschrieben:
+Eingebaut. Und es war weniger, als es aussah: **Schritt 4 ist bereits
+algorithmusunabhängig** — `computeSharedSecret`, `decodePublicKeyFromBytes`,
+`getPublicKeyData` und `encodePublicKey` führen alle einen DH-Fall. Gefehlt hat
+genau eine Erzeugung, nämlich die des flüchtigen Schlüsselpaars in Schritt 3.
+
+Neu: `makeEphemeralKeyPair(from:)` verzweigt nach `EVP_PKEY_get_base_id`. Für DH
+werden die **abgebildeten** Domänenparameter übernommen (p und q wie gehabt, das
+in Schritt 2 gerechnete neue g) und darüber ein Paar erzeugt. Der Rest von
+Schritt 3 — Tag `0x83` senden, Tag `0x84` auspacken — war schon
+algorithmusunabhängig.
+
+### Der ursprüngliche Befund
+
+PACE Schritt 3 war in der Bibliothek **nur für EC** geschrieben:
 
 ```swift
 guard let ecParams = EVP_PKEY_get0_EC_KEY(ephemeralParams),   // NULL bei DH

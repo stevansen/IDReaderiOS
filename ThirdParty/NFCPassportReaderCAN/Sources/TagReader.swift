@@ -152,86 +152,45 @@ public class TagReader {
         let instructionClass : UInt8 = isLast ? 0x00 : 0x10
         let INS_BSI_GENERAL_AUTHENTICATE : UInt8 = 0x86
         
-        // GEAENDERT: Befehlsverkettung, wenn das Datenfeld nicht in ein kurzes
-        // APDU passt.
+        // GEAENDERT: erweitertes APDU selbst bauen, wenn das Datenfeld nicht in
+        // ein kurzes passt.
         //
         // ## Warum
         //
         // Bei PACE mit klassischem DH ueber 2048 Bit ist der oeffentliche
         // Schluessel 256 Byte gross, das Datenfeld mit TLV-Huelle also 264 - mehr
-        // als die 255, die ein kurzes APDU traegt. CoreNFC macht daraus ein
-        // **erweitertes** APDU, und die italienischen Dokumente lehnen das ab.
+        // als die 255, die ein kurzes APDU traegt. Ein erweitertes APDU ist hier
+        // also **zwingend**, nicht optional.
         //
-        // Vom Geraet, dreimal in Folge und mit beiden Dokumenten:
+        // Was `NFCISO7816APDU(…, expectedResponseLength:)` daraus baut, weist
+        // dieses Dokument mit `6C00` ab. Byte fuer Byte selbst gebaut und ueber
+        // `NFCISO7816APDU(data:)` uebergeben, antwortet es sofort:
         //
-        //     → 10 86 00 00 7C00                        Schritt 1
-        //     ← SW 9000 7C0A8008…                       antwortet, mit Daten
-        //     → 10 86 00 00 7C820104 8182010083…        Schritt 2, 264 Byte
-        //     ← SW 6C00                                 „null Bytes verfuegbar"
-        //     ↻ Wiederholung (Le=256 / Le=0 / kein Le)
-        //     ← SW 6985                                 jedes Mal
+        //     → 10 86 00 00 | 00 01 08 | 264B | 00 00
+        //     ← SW 9000 7C820104 8282010028 3DF9…       der Abbildungsschluessel
         //
-        // Am `Le` liegt es also nicht - drei Fassungen davon sind durchprobiert.
-        // Schritt 1 mit `CLA 0x10` beantwortet der Chip mit Daten, das
-        // Verkettungsbit stoert ihn folglich nicht. Was ihn stoert, ist die
-        // **Laenge**: das erweiterte APDU nimmt er nicht an, und danach ist der
-        // PACE-Zustand verdorben - deshalb `6985` auf jede Wiederholung.
+        // Gemessen ueber sechs Uebertragungsformen in einem Kartenkontakt; die
+        // Messreihe samt der vier Irrwege steht in `docs/NFC-PACE.md`. Uebrig
+        // bleibt diese eine.
         //
-        // Also gar kein erweitertes APDU mehr senden, sondern zerlegen: Stuecke
-        // von 255 Byte mit gesetztem Verkettungsbit, das letzte ohne. Nach
-        // ISO 7816-4 setzt der Chip sie zusammen und beantwortet das letzte.
+        // Ein Reisepass mit ECDH kommt hier nie an: dort ist der Schluessel 65
+        // Byte gross und alles passt in ein kurzes APDU. Deshalb faellt der
+        // Fehler in einer Bibliothek, die fast nur mit Reisepaessen benutzt wird,
+        // niemandem auf.
         var response : ResponseAPDU
-        if commandData.count > 255, TagReader.oversized != .extendedWithLe {
-            if TagReader.oversized == .rawExtendedNoLe || TagReader.oversized == .rawExtendedLe {
-                let mitLe = TagReader.oversized == .rawExtendedLe
-                guard let cmd = TagReader.rawExtended(
-                    cla: instructionClass, ins: INS_BSI_GENERAL_AUTHENTICATE,
-                    p1: 0x00, p2: 0x00, data: commandData, withLe: mitLe
-                ) else {
-                    throw NFCPassportReaderError.InvalidDataPassed("APDU nicht baubar")
-                }
-                TagReader.trace?(
-                    "⋯ selbst gebaut: \(String(format: "%02X %02X 00 00 | 00 %02X %02X", instructionClass, INS_BSI_GENERAL_AUTHENTICATE, commandData.count >> 8, commandData.count & 0xFF))"
-                    + " | \(commandData.count)B" + (mitLe ? " | 00 00" : " | kein Le")
-                )
-                var r = try await send( cmd: cmd )
-                r.data = try unwrapDO( tag:0x7c, wrappedData: r.data)
-                return r
+        if commandData.count > 255 {
+            guard let cmd = TagReader.rawExtended(
+                cla: instructionClass, ins: INS_BSI_GENERAL_AUTHENTICATE,
+                p1: 0x00, p2: 0x00, data: commandData, withLe: true
+            ) else {
+                throw NFCPassportReaderError.InvalidDataPassed("APDU nicht baubar")
             }
-            if TagReader.oversized == .extendedNoLe {
-                // Erweitertes APDU, aber ohne Le-Feld.
-                let cmd = NFCISO7816APDU(
-                    instructionClass: instructionClass,
-                    instructionCode: INS_BSI_GENERAL_AUTHENTICATE,
-                    p1Parameter: 0x00, p2Parameter: 0x00,
-                    data: commandData, expectedResponseLength: -1
-                )
-                var r = try await send( cmd: cmd )
-                r.data = try unwrapDO( tag:0x7c, wrappedData: r.data)
-                return r
-            }
-            let stuecke = stride(from: 0, to: commandData.count, by: 255).map { start in
-                commandData.subdata(in: start ..< min(start + 255, commandData.count))
-            }
-            TagReader.trace?("⋯ Datenfeld \(commandData.count)B → \(stuecke.count) Stuecke, verkettet")
-            var letzte : ResponseAPDU? = nil
-            for (index, stueck) in stuecke.enumerated() {
-                let istLetztes = index == stuecke.count - 1
-                let letzteKlasse : UInt8 =
-                    TagReader.oversized == .chainAllChained ? 0x10 : 0x00
-                let kette = NFCISO7816APDU(
-                    instructionClass: istLetztes ? letzteKlasse : 0x10,
-                    instructionCode: INS_BSI_GENERAL_AUTHENTICATE,
-                    p1Parameter: 0x00,
-                    p2Parameter: 0x00,
-                    data: stueck,
-                    expectedResponseLength: istLetztes ? lengthExpected : -1
-                )
-                letzte = try await send( cmd: kette )
-            }
-            var zusammen = letzte!
-            zusammen.data = try unwrapDO( tag:0x7c, wrappedData: zusammen.data)
-            return zusammen
+            TagReader.trace?(
+                "⋯ erweitert, selbst gebaut: \(commandData.count)B"
+            )
+            var r = try await send( cmd: cmd )
+            r.data = try unwrapDO( tag:0x7c, wrappedData: r.data)
+            return r
         }
 
         let cmd : NFCISO7816APDU = NFCISO7816APDU(instructionClass: instructionClass, instructionCode: INS_BSI_GENERAL_AUTHENTICATE, p1Parameter: 0x00, p2Parameter: 0x00, data: commandData, expectedResponseLength: lengthExpected)
@@ -372,32 +331,6 @@ public class TagReader {
     /// diese Funktion aendern.
     public nonisolated(unsafe) static var trace : ((String) -> Void)?
 
-    /// Wie ein Datenfeld gesendet wird, das nicht in ein kurzes APDU passt.
-    ///
-    /// Bei PACE mit klassischem DH ueber 2048 Bit sind es 264 Byte, und dieses
-    /// Dokument nimmt keine der naheliegenden Formen an. Statt weiter je Bau eine
-    /// Vermutung auszuliefern, probiert `PACEHandler` sie in **einem**
-    /// Kartenkontakt der Reihe nach durch und schreibt jede Antwort mit.
-    ///
-    /// Was bisher gemessen wurde:
-    ///
-    /// * `extendedWithLe` → `6C00` „null Bytes verfuegbar"
-    /// * `chainLastPlain` → `6A80` „incorrect parameters in the data field"
-    public enum Oversized : String {
-        /// Erweitertes APDU mit Le = 256. Die Fassung des Originals.
-        case extendedWithLe
-        /// Erweitertes APDU ohne Le-Feld.
-        case extendedNoLe
-        /// Verkettet, letztes Stueck mit Klasse 0x00.
-        case chainLastPlain
-        /// Verkettet, **alle** Stuecke mit gesetztem Verkettungsbit.
-        case chainAllChained
-        /// Selbst gebautes erweitertes APDU, Fall 3E - ohne Le-Feld.
-        case rawExtendedNoLe
-        /// Selbst gebautes erweitertes APDU, Fall 4E - Le = 00 00.
-        case rawExtendedLe
-    }
-
     /// Ein erweitertes APDU Byte fuer Byte, ohne den Erzeuger von CoreNFC.
     ///
     /// ## Warum das ueberhaupt nötig sein kann
@@ -412,6 +345,9 @@ public class TagReader {
     /// `expectedResponseLength` zusammensetzt, ist nicht sichtbar. Diese Fassung
     /// baut die Bytes selbst und uebergibt sie ueber `NFCISO7816APDU(data:)` -
     /// damit steht fest, was auf dem Draht liegt.
+    /// Gemessen wurde das ueber sechs Formen in einem Kartenkontakt; die
+    /// Messreihe steht in `docs/NFC-PACE.md`. Uebrig bleibt die eine, die
+    /// geantwortet hat - Fall 4E, mit `00 00` als Le.
     static func rawExtended(
         cla : UInt8, ins : UInt8, p1 : UInt8, p2 : UInt8,
         data : Data, withLe : Bool
@@ -424,7 +360,7 @@ public class TagReader {
         return NFCISO7816APDU(data: Data(bytes))
     }
 
-    public nonisolated(unsafe) static var oversized : Oversized = .extendedWithLe
+
 
     private static func hex( _ bytes : [UInt8] ) -> String {
         bytes.map { String(format: "%02X", $0) }.joined()
