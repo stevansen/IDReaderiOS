@@ -444,6 +444,52 @@ Sie stehen in der Probierreihenfolge **vorn**, aus genau diesem Grund: die
 Verkettungsformen sind Ausweichmanöver, die erweiterten APDU sind der
 vorgeschriebene Weg.
 
+### Gefunden (Bau 17): der Erzeuger war es, nicht der Chip
+
+```
+1.17s ⋯ selbst gebaut: 10 86 00 00 | 00 01 08 | 264B | 00 00
+1.17s → 10 86 00 00 7C820104 8182010053 0A2A…
+1.88s ← SW 9000 7C820104 8282010028 3DF9…       ← 9000 MIT DATEN
+```
+
+Tag `0x82`, 256 Byte — der Abbildungsschlüssel des Chips. **PACE Schritt 2 läuft.**
+
+Damit ist die Ursache benannt: `NFCISO7816APDU(…, expectedResponseLength:)`
+erzeugt für ein Datenfeld über 255 Byte etwas, das dieses Dokument mit `6C00`
+abweist. Byte für Byte selbst gebaut und über `NFCISO7816APDU(data:)` übergeben,
+antwortet es sofort richtig. Alle Ausweichmanöver — Le-Varianten, Verkettung —
+waren Umwege um einen Fehler im Erzeuger.
+
+Die vollständige Messreihe an dieser einen Stelle:
+
+| Übertragung | Antwort |
+|---|---|
+| `expectedResponseLength: 256` | `6C00` |
+| Wiederholung mit `Le = 256` | `6985` |
+| Wiederholung ohne Le-Feld | `6985` |
+| verkettet, letztes Stück `CLA 0x00` | `6A80` |
+| **selbst gebaut, Fall 4E** | **`9000` + 256 Byte** ✓ |
+
+### Was jetzt noch fehlt
+
+PACE Schritt 3 und 4 sind in der Bibliothek **nur für EC** geschrieben:
+
+```swift
+guard let ecParams = EVP_PKEY_get0_EC_KEY(ephemeralParams),   // NULL bei DH
+      let group = EC_KEY_get0_group(ecParams), …
+else { throw … "Failed to generate EC key" }
+```
+
+Am Gerät genau diese Meldung. Schritt 2 hat einen DH-Zweig
+(`doDHMappingAgreement`), Schritt 3 und 4 haben keinen. Das ist umschrieben und
+endlich — der Auftrag dafür steht in
+[`../REWORK_PROMPT.md`](../REWORK_PROMPT.md).
+
+Nebenbefund: nach dem erfolgreichen Schritt 2 antwortet die Karte auf ein
+`SELECT` mit `6883` („last command of the chain expected"). Unser Schritt 2 trug
+`CLA 0x10`, die Kette gilt für sie also noch als offen. Ob das nach einem
+vollständigen PACE-Durchlauf verschwindet, zeigt der nächste Bau.
+
 ### Was als nächstes zu prüfen ist
 
 Mit der berichtigten Statusprüfung nennt das Gerät das Statuswort des Chips.

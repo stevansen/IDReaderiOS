@@ -27,6 +27,7 @@ Commit `7ab0d20`, Version 1.8 / versionCode 11.
 | Datenschutz-Gegenstücke (Sicherung, Dateischutz, App-Umschalter, Zwischenablage, Netzprüfung) | gebaut | `Scripts/check-no-network.sh` |
 | Lizenz: Apache-2.0 | umgestellt, **Christians Zustimmung fehlt noch** | [LICENCE-CHOICE.md](LICENCE-CHOICE.md) |
 | Bedienungshilfen: Schriftgrößen, Vorlesefunktion, Kontrast | geprüft und nachgebessert | [ACCESSIBILITY.md](ACCESSIBILITY.md) |
+| **Lesen am echten Chip** | **geht noch nicht** — PACE Schritt 1 und 2 laufen, Schritt 3 und 4 fehlt der DH-Zweig | [NFC-PACE.md](NFC-PACE.md), [EU-EID-STANDARDS.md](EU-EID-STANDARDS.md), [`../REWORK_PROMPT.md`](../REWORK_PROMPT.md) |
 | Store-Eintrag über die API | Fassung 1.8, Kategorie, Texte und Bilder für `de-DE` und `it` gesetzt; **`en-US` fehlt** | [`../Scripts/asc.swift`](../Scripts/asc.swift), [`../store/README.md`](../store/README.md) |
 | Sperrprüfung: CRL lesen, Signatur prüfen, ablegen, offline abgleichen, offene Prüfungen nachholen, Datum am Datensatz | gebaut, **gegen die echte italienische CRL durchlaufen** | 29 Tests; im Simulator geholt, geprüft und angezeigt |
 
