@@ -20,6 +20,23 @@ public enum AccessKey: Sendable, Equatable {
     /// aus. Wer sie mitgibt, erzeugt einen falschen Schluessel.
     case mrz(documentNumber: String, dateOfBirth: String, dateOfExpiry: String)
 
+    /// Der Schluessel als Umriss, ohne ihn zu nennen.
+    ///
+    /// Fuer den technischen Grund auf dem Fehlerblatt. Er wird kopiert und
+    /// verschickt, also darf der Wert selbst nicht darin stehen - die CAN ist
+    /// der Zugangsschluessel zur Karte, und die MRZ-Bestandteile sind
+    /// Personendaten. Was hier steht, sind Laengen: sie unterscheiden einen
+    /// vertippten von einem falsch erkannten Schluessel, und beides von einem
+    /// Fehler in der Ableitung.
+    public var shape: String {
+        switch self {
+        case let .can(can):
+            return "CAN(\(can.count) Ziffern)"
+        case let .mrz(number, birth, expiry):
+            return "MRZ(Nr \(number.count), Geb \(birth.count), Abl \(expiry.count))"
+        }
+    }
+
     public var isValid: Bool {
         switch self {
         case let .can(can):

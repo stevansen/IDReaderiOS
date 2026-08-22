@@ -72,6 +72,11 @@ public struct ReadError: Error, Sendable {
         self.kind = kind
         self.detail = detail
     }
+
+    /// Haengt einen Umstand an den technischen Grund.
+    public func adding(_ note: String) -> ReadError {
+        ReadError(kind, detail.isEmpty ? note : "\(detail) · \(note)")
+    }
 }
 
 /// Was die Texterkennung gerade tut, und woran sie gescheitert ist.

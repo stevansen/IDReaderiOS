@@ -199,7 +199,17 @@ struct ErrorSheet: View {
                 .buttonStyle(.plain)
                 .foregroundStyle(palette.onPrimary)
                 .background(palette.primary, in: .capsule)
-                .layoutPriority(1.4)
+                // KEIN `layoutPriority` hier.
+                //
+                // Es stand auf 1.4, und weil beide Knoepfe `maxWidth: .infinity`
+                // haben, nahm der hoeher gewichtete die ganze Breite: „Zurueck"
+                // wurde auf null Punkte gequetscht und war unsichtbar. Auf den
+                // Rueckmeldungen aus dem Test steht deshalb nur „Erneut
+                // versuchen" - und ein fehlgeschlagener Lesevorgang liess sich
+                // nur durch einen weiteren fortsetzen.
+                //
+                // Dasselbe Missverstaendnis wie beim Umschalter: `layoutPriority`
+                // ist nicht Compose' `weight`.
             }
         }
         .padding(24)

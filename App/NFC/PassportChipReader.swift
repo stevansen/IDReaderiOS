@@ -82,6 +82,7 @@ final class PassportChipReader: ChipDocumentReader {
             throw ReadCancelled()
         } catch {
             throw PassportChipReader.mapError(error, key: key)
+                .adding(key.shape)
         }
 
         onProgress(.verifying)
