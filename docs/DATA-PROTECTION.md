@@ -102,6 +102,31 @@ wie „nicht gesperrt". Aufbewahrt werden dafür zwei Angaben über den Signiere
 seine Seriennummer und der Abdruck seines Ausstellernamens. Beide sagen nichts
 über die Person — ein Signierer signiert zehntausende Dokumente.
 
+**Das Diagnoseprotokoll, und warum es keine Personendaten enthält.** Ein
+Fehlschlag am Gerät ist ohne Kabel nicht zu untersuchen — das hat diese
+Portierung mehrere Bauten gekostet. Seit dem 22. August 2026 hält die App
+deshalb ein Protokoll des APDU-Verkehrs, das der Bediener nach einem Fehlschlag
+kopieren und verschicken kann.
+
+Ein vollständiges APDU-Protokoll eines Ausweislesevorgangs enthält **nach** dem
+Aufbau der gesicherten Verbindung Namen, Geburtsdatum und Lichtbild im Klartext.
+Genau das darf niemand versehentlich verschicken. Die Grenze steckt deshalb nicht
+in einem Vorsatz, sondern in der Mechanik — in `TagReader.send`, der einzigen
+Stelle, durch die jedes APDU läuft:
+
+* **Vor** dem Aufbau der gesicherten Verbindung: alles. Das sind Applet-Auswahl,
+  `EF.CardAccess` und der PACE-Austausch — flüchtige Schlüssel und Nonces, keine
+  Personendaten, und nicht der Zugangsschlüssel.
+* **Danach**: nur Befehlskopf, Längen und Statuswort. Keine Nutzdaten.
+
+Wer diese Weiche umgehen will, muss die Funktion ändern; sie ist nicht durch
+Aufmerksamkeit gesichert.
+
+Das Protokoll liegt **nur im Arbeitsspeicher**, hält den letzten Lesevorgang,
+wird bei jedem neuen geleert und geht mit der App verloren. Es steht in keiner
+Datei, in keiner Sicherung und wird von der App nirgends hingeschickt — es
+verlässt das Gerät nur, wenn der Bediener es kopiert und selbst einfügt.
+
 **Was gespeichert wird, und wie lange.** Datensätze liegen mit AES-256-GCM
 verschlüsselt, der Schlüssel im Schlüsselbund mit
 `kSecAttrAccessibleWhenUnlockedThisDeviceOnly`: er wird nie gesichert, nie auf ein

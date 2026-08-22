@@ -52,6 +52,7 @@ final class PassportChipReader: ChipDocumentReader {
         let trail = ReadTrail()
         reader.trackingDelegate = trail
         self.trail = trail
+        ReadLog.shared.beginn("\(key.isCan ? "Identitaetskarte" : "Reisepass"), \(key.shape)")
         defer { self.reader = nil }
 
         onProgress(.waitingForCard)
@@ -88,9 +89,11 @@ final class PassportChipReader: ChipDocumentReader {
             // versuchen".
             throw ReadCancelled()
         } catch {
-            throw PassportChipReader.mapError(error, key: key)
+            let fehler = PassportChipReader.mapError(error, key: key)
                 .adding(key.shape)
                 .adding(trail.summary)
+            ReadLog.shared.add("✗ \(fehler.detail)")
+            throw fehler
         }
 
         onProgress(.verifying)
@@ -99,6 +102,7 @@ final class PassportChipReader: ChipDocumentReader {
         // nicht geprueft - und das Ergebnis sagt das dann auch.
         model.verifyPassport(masterListURL: trustBundle)
 
+        ReadLog.shared.add("✓ gelesen")
         onProgress(.done)
         return ChipReadResult(
             data: documentData(from: model),

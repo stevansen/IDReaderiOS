@@ -72,6 +72,7 @@
 "error_pace_unavailable" = "Non e' stato possibile aprire il chip: in questa versione non e' collegato alcun back end PACE. Vedi docs/NFC-PACE.md.";
 "error_title" = "Lettura non riuscita";
 "error_unknown" = "Errore sconosciuto durante la lettura della carta.";
+"error_copy_log" = "Copia il registro (%d righe)";
 "error_unsupported_tag" = "L'oggetto rilevato non è una smart card leggibile.";
 "error_wrong_can" = "CAN errato. Controlla il numero di 6 cifre sul fronte della carta.";
 "error_wrong_mrz_key" = "I tre campi non aprono il chip. Confronta numero del passaporto, data di nascita e data di scadenza con la pagina dei dati.";

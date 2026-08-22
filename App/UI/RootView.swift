@@ -96,7 +96,12 @@ struct RootView: View {
                 archiveCount: model.records.count,
                 onOpenArchive: model.openArchive,
                 onOpenSettings: { settingsOpen = true },
-                strings: strings
+                strings: strings,
+                onShowErrorSheet: {
+                    #if DEBUG
+                    model.zeigeFehlerblattZurPruefung()
+                    #endif
+                }
             ) { shown, resetToken in
                 switch shown {
                 case .identityCard:

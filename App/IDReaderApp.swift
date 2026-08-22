@@ -14,6 +14,11 @@ struct IDReaderApp: App {
     @Environment(\.scenePhase) private var scenePhase
 
     init() {
+        // Die Mitschrift des APDU-Verkehrs einhaengen. Sie liegt nur im
+        // Arbeitsspeicher und haelt den letzten Lesevorgang; was sie enthaelt und
+        // wo die Grenze steckt, steht in App/NFC/ReadLog.swift.
+        ReadLog.shared.install()
+
         let settings = AppSettings()
         let strings = Strings(language: settings.language)
 

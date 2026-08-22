@@ -41,6 +41,9 @@ final class ReadTrail: PassportReaderTrackingDelegate {
         lock.lock()
         marks.append(mark)
         lock.unlock()
+        // Dieselben Marken auch in das Protokoll, damit dort zu sehen ist, in
+        // welcher Stufe welches APDU lief.
+        ReadLog.shared.add("· \(mark)")
     }
 
     func reset() {

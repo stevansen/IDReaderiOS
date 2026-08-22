@@ -361,6 +361,33 @@ final class ReaderModel {
         run(key: key)
     }
 
+    /// Nur im Debug-Bau: das Fehlerblatt ohne Chip zeigen.
+    ///
+    /// Am Simulator gibt es kein NFC, also ist das Fehlerblatt dort sonst nicht
+    /// zu sehen - und genau dort ist schon einmal ein Knopf auf null Punkte
+    /// gequetscht worden, ohne dass es jemandem auffiel. Ein Bildschirm, den man
+    /// nur am Geraet im Fehlerfall zu Gesicht bekommt, wird nicht geprueft.
+    #if DEBUG
+    func zeigeFehlerblattZurPruefung() {
+        ReadLog.shared.beginn("Probelauf ohne Chip")
+        ReadLog.shared.add("→ 00 A4 04 0C A0000002471001")
+        ReadLog.shared.add("← SW 9000")
+        ReadLog.shared.add("· Chip erkannt")
+        ReadLog.shared.add("· PACE begonnen")
+        ReadLog.shared.add("→ 00 B0 00 00")
+        ReadLog.shared.add("← SW 9000 31 14 30 12 06 0A 04 00 7F 00 07 02 02 04 01 01")
+        ReadLog.shared.add("· CardAccess gelesen (1): 0.4.0.127.0.7.2.2.4.1.1 v2 Param 2 GM")
+        ReadLog.shared.add("→ 00 22 C1 A4 80 0A 04 00 7F 00 07 02 02 04 01 01 83 01 02")
+        ReadLog.shared.add("← SW 6A80")
+        ReadLog.shared.add("· PACE gescheitert")
+        stage = .error(
+            .unknown,
+            lastStep: .authenticating,
+            detail: "Probelauf · CAN(6 Ziffern) · Chip erkannt → PACE begonnen → PACE gescheitert"
+        )
+    }
+    #endif
+
     private func run(key: AccessKey) {
         readTask?.cancel()
         readTask = Task { [reader, archive, revocation] in

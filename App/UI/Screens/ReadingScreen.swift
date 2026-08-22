@@ -141,6 +141,7 @@ struct ErrorSheet: View {
 
     @Environment(\.palette) private var palette
     @State private var copied = false
+    @State private var logCopied = false
 
     var body: some View {
         ScrollView {
@@ -181,6 +182,29 @@ struct ErrorSheet: View {
                 .buttonStyle(.plain)
                 .foregroundStyle(palette.onSurfaceVariant)
                 .accessibilityLabel(detail)
+            }
+
+            if !ReadLog.shared.isEmpty {
+                Button {
+                    UIPasteboard.general.string = ReadLog.shared.text(kopfzusatz: detail)
+                    logCopied = true
+                } label: {
+                    HStack(spacing: 8) {
+                        Image(systemName: logCopied ? "checkmark" : "square.and.arrow.up.on.square")
+                        Text(strings.format(.errorCopyLog, ReadLog.shared.zeilen))
+                            .font(.footnote)
+                        Spacer(minLength: 0)
+                    }
+                    .padding(.horizontal, 12)
+                    .frame(minHeight: 44)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(palette.outlineVariant, lineWidth: 1)
+                    }
+                }
+                .buttonStyle(.plain)
+                .foregroundStyle(palette.onSurfaceVariant)
             }
 
             HStack(spacing: 12) {

@@ -263,8 +263,53 @@ public class TagReader {
         return try await send( cmd: cmd )
     }
 
+    /// GEAENDERT: Mitschrift des APDU-Verkehrs fuer die Ferndiagnose.
+    ///
+    /// ## Warum hier und nicht im Systemlog
+    ///
+    /// Die Bibliothek protokolliert alles mit `Logger.…debug`. Das steht im
+    /// Systemlog des Geraets und ist mit einem Kabel zu lesen - aber nicht von
+    /// jemandem, der die App aus TestFlight geladen hat und nur berichten kann,
+    /// dass es nicht geht. `OSLogStore` hilft nicht: Eintraege der Stufe `debug`
+    /// werden nicht dauerhaft gesichert.
+    ///
+    /// ## Die Grenze steckt in der Mechanik
+    ///
+    /// Ein vollstaendiges APDU-Protokoll eines Ausweislesevorgangs enthaelt
+    /// **nach** dem Aufbau der gesicherten Verbindung Namen, Geburtsdatum und
+    /// Lichtbild im Klartext. Das darf niemand versehentlich verschicken.
+    ///
+    /// Deshalb entscheidet **diese** Stelle - die einzige, durch die jedes APDU
+    /// laeuft - was mitgeschrieben wird:
+    ///
+    /// * **Vor** dem Aufbau (`secureMessaging == nil`): alles. Das sind
+    ///   Applet-Auswahl, EF.CardAccess und der PACE-Austausch - fluechtige
+    ///   Schluessel und Nonces, keine Personendaten.
+    /// * **Danach**: nur Befehlskopf, Laengen und Statuswort. Keine Nutzdaten.
+    ///
+    /// Nicht ein Vorsatz, sondern eine Weiche im Datenpfad. Wer sie umgeht, muss
+    /// diese Funktion aendern.
+    public nonisolated(unsafe) static var trace : ((String) -> Void)?
+
+    private static func hex( _ bytes : [UInt8] ) -> String {
+        bytes.map { String(format: "%02X", $0) }.joined()
+    }
+
     func send( cmd: NFCISO7816APDU, useExtendedMode : Bool = false ) async throws -> ResponseAPDU {
         Logger.tagReader.debug( "TagReader - sending \(cmd)" )
+        let geschuetzt = secureMessaging != nil
+        if let trace = TagReader.trace {
+            let kopf = String(
+                format: "%02X %02X %02X %02X",
+                cmd.instructionClass, cmd.instructionCode, cmd.p1Parameter, cmd.p2Parameter
+            )
+            let nutz = [UInt8](cmd.data ?? Data())
+            if geschuetzt {
+                trace("→ \(kopf) Lc=\(nutz.count) [gesichert, Inhalt nicht mitgeschrieben]")
+            } else {
+                trace("→ \(kopf) \(nutz.isEmpty ? "" : TagReader.hex(nutz))")
+            }
+        }
         var toSend = cmd
         if let sm = secureMessaging {
             toSend = try sm.protect(apdu:cmd, useExtendedMode: useExtendedMode)
@@ -307,6 +352,15 @@ public class TagReader {
         // `InvalidASN1Value`, wo eigentlich die Absage des Chips haette stehen
         // muessen. Der Fehler war nicht, dass die Antwort unlesbar war - es gab
         // keine Antwort, nur eine verschluckte Absage.
+        if let trace = TagReader.trace {
+            let status = String(format: "%02X%02X", rep.sw1, rep.sw2)
+            if geschuetzt {
+                trace("← \(rep.data.count)B SW \(status) [gesichert]")
+            } else {
+                trace("← SW \(status) \(rep.data.isEmpty ? "" : TagReader.hex(rep.data))")
+            }
+        }
+
         if !(rep.sw1 == 0x90 && rep.sw2 == 0x00) {
             Logger.tagReader.error( "Error reading tag: sw1 - 0x\(binToHexRep(sw1)), sw2 - 0x\(binToHexRep(sw2))" )
             let tagError: NFCPassportReaderError

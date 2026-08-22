@@ -26,6 +26,9 @@ struct DocumentInputScaffold<Content: View>: View {
     let onOpenArchive: () -> Void
     let onOpenSettings: () -> Void
     let strings: Strings
+    #if DEBUG
+    var onShowErrorSheet: (() -> Void)?
+    #endif
     @ViewBuilder var content: (DocumentMode, Int) -> Content
 
     /// Wer die schon gewaehlte Art noch einmal antippt, will die Maske von vorn.
@@ -134,6 +137,15 @@ struct DocumentInputScaffold<Content: View>: View {
                 Section {
                     Text(strings.format(.menuVersion, AppInfo.version))
                 }
+                #if DEBUG
+                // Nur im Debug-Bau, und nur damit das Fehlerblatt am Simulator
+                // ueberhaupt zu sehen ist - es gibt dort kein NFC.
+                if let probe = onShowErrorSheet {
+                    Section {
+                        Button("Fehlerblatt (Debug)", action: probe)
+                    }
+                }
+                #endif
             } label: {
                 Image(systemName: "ellipsis")
                     .frame(width: 44, height: 44)

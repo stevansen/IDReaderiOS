@@ -72,6 +72,7 @@
 "error_pace_unavailable" = "Der Chip liess sich nicht oeffnen: in dieser Fassung ist kein PACE-Backend eingebunden. Siehe docs/NFC-PACE.md.";
 "error_title" = "Lesen fehlgeschlagen";
 "error_unknown" = "Unbekannter Fehler beim Lesen der Karte.";
+"error_copy_log" = "Protokoll kopieren (%d Zeilen)";
 "error_unsupported_tag" = "Das erkannte Objekt ist keine lesbare Chipkarte.";
 "error_wrong_can" = "CAN stimmt nicht. Bitte die 6-stellige Zahl auf der Kartenvorderseite prüfen.";
 "error_wrong_mrz_key" = "Die drei Felder öffnen den Chip nicht. Bitte Passnummer, Geburtsdatum und Ablaufdatum mit der Datenseite vergleichen.";
