@@ -93,7 +93,28 @@ swift Scripts/asc.swift screenshots
 swift Scripts/asc.swift attach-build
 ```
 
-**Der letzte Befehl ist der, den man vergisst.** Ein App-Icon lädt man auf iOS
+Und für die Bauten:
+
+```bash
+swift Scripts/asc.swift export-compliance 4   # falls Apple sie nicht selbst übernimmt
+swift Scripts/asc.swift test-build 4 Intern
+swift Scripts/asc.swift expire-build 3
+```
+
+Drei Dinge, die dabei aufgefallen sind und in keiner Anleitung stehen:
+
+* **Die interne Gruppe nimmt keine Zuweisung an.** Sie steht auf „alle Bauten",
+  hat also ohnehin jeden; der Versuch endet in „Cannot add internal group to a
+  build". Das ist keine Störung, sondern die Auskunft, dass nichts zu tun ist.
+* **Die Ausfuhrangabe übernimmt Apple** vom vorigen Bau derselben Fassung —
+  aber erst, wenn die Verarbeitung durch ist. Wer kurz nach dem Hochladen
+  nachsieht, findet `null` und hält den Bau für blockiert.
+* **Löschen gibt es nicht.** Für einen hochgeladenen Bau kennt App Store Connect
+  nur „abgelaufen". Die Zeile bleibt als Beleg stehen, dass es ihn gab — richtig
+  so: was einmal an Tester ging, soll man nachher noch nachlesen können.
+  `expire-build` weigert sich, den Bau abzuräumen, der an der Fassung hängt.
+
+**Der Befehl `attach-build` ist der, den man vergisst.** Ein App-Icon lädt man auf iOS
 nicht hoch — der Store nimmt es aus dem Bau. Hängt kein Bau an der Fassung, hat
 der Eintrag kein Icon, und die App-Liste zeigt ein graues Platzhalterquadrat.
 Hochladen allein verbindet nichts.

@@ -588,6 +588,107 @@ func haengeBauAn(_ nummer: String?) async throws {
     print("Damit hat der Eintrag ein Icon: der Store nimmt es aus dem Bau.")
 }
 
+/// Beantwortet die Ausfuhrfrage fuer einen Bau.
+///
+/// Ohne sie steht der Bau in TestFlight auf „Fehlende Compliance" und laesst
+/// sich nicht installieren - unabhaengig von jeder Testgruppe.
+///
+/// `false` heisst „faellt unter eine Ausnahme". Es ist dieselbe Angabe, die fuer
+/// die Bauten 1 bis 3 ueber die Oberflaeche entstanden ist, aus denselben zwei
+/// Antworten: standardmaessige Verfahren zusaetzlich zu Apples, und **kein**
+/// Vertrieb in Frankreich. Der zweite Teil traegt nur, solange der Bau bei
+/// Testern bleibt; siehe docs/TESTFLIGHT.md.
+func setzeAusfuhrangabe(_ nummer: String, ausgenommen: Bool) async throws {
+    let baeume = rows(try await call(
+        "GET", "apps/\(appID)/builds?limit=20&fields[builds]=version"
+    ))
+    guard let bau = baeume.first(where: { attr($0, "version") == nummer }) else {
+        throw Fehler("Bau \(nummer) nicht gefunden.")
+    }
+    try await call("PATCH", "builds/\(ident(bau))", body: [
+        "data": [
+            "type": "builds",
+            "id": ident(bau),
+            "attributes": ["usesNonExemptEncryption": !ausgenommen],
+        ],
+    ])
+    print("Bau \(nummer): Ausfuhrangabe gesetzt (nicht-freigestellte Verschluesselung = \(!ausgenommen)).")
+}
+
+/// Setzt einen Bau auf abgelaufen.
+///
+/// Loeschen geht nicht - App Store Connect kennt fuer einen hochgeladenen Bau
+/// nur „abgelaufen". Danach kann ihn niemand mehr installieren; die Zeile bleibt
+/// als Beleg stehen, dass es ihn gab. Das ist richtig so: was einmal an Tester
+/// ging, soll man nachher noch nachlesen koennen.
+func setzeAbgelaufen(_ nummer: String) async throws {
+    let baeume = rows(try await call(
+        "GET", "apps/\(appID)/builds?limit=20&fields[builds]=version,expired"
+    ))
+    guard let bau = baeume.first(where: { attr($0, "version") == nummer }) else {
+        throw Fehler("Bau \(nummer) nicht gefunden.")
+    }
+    if ((bau["attributes"] as? [String: Any])?["expired"] as? Bool) == true {
+        print("Bau \(nummer) ist schon abgelaufen.")
+        return
+    }
+    // Sicherung: nicht den Bau abraeumen, der an der Fassung haengt.
+    let version = try await inflightVersion()
+    let angehaengt = one(try await call("GET", "appStoreVersions/\(ident(version))/build"))
+    if !angehaengt.isEmpty, ident(angehaengt) == ident(bau) {
+        throw Fehler("""
+            Bau \(nummer) haengt an Fassung \(attr(version, "versionString")).
+            Erst einen anderen anhaengen (attach-build), dann diesen ablaufen lassen.
+            """)
+    }
+    try await call("PATCH", "builds/\(ident(bau))", body: [
+        "data": [
+            "type": "builds",
+            "id": ident(bau),
+            "attributes": ["expired": true],
+        ],
+    ])
+    print("Bau \(nummer) ist jetzt abgelaufen.")
+}
+
+/// Gibt einen Bau einer Testgruppe frei.
+func gibZumTest(_ nummer: String, gruppe gesucht: String) async throws {
+    let baeume = rows(try await call(
+        "GET", "apps/\(appID)/builds?limit=20&fields[builds]=version"
+    ))
+    guard let bau = baeume.first(where: { attr($0, "version") == nummer }) else {
+        throw Fehler("Bau \(nummer) nicht gefunden.")
+    }
+    let gruppen = rows(try await call("GET", "apps/\(appID)/betaGroups?limit=20"))
+    guard let gruppe = gruppen.first(where: {
+        attr($0, "name").caseInsensitiveCompare(gesucht) == .orderedSame
+    }) else {
+        let liste = gruppen.map { attr($0, "name") }.joined(separator: ", ")
+        throw Fehler("Gruppe \(gesucht) gibt es nicht. Vorhanden: \(liste)")
+    }
+
+    let tester = rows(try await call("GET", "betaGroups/\(ident(gruppe))/betaTesters?limit=50"))
+
+    // Eine interne Gruppe mit „alle Bauten" nimmt keine Zuweisung an - sie hat
+    // ohnehin jeden. Der Versuch endet in „Cannot add internal group to a
+    // build", und das ist keine Stoerung, sondern die Auskunft, dass nichts zu
+    // tun ist.
+    let alleBauten = (gruppe["attributes"] as? [String: Any])?["hasAccessToAllBuilds"] as? Bool
+    if alleBauten == true {
+        print("""
+            Gruppe \(attr(gruppe, "name")) steht auf „alle Bauten\" - eine Zuweisung
+            nimmt sie nicht an und braucht sie nicht. Bau \(nummer) steht ihren
+            \(tester.count) Testern schon zur Verfuegung.
+            """)
+        return
+    }
+
+    try await call("POST", "betaGroups/\(ident(gruppe))/relationships/builds", body: [
+        "data": [["type": "builds", "id": ident(bau)]],
+    ])
+    print("Bau \(nummer) → Gruppe \(attr(gruppe, "name")): \(tester.count) Tester.")
+}
+
 // ---------------------------------------------------------------------------
 // Bedienungshilfen-Angaben
 // ---------------------------------------------------------------------------
@@ -698,6 +799,15 @@ do {
     case "screenshots": try await ladeBilder()
     case "attach-build":
         try await haengeBauAn(argumente.count > 1 ? argumente[1] : nil)
+    case "export-compliance":
+        guard argumente.count > 1 else { throw Fehler("Baunummer fehlt.") }
+        try await setzeAusfuhrangabe(argumente[1], ausgenommen: true)
+    case "expire-build":
+        guard argumente.count > 1 else { throw Fehler("Baunummer fehlt.") }
+        try await setzeAbgelaufen(argumente[1])
+    case "test-build":
+        guard argumente.count > 2 else { throw Fehler("Aufruf: test-build <Nummer> <Gruppe>") }
+        try await gibZumTest(argumente[1], gruppe: argumente[2])
     case "accessibility":
         try await setzeBedienungshilfen(veroeffentlichen: argumente.contains("--publish"))
     case "delete":
