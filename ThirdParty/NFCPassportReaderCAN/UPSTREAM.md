@@ -362,8 +362,9 @@ Höflichkeit: solange das ein Fork ist, trägt dieses Repository die Wartung, un
 | 3 | `startReading` fängt den PACE-Fehler ab und verwirft ihn. Bei einem Zugang ohne BAC-Rückfall bleibt danach keine Auskunft übrig. | **ja** |
 | 4 | PACE Schritt 3 erzeugt bedingungslos ein `EC_KEY`. Bei DH gibt `EVP_PKEY_get0_EC_KEY` `NULL` → „Failed to generate EC key". Schritt 2 hat einen DH-Zweig, Schritt 3 hatte keinen. | ja, betrifft alle DH-Dokumente |
 | 5 | Erweiterte APDU über `NFCISO7816APDU(…, expectedResponseLength:)` werden von italienischen Dokumenten mit `6C00` abgewiesen; selbst gebaut gehen sie durch. | **Vorsicht** — hier ist unklar, ob CoreNFC oder der Chip abweicht. Als Beobachtung melden, nicht als Fehlerbehauptung. |
+| 6 | `ensureReadDataNotBeenTamperedWith` fängt den Fehler der SOD-Signaturprüfung ab, nimmt den **ungeprüften** Inhalt und lässt `documentSigningCertificateVerified` auf `false` stehen — ohne den Grund irgendwo festzuhalten. Herauskommt ein Wahrheitswert ohne Begründung. | **ja**, und derselbe Fehlertyp wie Nummer 3 |
 
-Die Nummern 1 bis 3 sind klein, allgemein richtig und ohne unseren Sonderfall
+Die Nummern 1 bis 3 und 6 sind klein, allgemein richtig und ohne unseren Sonderfall
 verständlich — die haben die besten Aussichten. Nummer 4 braucht die Begründung
 aus `docs/EU-EID-STANDARDS.md`. Nummer 5 ist eine Beobachtung, keine Diagnose:
 ich weiß nicht, welche Seite vom Standard abweicht, nur dass die selbst gebaute

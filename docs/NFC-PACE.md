@@ -679,3 +679,53 @@ Fall gibt es in der Bibliothek einen zweiten, über OpenSSL-CMS laufenden Pfad
 
 **Erst messen.**
 
+## Bau 20: die Zeile kam nicht — und warum das eine Auskunft ist
+
+Der Kartenlauf bestätigt den Befund und liefert zwei neue Angaben:
+
+```
+· Dokument laut MRZ: C
+· Datengruppen mit Pruefsumme: 1,2,11,12,14
+· SOD-Signatur=false Kette=true CA erwartet=true CA=true
+```
+
+**`· Pruefungsfehler:` fehlt.** Nicht, weil kein Fehler auftrat, sondern weil die
+Bibliothek diesen einen Fehler nirgends ablegt:
+
+```swift
+do {
+    signedData = try OpenSSLUtils.verifyAndReturnSODEncapsulatedData(sod: sod)
+    documentSigningCertificateVerified = true
+} catch {
+    signedData = try sod.getEncapsulatedContent()   // Fehler verworfen
+}
+```
+
+`verificationErrors` sammelt nur, was aus `ensureReadDataNotBeenTamperedWith`
+**heraus**geworfen wird. Dieser Fehler wird abgefangen, der ungeprüfte Inhalt
+genommen und weitergemacht. Ich hatte den `catch` nicht gelesen, bevor ich die
+Zeile gebaut habe — das ist derselbe Fehler wie fünfmal in PACE: eine Annahme
+ausgeliefert statt sie vorher zu prüfen, diesmal eine Annahme darüber, *wo* die
+Auskunft landet. Kosten: ein Bau.
+
+Nebenbefund, harmlos: der Dokumentcode der CIE ist **`C`**, nicht `ID`. Nach
+ICAO 9303 ist das für Karten zulässig (`I`, `A` oder `C`), und
+`DocumentType.of(documentCode:)` prüft richtigerweise nur auf `P` und ordnet
+alles andere der Karte zu.
+
+### Was Bau 21 mitbringt
+
+Zwei Änderungen in der vendorierten Bibliothek, beide klein:
+
+1. Der verworfene Fehler wird in `sodVerificationDetail` festgehalten.
+2. Scheitert der handgeschriebene Prüfpfad, wird der **CMS-Pfad** versucht — und
+   umgekehrt. Beide prüfen dieselbe Signatur; der eine zerlegt die ASN.1-Struktur
+   selbst, der andere lässt OpenSSL das tun. Ein Dokument, das den einen nicht
+   besteht, ist deshalb nicht unecht: es kann eine Struktur tragen, die dieser
+   Pfad nicht abdeckt. Die Kette bis zur CSCA bleibt davon unberührt, die prüft
+   `validateAndExtractSigningCertificates` getrennt.
+
+Das ist ausdrücklich **kein blinder Umbau**: das Protokoll schreibt mit, welcher
+Pfad gescheitert ist und welcher getragen hat. Trägt der CMS-Pfad, ist die
+Ursache benannt; trägt keiner, stehen zwei Meldungen da statt keiner.
+

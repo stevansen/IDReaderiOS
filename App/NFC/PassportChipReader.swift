@@ -344,6 +344,16 @@ final class PassportChipReader: ChipDocumentReader {
         for fehler in model.verificationErrors {
             ReadLog.shared.add("· Pruefungsfehler: \(fehler)")
         }
+        // Und der Grund fuer eine gescheiterte SOD-Signatur getrennt davon.
+        //
+        // Bau 20 hat `verificationErrors` mitgeschrieben und dort stand nichts:
+        // die Bibliothek fing diesen einen Fehler ab, nahm den ungeprueften
+        // Inhalt und schrieb ihn nirgends hin. Ein Wahrheitswert ohne
+        // Begruendung - und ich hatte den `catch` nicht gelesen, bevor ich die
+        // Zeile gebaut habe. Das kostete einen Bau.
+        if let detail = model.sodVerificationDetail {
+            ReadLog.shared.add("· SOD-Signatur: \(detail)")
+        }
         if let signer = model.documentSigningCertificate?.getSubjectName() {
             ReadLog.shared.add("· Signierer: \(signer)")
         } else {

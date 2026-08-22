@@ -132,6 +132,13 @@ public class NFCPassportModel {
     /// Frage "womit wurde geprueft?" hingehoert. Am Urteil aendert es nichts.
     public internal(set) var sodHashAlgorithm : String?
 
+    /// Warum die Signatur des Security Objects nicht aufging - und ob der
+    /// jeweils andere Pruefpfad sie doch bestaetigt hat.
+    ///
+    /// `nil`, solange der erste Pfad durchgeht. Enthaelt Meldungen aus OpenSSL
+    /// und aus dieser Bibliothek, keine Personendaten.
+    public internal(set) var sodVerificationDetail : String?
+
     public internal(set) var PACEStatus : PassportAuthenticationStatus = .notDone
     public internal(set) var chipAuthenticationStatus : PassportAuthenticationStatus = .notDone
 
@@ -449,15 +456,43 @@ public class NFCPassportModel {
         // Get SOD Content and verify that its correctly signed by the Document Signing Certificate
         var signedData : Data
         documentSigningCertificateVerified = false
+        // ---------------------------------------------------------------------
+        // GEAENDERT gegenueber AndyQ/NFCPassportReader
+        //
+        // Zwei Aenderungen, beide aus einem Fall am Geraet:
+        //
+        // 1. Der Fehler wurde **verworfen**. Der `catch` fing ihn, nahm den
+        //    ungeprueften Inhalt und liess `documentSigningCertificateVerified`
+        //    auf false stehen - ohne irgendwo festzuhalten, warum. Die
+        //    italienische Identitaetskarte scheitert genau hier, und von aussen
+        //    war das ein Wahrheitswert ohne Begruendung. Derselbe Fehlertyp wie
+        //    beim verworfenen PACE-Fehler, siehe UPSTREAM.md.
+        //
+        // 2. Scheitert der handgeschriebene Pruefpfad, wird der **CMS-Pfad**
+        //    versucht (und umgekehrt). Beide pruefen dieselbe Signatur; der eine
+        //    zerlegt die ASN.1-Struktur selbst, der andere laesst OpenSSL das
+        //    tun. Ein Dokument, das den einen nicht besteht, ist deshalb nicht
+        //    unecht - es kann schlicht eine Struktur tragen, die der eine Pfad
+        //    nicht abdeckt. Die Kette bis zur CSCA wird davon nicht beruehrt,
+        //    die prueft `validateAndExtractSigningCertificates` getrennt.
+        // ---------------------------------------------------------------------
+        func pruefe( cms: Bool ) throws -> Data {
+            cms ? try OpenSSLUtils.verifyAndReturnSODEncapsulatedDataUsingCMS(sod: sod)
+                : try OpenSSLUtils.verifyAndReturnSODEncapsulatedData(sod: sod)
+        }
         do {
-            if useCMSVerification {
-                signedData = try OpenSSLUtils.verifyAndReturnSODEncapsulatedDataUsingCMS(sod: sod)
-            } else {
-                signedData = try OpenSSLUtils.verifyAndReturnSODEncapsulatedData(sod: sod)
-            }
+            signedData = try pruefe(cms: useCMSVerification)
             documentSigningCertificateVerified = true
         } catch {
-            signedData = try sod.getEncapsulatedContent()
+            sodVerificationDetail = "\(useCMSVerification ? "CMS" : "direkt"): \(error)"
+            do {
+                signedData = try pruefe(cms: !useCMSVerification)
+                documentSigningCertificateVerified = true
+                sodVerificationDetail! += " - dafuer \(useCMSVerification ? "direkt" : "CMS")"
+            } catch {
+                sodVerificationDetail! += " | \(useCMSVerification ? "direkt" : "CMS"): \(error)"
+                signedData = try sod.getEncapsulatedContent()
+            }
         }
                 
         // Now Verify passport data by comparing compare Hashes in SOD against
