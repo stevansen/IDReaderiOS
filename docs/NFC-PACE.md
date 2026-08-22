@@ -360,6 +360,35 @@ Damit stehen zwei Lesarten, und der nächste Durchgang entscheidet:
    Antwort ist erst mit dem nächsten, unverketteten Befehl zu holen. Das wäre ein
    Umbau des PACE-Ablaufs für den DH-Fall und kein Einzeiler mehr.
 
+### Der Reisepass rechnet nur langsam (Bau 13)
+
+```
+1.42s → 10 86 00 00 7C00
+4.76s ← SW 9000 7C0A8008B7E5C4DE0769515A     3,34 Sekunden
+```
+
+Damit ist das zweite Rätsel erledigt. Der Reisepass ist nicht verrutscht und
+antwortet nicht „gar nicht" — er braucht für den ersten PACE-Schritt **3,3
+Sekunden**, und die Läufe davor sind an einem Zeitfenster gestorben, nicht an
+der Lage. Danach zeigt er denselben Verlauf wie die Karte: `6C00`, Wiederholung,
+`6985`. Und BAC beantwortet er mit `6985` — die Absage eines Chips, der PACE
+verlangt.
+
+**Beide Dokumente verhalten sich identisch.** Ein Fehler, nicht zwei.
+
+### Zweimal danebengelegen an derselben Zeile
+
+`6C xx` und `61 xx` sehen gleich aus und bedeuten Verschiedenes:
+
+| Versuch | `Le` | Ergebnis |
+|---|---|---|
+| Bau 12 | 256 (Gewohnheit von `61 00`) | `6985` — derselbe Wert, den der Chip beanstandet hatte |
+| Bau 14 | 0 | in CoreNFC ist `0` ein Le-**Feld** mit Wert null: kurz gelesen 256, erweitert 65536 |
+| Bau 15 | **kein Le-Feld** (`-1`) | die buchstäbliche Lesart von „null Bytes verfügbar" |
+
+CoreNFC unterscheidet „Le = 0" und „kein Le" über `expectedResponseLength: -1`.
+Das ist die Falle, in die beide Versuche gelaufen sind.
+
 ### Was als nächstes zu prüfen ist
 
 Mit der berichtigten Statusprüfung nennt das Gerät das Statuswort des Chips.

@@ -359,9 +359,20 @@ public class TagReader {
         // Antwortdaten. Die Bibliothek erwartet hier trotzdem welche, weil
         // Reisepaesse sie an dieser Stelle liefern.
         if sw1 == 0x6C {
-            let le = Int(sw2)
+            // `sw2 == 0` heisst „null Bytes verfuegbar", und das ist in CoreNFC
+            // **nicht** `expectedResponseLength: 0`. Dort steht `0` fuer ein
+            // Le-Feld mit dem Wert null - kurz gelesen 256, erweitert 65536, also
+            // gerade das Gegenteil. „Kein Le-Feld" ist `-1`.
+            //
+            // Zweimal danebengelegen an derselben Zeile: erst 256 statt 0, dann
+            // 0 statt „kein Le". Beide Male, weil `6C xx` und `61 xx` gleich
+            // aussehen und Verschiedenes bedeuten.
+            let le = sw2 == 0x00 ? -1 : Int(sw2)
             Logger.tagReader.debug( "Retrying with Le \(le) after 6C\(binToHexRep(sw2))" )
-            TagReader.trace?("↻ 6C\(String(format: "%02X", sw2)) → Wiederholung mit Le=\(le)")
+            TagReader.trace?(
+                "↻ 6C\(String(format: "%02X", sw2)) → Wiederholung "
+                + (le < 0 ? "ohne Le-Feld" : "mit Le=\(le)")
+            )
             let retry = NFCISO7816APDU(
                 instructionClass: toSend.instructionClass,
                 instructionCode: toSend.instructionCode,
