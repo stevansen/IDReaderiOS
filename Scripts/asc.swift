@@ -557,28 +557,38 @@ func haengeBauAn(_ nummer: String?) async throws {
     let version = try await inflightVersion()
     let versionID = ident(version)
 
-    let baeume = rows(try await call(
-        "GET",
-        "apps/\(appID)/builds?limit=20&fields[builds]=version,processingState,expired"
-    ))
-    let brauchbar = baeume.filter {
-        attr($0, "processingState") == "VALID"
-            && (($0["attributes"] as? [String: Any])?["expired"] as? Bool) != true
-    }
-    guard !brauchbar.isEmpty else {
-        throw Fehler("Kein gueltiger, nicht abgelaufener Bau vorhanden.")
+    func brauchbar(_ bau: [String: Any]) -> Bool {
+        attr(bau, "processingState") == "VALID"
+            && ((bau["attributes"] as? [String: Any])?["expired"] as? Bool) != true
     }
 
-    // Ohne Angabe der hoechste; sonst der genannte.
+    // Mit Nummer gezielt fragen, ohne Nummer den juengsten Upload nehmen.
+    //
+    // `sort=-uploadedDate` und nicht `-version`: die Fassungsnummer ist in der
+    // Schnittstelle eine Zeichenkette, und lexikalisch steht "9" ueber "22".
+    // Nach Datum ist die Reihenfolge eindeutig, und der juengste Upload ist
+    // genau, was „ohne Angabe" meint.
     let gewaehlt: [String: Any]
     if let nummer {
-        guard let treffer = brauchbar.first(where: { attr($0, "version") == nummer }) else {
-            let liste = brauchbar.map { attr($0, "version") }.joined(separator: ", ")
-            throw Fehler("Bau \(nummer) ist nicht brauchbar. Verfuegbar: \(liste)")
+        let bau = try await holeBau(nummer, felder: "version,processingState,expired")
+        guard brauchbar(bau) else {
+            throw Fehler("""
+                Bau \(nummer) ist nicht brauchbar: \
+                \(attr(bau, "processingState"))\
+                \(((bau["attributes"] as? [String: Any])?["expired"] as? Bool) == true ? ", abgelaufen" : "").
+                """)
         }
-        gewaehlt = treffer
+        gewaehlt = bau
     } else {
-        gewaehlt = brauchbar.max { (Int(attr($0, "version")) ?? 0) < (Int(attr($1, "version")) ?? 0) }!
+        let baeume = rows(try await call(
+            "GET",
+            "apps/\(appID)/builds?sort=-uploadedDate&limit=20"
+                + "&fields[builds]=version,processingState,expired"
+        ))
+        guard let jung = baeume.first(where: brauchbar) else {
+            throw Fehler("Kein gueltiger, nicht abgelaufener Bau vorhanden.")
+        }
+        gewaehlt = jung
     }
 
     try await call("PATCH", "appStoreVersions/\(versionID)/relationships/build", body: [
@@ -712,12 +722,7 @@ func ladeBenutzerEin(email: String, vorname: String, nachname: String) async thr
 /// Vertrieb in Frankreich. Der zweite Teil traegt nur, solange der Bau bei
 /// Testern bleibt; siehe docs/TESTFLIGHT.md.
 func setzeAusfuhrangabe(_ nummer: String, ausgenommen: Bool) async throws {
-    let baeume = rows(try await call(
-        "GET", "apps/\(appID)/builds?limit=20&fields[builds]=version"
-    ))
-    guard let bau = baeume.first(where: { attr($0, "version") == nummer }) else {
-        throw Fehler("Bau \(nummer) nicht gefunden.")
-    }
+    let bau = try await holeBau(nummer)
     try await call("PATCH", "builds/\(ident(bau))", body: [
         "data": [
             "type": "builds",
@@ -728,6 +733,26 @@ func setzeAusfuhrangabe(_ nummer: String, ausgenommen: Bool) async throws {
     print("Bau \(nummer): Ausfuhrangabe gesetzt (nicht-freigestellte Verschluesselung = \(!ausgenommen)).")
 }
 
+/// Genau den einen Bau holen, nach seiner Nummer.
+///
+/// Vorher listeten vier Stellen `apps/<id>/builds?limit=20` und suchten darin.
+/// Beim zweiundzwanzigsten Bau fiel er aus den ersten zwanzig heraus, und das
+/// Werkzeug meldete „Bau 22 nicht gefunden" - obwohl er da war und `VALID`. Eine
+/// Auflistung mit Obergrenze zu durchsuchen ist eine Wette darauf, dass die
+/// Antwort in den ersten n steht.
+///
+/// `sort=-version` waere hier keine Loesung, sondern eine zweite Wette: die
+/// Fassungsnummer ist in der Schnittstelle eine **Zeichenkette**, und lexikalisch
+/// steht "9" ueber "22".
+func holeBau(_ nummer: String, felder: String = "version") async throws -> [String: Any] {
+    let treffer = rows(try await call(
+        "GET",
+        "builds?filter[app]=\(appID)&filter[version]=\(nummer)&fields[builds]=\(felder)"
+    ))
+    guard let bau = treffer.first else { throw Fehler("Bau \(nummer) nicht gefunden.") }
+    return bau
+}
+
 /// Setzt einen Bau auf abgelaufen.
 ///
 /// Loeschen geht nicht - App Store Connect kennt fuer einen hochgeladenen Bau
@@ -735,12 +760,7 @@ func setzeAusfuhrangabe(_ nummer: String, ausgenommen: Bool) async throws {
 /// als Beleg stehen, dass es ihn gab. Das ist richtig so: was einmal an Tester
 /// ging, soll man nachher noch nachlesen koennen.
 func setzeAbgelaufen(_ nummer: String) async throws {
-    let baeume = rows(try await call(
-        "GET", "apps/\(appID)/builds?limit=20&fields[builds]=version,expired"
-    ))
-    guard let bau = baeume.first(where: { attr($0, "version") == nummer }) else {
-        throw Fehler("Bau \(nummer) nicht gefunden.")
-    }
+    let bau = try await holeBau(nummer, felder: "version,expired")
     if ((bau["attributes"] as? [String: Any])?["expired"] as? Bool) == true {
         print("Bau \(nummer) ist schon abgelaufen.")
         return
@@ -766,12 +786,7 @@ func setzeAbgelaufen(_ nummer: String) async throws {
 
 /// Gibt einen Bau einer Testgruppe frei.
 func gibZumTest(_ nummer: String, gruppe gesucht: String) async throws {
-    let baeume = rows(try await call(
-        "GET", "apps/\(appID)/builds?limit=20&fields[builds]=version"
-    ))
-    guard let bau = baeume.first(where: { attr($0, "version") == nummer }) else {
-        throw Fehler("Bau \(nummer) nicht gefunden.")
-    }
+    let bau = try await holeBau(nummer)
     let gruppen = rows(try await call("GET", "apps/\(appID)/betaGroups?limit=20"))
     guard let gruppe = gruppen.first(where: {
         attr($0, "name").caseInsensitiveCompare(gesucht) == .orderedSame

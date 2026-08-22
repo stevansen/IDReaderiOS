@@ -93,13 +93,21 @@ Consent given for one release does not extend to any later one. Apache-2.0 is
 irrevocable for what has been published under it: a later change of licence
 binds only later versions, and cannot take back what is already out.
 
-**Still to be recorded here:** Christian Auer's consent to Apache-2.0. Stefan
-Hellweger's is given by making this change. Until the second one is written down,
-the licence in this repository is what a reader will rely on, and it is only
-half agreed — which is a reason to settle it, not a reason to publish a version
-without it.
+Recorded consent to Apache-2.0:
 
-The Android original (cauer71/AndroidDev) carries no licence as of this date.
-This port is derivative work; two different licence positions for one work are a
-mess waiting to be discovered by someone who needs the answer. The same change
-belongs there.
+    Stefan Hellweger   21 August 2026   the commit that added LICENSE, NOTICE and
+                                        COPYRIGHT to this repository
+    Christian Auer     agreed, not yet recorded in writing
+
+**The Android original now carries the same licence.** LICENSE, NOTICE and
+COPYRIGHT are in `cauer71/AndroidDev` as of 21 August 2026 (commits `447a8f6`
+and `94369bb`), so the two repositories no longer state two different licence
+positions for one work. That was the mess worth avoiding, and it is avoided.
+
+What is still open is smaller and precise: **both of those commits were authored
+by Stefan Hellweger.** The files record Christian Auer as a holder and record
+his consent as required, but no artefact in either repository is *his*. A reader
+who checks will find a licence that one holder wrote down for two. One line from
+him — a commit of his own, or a word in an issue, with a date — closes it, and
+`AndroidDev/COPYRIGHT` still carries the `<date> <how>` placeholders that were
+put there for exactly this.
