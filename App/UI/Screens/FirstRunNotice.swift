@@ -157,6 +157,7 @@ struct SettingsScreen: View {
 
     @Environment(\.palette) private var palette
     @State private var warningShown = false
+    @State private var logCopied = false
     private var strings: Strings { model.strings }
 
     var body: some View {
@@ -234,6 +235,8 @@ struct SettingsScreen: View {
                     }
 
                     retentionCard
+
+                    logCard
 
                     revocationCard
 
@@ -366,6 +369,66 @@ struct SettingsScreen: View {
         formatter.locale = Locale(identifier: "en_US_POSIX")
         formatter.dateFormat = "dd.MM.yyyy"
         return formatter.string(from: date)
+    }
+
+    /// Das Diagnoseprotokoll.
+    ///
+    /// Steht hier und nicht nur auf dem Fehlerblatt, weil man es dort nur im
+    /// Augenblick des Fehlschlags erreicht - und wer gerade eine Karte in der
+    /// Hand hält, hat andere Sorgen. Von hier aus lässt sich der letzte
+    /// Lesevorgang nachträglich holen, auch ein gelungener.
+    ///
+    /// Ist nichts da, steht das auch da. Ein Knopf, der nichts kopiert, ist
+    /// schlimmer als eine Zeile, die sagt, dass noch nichts zu holen ist.
+    @ViewBuilder private var logCard: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            Text(strings[.settingsDiagnostics])
+                .font(AppType.cardHeading)
+                .padding(.horizontal, 16)
+                .padding(.top, 12)
+                .padding(.bottom, 4)
+
+            if ReadLog.shared.isEmpty {
+                Text(strings[.settingsDiagnosticsEmpty])
+                    .font(.footnote)
+                    .foregroundStyle(palette.onSurfaceVariant)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 10)
+            } else {
+                Button {
+                    UIPasteboard.general.string = ReadLog.shared.text()
+                    logCopied = true
+                } label: {
+                    HStack(spacing: 8) {
+                        Image(systemName: logCopied ? "checkmark" : "doc.on.doc")
+                        Text(strings.format(.errorCopyLog, ReadLog.shared.zeilen))
+                        Spacer(minLength: 0)
+                    }
+                    .font(.body)
+                    .padding(.horizontal, 16)
+                    .frame(minHeight: 52)
+                }
+                .buttonStyle(.plain)
+                .foregroundStyle(palette.primary)
+            }
+
+            Divider()
+                .overlay(palette.outlineVariant)
+                .padding(.horizontal, 16)
+
+            Text(strings[.settingsDiagnosticsHint])
+                .font(.footnote)
+                .foregroundStyle(palette.onSurfaceVariant)
+                .padding(.horizontal, 16)
+                .padding(.top, 10)
+                .padding(.bottom, 12)
+        }
+        .background(palette.surfaceContainerLowest, in: .rect(cornerRadius: 20))
+        .overlay {
+            RoundedRectangle(cornerRadius: 20)
+                .stroke(palette.outlineVariant, lineWidth: 1)
+                .allowsHitTesting(false)
+        }
     }
 
     /// Die Aufbewahrung.

@@ -319,6 +319,47 @@ public class TagReader {
         var (data, sw1, sw2) = try await tag.sendCommand(apdu: toSend)
         Logger.tagReader.debug( "TagReader - Received response, size \(data.count)b" )
 
+        // GEAENDERT: `6C xx` behandeln - „falsches Le, richtig ist xx".
+        //
+        // Nach ISO 7816-4 ist der Befehl daraufhin mit `Le = xx` zu wiederholen.
+        // Das Original behandelt `61 xx` (GET RESPONSE), aber nicht `6C xx`, und
+        // wirft es stattdessen als Fehler.
+        //
+        // Genau daran scheitert die italienische Karte. Aus dem APDU-Protokoll
+        // eines Geraets:
+        //
+        //     → 10 86 00 00 7C820104 8182010003E04C19…   (264 Byte, PACE Schritt 2)
+        //     ← SW 6C00
+        //
+        // Der oeffentliche DH-Schluessel ist 256 Byte gross, das Datenfeld also
+        // 264 - mehr als ein kurzes APDU traegt. CoreNFC macht daraus ein
+        // erweitertes APDU, und der Chip beanstandet dessen Le. Ein Reisepass mit
+        // ECDH kommt hier nie an: dort ist der Schluessel 32 bis 66 Byte gross und
+        // alles passt in ein kurzes APDU. Deshalb faellt es in einer Bibliothek,
+        // die fast nur mit Reisepaessen benutzt wird, nicht auf.
+        //
+        // `xx = 0x00` heisst nach der ueblichen Auslegung 256.
+        if sw1 == 0x6C {
+            let le = sw2 == 0x00 ? 256 : Int(sw2)
+            Logger.tagReader.debug( "Retrying with Le \(le) after 6C\(binToHexRep(sw2))" )
+            TagReader.trace?("↻ 6C\(String(format: "%02X", sw2)) → Wiederholung mit Le=\(le)")
+            let retry = NFCISO7816APDU(
+                instructionClass: toSend.instructionClass,
+                instructionCode: toSend.instructionCode,
+                p1Parameter: toSend.p1Parameter,
+                p2Parameter: toSend.p2Parameter,
+                data: toSend.data ?? Data(),
+                expectedResponseLength: le
+            )
+            (data, sw1, sw2) = try await tag.sendCommand(apdu: retry)
+            if let trace = TagReader.trace {
+                let status = String(format: "%02X%02X", sw1, sw2)
+                trace(geschuetzt
+                    ? "← \(data.count)B SW \(status) [gesichert]"
+                    : "← SW \(status) \(data.isEmpty ? "" : TagReader.hex([UInt8](data)))")
+            }
+        }
+
         // Some commands may have bigger response than expected. Read the whole response using INS 0xC0 (GET RESPONSE).
         while (sw1 == 0x61) {
             let getResponseCmd = NFCISO7816APDU(instructionClass: 0x0, instructionCode: 0xC0, p1Parameter: 0x0, p2Parameter: 0x0, data: Data(), expectedResponseLength: Int(sw2))

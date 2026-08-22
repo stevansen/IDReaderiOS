@@ -202,6 +202,9 @@ public enum StringKey: String, Sendable, CaseIterable {
     case errorUnknown = "error_unknown"
     /// „Protokoll kopieren (%d Zeilen)" - der Knopf auf dem Fehlerblatt.
     case errorCopyLog = "error_copy_log"
+    case settingsDiagnostics = "settings_diagnostics"
+    case settingsDiagnosticsEmpty = "settings_diagnostics_empty"
+    case settingsDiagnosticsHint = "settings_diagnostics_hint"
     case actionRetry = "action_retry"
     case actionBack = "action_back"
 

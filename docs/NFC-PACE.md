@@ -290,6 +290,40 @@ Ein Verdacht, ausdrücklich als solcher: RFC-5114-Parameter tragen ein `q`
 OpenSSL 3.0 veraltet. Beides sind Stellen, an denen ein Pfad brechen kann, der
 mit Reisepässen — die ECDH nehmen — nie befahren wird.
 
+### Die Ursache, aus dem APDU-Protokoll eines Geräts (Bau 11)
+
+```
+0.91s → 00 22 C1 A4 800A04007F00070202040101830102
+0.94s ← SW 9000                                        MSE:Set AT angenommen
+0.94s → 10 86 00 00 7C00
+0.98s ← SW 9000 7C0A8008356899530694DF57               Schritt 1: Nonce, 8 Byte
+0.99s → 10 86 00 00 7C820104 8182010003E04C19…         Schritt 2: 264 Byte
+2.38s ← SW 6C00                                        „falsches Le"
+```
+
+**Der Verdacht mit Tag 0x84 ist damit widerlegt.** Der MSE:Set AT enthält nur
+`80` (Verfahren) und `83 01 02` (CAN) — und der Chip antwortet `9000`. Er
+verlangt die Domänenparameter nicht. Gut, dass die Änderung nicht ins Blaue
+eingebaut wurde.
+
+Die Ursache steht eine Zeile weiter. Der öffentliche DH-Schlüssel ist bei
+2048 Bit **256 Byte** groß, das Datenfeld mit TLV-Hülle also 264 — mehr als ein
+kurzes APDU trägt (255). CoreNFC macht daraus ein **erweitertes** APDU, und der
+Chip beanstandet dessen `Le` mit `6C00`.
+
+Nach ISO 7816-4 heißt `6C xx`: *falsches Le, das richtige ist xx* — der Befehl
+ist damit zu wiederholen. Die Lesebibliothek behandelt `61 xx` (GET RESPONSE),
+aber **`6C xx` nicht**; sie wirft es als Fehler.
+
+**Und damit ist auch erklärt, warum das in einer weit verbreiteten Bibliothek
+niemandem auffällt:** ein Reisepass mit ECDH hat einen öffentlichen Schlüssel von
+32 bis 66 Byte. Alles passt in ein kurzes APDU, `6C00` kommt nie. Nur wer
+klassisches DH über 2048 Bit rechnet — die italienischen Dokumente — läuft
+hinein.
+
+Behoben: `6C xx` wird behandelt, der Befehl mit `Le = xx` wiederholt
+(`xx = 0x00` heißt nach üblicher Auslegung 256).
+
 ### Was als nächstes zu prüfen ist
 
 Mit der berichtigten Statusprüfung nennt das Gerät das Statuswort des Chips.

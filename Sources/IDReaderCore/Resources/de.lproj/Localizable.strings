@@ -73,6 +73,9 @@
 "error_title" = "Lesen fehlgeschlagen";
 "error_unknown" = "Unbekannter Fehler beim Lesen der Karte.";
 "error_copy_log" = "Protokoll kopieren (%d Zeilen)";
+"settings_diagnostics" = "Diagnose";
+"settings_diagnostics_empty" = "Noch kein Lesevorgang in dieser Sitzung.";
+"settings_diagnostics_hint" = "Das Protokoll des letzten Lesevorgangs — Befehle an den Chip und seine Antworten. Es liegt nur im Arbeitsspeicher, wird bei jedem neuen Lesevorgang geleert und steht in keiner Datei. Nach dem Aufbau der gesicherten Verbindung enthält es nur Längen und Statuswörter, also keine Personendaten. Es verlässt das Gerät nur, wenn Sie es kopieren und selbst einfügen.";
 "error_unsupported_tag" = "Das erkannte Objekt ist keine lesbare Chipkarte.";
 "error_wrong_can" = "CAN stimmt nicht. Bitte die 6-stellige Zahl auf der Kartenvorderseite prüfen.";
 "error_wrong_mrz_key" = "Die drei Felder öffnen den Chip nicht. Bitte Passnummer, Geburtsdatum und Ablaufdatum mit der Datenseite vergleichen.";

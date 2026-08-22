@@ -73,6 +73,9 @@
 "error_title" = "Reading failed";
 "error_unknown" = "Unknown error while reading the card.";
 "error_copy_log" = "Copy the log (%d lines)";
+"settings_diagnostics" = "Diagnostics";
+"settings_diagnostics_empty" = "No read in this session yet.";
+"settings_diagnostics_hint" = "The log of the last read — the commands sent to the chip and its answers. It lives in memory only, is cleared on every new read and is written to no file. After the secure channel is established it holds only lengths and status words, so no personal data. It leaves the device only if you copy it and paste it yourself.";
 "error_unsupported_tag" = "The detected object is not a readable smart card.";
 "error_wrong_can" = "Wrong CAN. Please check the 6-digit number on the front of the card.";
 "error_wrong_mrz_key" = "The three fields do not open the chip. Check the passport number, date of birth and date of expiry against the data page.";

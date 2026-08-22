@@ -73,6 +73,9 @@
 "error_title" = "Lettura non riuscita";
 "error_unknown" = "Errore sconosciuto durante la lettura della carta.";
 "error_copy_log" = "Copia il registro (%d righe)";
+"settings_diagnostics" = "Diagnostica";
+"settings_diagnostics_empty" = "Nessuna lettura in questa sessione.";
+"settings_diagnostics_hint" = "Il registro dell’ultima lettura — i comandi inviati al chip e le sue risposte. Resta solo in memoria, viene svuotato a ogni nuova lettura e non è scritto in alcun file. Dopo l’apertura del canale sicuro contiene solo lunghezze e parole di stato, quindi nessun dato personale. Esce dal dispositivo solo se lo copi e lo incolli tu.";
 "error_unsupported_tag" = "L'oggetto rilevato non è una smart card leggibile.";
 "error_wrong_can" = "CAN errato. Controlla il numero di 6 cifre sul fronte della carta.";
 "error_wrong_mrz_key" = "I tre campi non aprono il chip. Confronta numero del passaporto, data di nascita e data di scadenza con la pagina dei dati.";
