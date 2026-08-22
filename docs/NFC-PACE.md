@@ -729,3 +729,72 @@ Das ist ausdrücklich **kein blinder Umbau**: das Protokoll schreibt mit, welche
 Pfad gescheitert ist und welcher getragen hat. Trägt der CMS-Pfad, ist die
 Ursache benannt; trägt keiner, stehen zwei Meldungen da statt keiner.
 
+## Gelöst: die Karte scheitert am selbstgeschriebenen Prüfpfad (Bau 21)
+
+```
+· SOD-Signatur=true Kette=true CA erwartet=true CA=true
+· SOD-Signatur: direkt: VerifyAndReturnSODEncapsulatedData(
+                "Unable to verify signature for signed attributes") - dafuer CMS
+· DG12 vorhanden: Ausstellungsdatum 8 Ziffern, Stelle vorhanden
+```
+
+**Alle vier Stufen gehen auf.** Die Identitätskarte bekommt ihr Siegel, in 4,30 s.
+
+Die Ursache ist benannt und liegt **nicht** am Dokument: der handgeschriebene
+Prüfpfad der Bibliothek bekommt die Signatur der signierten Attribute nicht
+verifiziert, OpenSSLs eigene CMS-Prüfung schon. Beide prüfen dieselbe Signatur
+mit demselben Zertifikat — der eine zerlegt die ASN.1-Struktur selbst und setzt
+Digest und Padding aus einer Zeichenkettensuche zusammen, der andere liest die
+Algorithmusparameter aus der Struktur.
+
+Genau dort steckt die Schwäche:
+
+```swift
+if digestType.contains("sha256") || digestType.contains("rsassapss") { digest = "sha256" }
+…
+if digestType.contains("rsassapss") {
+    EVP_PKEY_CTX_ctrl_str(pkey_ctx, "rsa_padding_mode", "pss")
+    EVP_PKEY_CTX_ctrl_str(pkey_ctx, "rsa_pss_saltlen", "auto")
+}
+```
+
+Bei RSASSA-PSS wird der Digest **fest auf SHA-256 gesetzt**, unabhängig davon,
+was die Parameter des Verfahrens nennen — und der Verfahrensname kommt aus dem
+Textausdruck von `ASN1_parse_dump`, nicht aus der Struktur. Ein Dokument mit PSS
+über einem anderen Digest fällt damit durch. Welcher der beiden Fälle es bei der
+CIE ist, sagt der nächste Lauf: die Meldung nennt jetzt auch das Verfahren.
+
+Für das Urteil ist das schon entschieden — der CMS-Pfad trägt, und er ist nicht
+der schwächere, sondern der vollständigere.
+
+### Und damit ist die Kette am echten Chip belegt
+
+| | Identitätskarte | Reisepass |
+|---|---|---|
+| PACE (DH-2048, GM, 3DES) | ✓ | ✓ |
+| Chip Authentication | ✓ | ✓ |
+| Datengruppen unverändert | ✓ (1, 2, 11, 12, 14) | ✓ (1, 2, 14) |
+| SOD-Signatur | ✓ über CMS | ✓ direkt |
+| Kette bis zur italienischen CSCA | ✓ | ✓ |
+| **Siegel** | **grün** | **grün** |
+| gesamt | 4,30 s | 5,51 s |
+
+Zwei getrennte Zweige, zwei Signierer, zwei CSCA — beide im mitgelieferten
+Bündel. Auftrag 5 aus [`REWORK_PROMPT.md`](../REWORK_PROMPT.md) ist damit für
+Passive Authentication und Chip Authentication erledigt.
+
+### Was das über die Fehlersuche sagt
+
+Vier Bauten von der Frage bis zur Antwort, und drei davon gingen für falsche
+Annahmen über den *Ort* der Auskunft weg — nicht über die Sache:
+
+1. „Es fehlt der Vertrauensanker." Falsch, der Anker stand im Protokoll.
+2. Zwei vertauschte Wahrheitswerte, weil ich den Namen geglaubt habe statt dem
+   Code.
+3. `verificationErrors` würde den Grund enthalten. Tat es nicht, weil der `catch`
+   ihn verwarf — und den `catch` hatte ich nicht gelesen.
+
+Erst die vierte Änderung war ein Instrument statt einer Vermutung, und die hat es
+in einem Kartenkontakt entschieden. Das ist dieselbe Lehre wie bei PACE, und ich
+habe sie zweimal gebraucht.
+

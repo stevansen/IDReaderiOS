@@ -484,7 +484,11 @@ public class NFCPassportModel {
             signedData = try pruefe(cms: useCMSVerification)
             documentSigningCertificateVerified = true
         } catch {
-            sodVerificationDetail = "\(useCMSVerification ? "CMS" : "direkt"): \(error)"
+            // Das Signaturverfahren mit in die Meldung: es entscheidet, welcher
+            // Zweig in `verifySignature` greift, und ohne es ist die Ursache
+            // nicht zu benennen - nur der Ausfall.
+            let verfahren = (try? sod.getSignatureAlgorithm()) ?? "unbekannt"
+            sodVerificationDetail = "\(useCMSVerification ? "CMS" : "direkt") [\(verfahren)]: \(error)"
             do {
                 signedData = try pruefe(cms: !useCMSVerification)
                 documentSigningCertificateVerified = true
