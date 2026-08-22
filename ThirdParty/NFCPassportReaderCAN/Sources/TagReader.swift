@@ -181,7 +181,35 @@ public class TagReader {
         // von 255 Byte mit gesetztem Verkettungsbit, das letzte ohne. Nach
         // ISO 7816-4 setzt der Chip sie zusammen und beantwortet das letzte.
         var response : ResponseAPDU
-        if commandData.count > 255 {
+        if commandData.count > 255, TagReader.oversized != .extendedWithLe {
+            if TagReader.oversized == .rawExtendedNoLe || TagReader.oversized == .rawExtendedLe {
+                let mitLe = TagReader.oversized == .rawExtendedLe
+                guard let cmd = TagReader.rawExtended(
+                    cla: instructionClass, ins: INS_BSI_GENERAL_AUTHENTICATE,
+                    p1: 0x00, p2: 0x00, data: commandData, withLe: mitLe
+                ) else {
+                    throw NFCPassportReaderError.InvalidDataPassed("APDU nicht baubar")
+                }
+                TagReader.trace?(
+                    "⋯ selbst gebaut: \(String(format: "%02X %02X 00 00 | 00 %02X %02X", instructionClass, INS_BSI_GENERAL_AUTHENTICATE, commandData.count >> 8, commandData.count & 0xFF))"
+                    + " | \(commandData.count)B" + (mitLe ? " | 00 00" : " | kein Le")
+                )
+                var r = try await send( cmd: cmd )
+                r.data = try unwrapDO( tag:0x7c, wrappedData: r.data)
+                return r
+            }
+            if TagReader.oversized == .extendedNoLe {
+                // Erweitertes APDU, aber ohne Le-Feld.
+                let cmd = NFCISO7816APDU(
+                    instructionClass: instructionClass,
+                    instructionCode: INS_BSI_GENERAL_AUTHENTICATE,
+                    p1Parameter: 0x00, p2Parameter: 0x00,
+                    data: commandData, expectedResponseLength: -1
+                )
+                var r = try await send( cmd: cmd )
+                r.data = try unwrapDO( tag:0x7c, wrappedData: r.data)
+                return r
+            }
             let stuecke = stride(from: 0, to: commandData.count, by: 255).map { start in
                 commandData.subdata(in: start ..< min(start + 255, commandData.count))
             }
@@ -189,11 +217,10 @@ public class TagReader {
             var letzte : ResponseAPDU? = nil
             for (index, stueck) in stuecke.enumerated() {
                 let istLetztes = index == stuecke.count - 1
+                let letzteKlasse : UInt8 =
+                    TagReader.oversized == .chainAllChained ? 0x10 : 0x00
                 let kette = NFCISO7816APDU(
-                    // Verkettungsbit bei allen ausser dem letzten Stueck. Beim
-                    // letzten die Klasse des eigentlichen Befehls - nur daran
-                    // erkennt der Chip, dass die Kette zu Ende ist.
-                    instructionClass: istLetztes ? 0x00 : 0x10,
+                    instructionClass: istLetztes ? letzteKlasse : 0x10,
                     instructionCode: INS_BSI_GENERAL_AUTHENTICATE,
                     p1Parameter: 0x00,
                     p2Parameter: 0x00,
@@ -344,6 +371,60 @@ public class TagReader {
     /// Nicht ein Vorsatz, sondern eine Weiche im Datenpfad. Wer sie umgeht, muss
     /// diese Funktion aendern.
     public nonisolated(unsafe) static var trace : ((String) -> Void)?
+
+    /// Wie ein Datenfeld gesendet wird, das nicht in ein kurzes APDU passt.
+    ///
+    /// Bei PACE mit klassischem DH ueber 2048 Bit sind es 264 Byte, und dieses
+    /// Dokument nimmt keine der naheliegenden Formen an. Statt weiter je Bau eine
+    /// Vermutung auszuliefern, probiert `PACEHandler` sie in **einem**
+    /// Kartenkontakt der Reihe nach durch und schreibt jede Antwort mit.
+    ///
+    /// Was bisher gemessen wurde:
+    ///
+    /// * `extendedWithLe` → `6C00` „null Bytes verfuegbar"
+    /// * `chainLastPlain` → `6A80` „incorrect parameters in the data field"
+    public enum Oversized : String {
+        /// Erweitertes APDU mit Le = 256. Die Fassung des Originals.
+        case extendedWithLe
+        /// Erweitertes APDU ohne Le-Feld.
+        case extendedNoLe
+        /// Verkettet, letztes Stueck mit Klasse 0x00.
+        case chainLastPlain
+        /// Verkettet, **alle** Stuecke mit gesetztem Verkettungsbit.
+        case chainAllChained
+        /// Selbst gebautes erweitertes APDU, Fall 3E - ohne Le-Feld.
+        case rawExtendedNoLe
+        /// Selbst gebautes erweitertes APDU, Fall 4E - Le = 00 00.
+        case rawExtendedLe
+    }
+
+    /// Ein erweitertes APDU Byte fuer Byte, ohne den Erzeuger von CoreNFC.
+    ///
+    /// ## Warum das ueberhaupt nötig sein kann
+    ///
+    /// Bei PACE mit DH ueber 2048 Bit ist das Datenfeld 264 Byte gross. Ein
+    /// kurzes APDU traegt 255. **Ein erweitertes APDU ist bei diesem Verfahren
+    /// also zwingend, nicht optional** - ein Chip, der DH-2048 vorschreibt, muss
+    /// sie annehmen koennen.
+    ///
+    /// Er antwortet trotzdem `6C00`. Damit ist der naechste Verdaechtige nicht
+    /// der Chip, sondern der Weg dorthin: was `NFCISO7816APDU` aus Daten und
+    /// `expectedResponseLength` zusammensetzt, ist nicht sichtbar. Diese Fassung
+    /// baut die Bytes selbst und uebergibt sie ueber `NFCISO7816APDU(data:)` -
+    /// damit steht fest, was auf dem Draht liegt.
+    static func rawExtended(
+        cla : UInt8, ins : UInt8, p1 : UInt8, p2 : UInt8,
+        data : Data, withLe : Bool
+    ) -> NFCISO7816APDU? {
+        var bytes : [UInt8] = [cla, ins, p1, p2]
+        // Erweitertes Lc: ein Nullbyte, dann zwei Laengenbytes.
+        bytes += [0x00, UInt8(data.count >> 8), UInt8(data.count & 0xFF)]
+        bytes += [UInt8](data)
+        if withLe { bytes += [0x00, 0x00] }
+        return NFCISO7816APDU(data: Data(bytes))
+    }
+
+    public nonisolated(unsafe) static var oversized : Oversized = .extendedWithLe
 
     private static func hex( _ bytes : [UInt8] ) -> String {
         bytes.map { String(format: "%02X", $0) }.joined()

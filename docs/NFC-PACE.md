@@ -418,6 +418,32 @@ Dass das die richtige Lesart ist, ist noch nicht bewiesen. Aber es ist die
 einzige verbliebene, und das Protokoll zeigt jedes Stück einzeln — die Antwort
 auf das erste Stück sagt schon, ob der Chip verkettet.
 
+### Die Rechnung, die alles umdreht
+
+264 Byte im Datenfeld. Ein kurzes APDU trägt 255.
+
+**Damit ist ein erweitertes APDU bei diesem Verfahren zwingend, nicht optional.**
+Ein Chip, der PACE mit DH über 2048 Bit vorschreibt — und die CIE schreibt es
+vor, sie bietet in `EF.CardAccess` nichts anderes an —, *muss* erweiterte APDU
+annehmen können. Es gibt keinen Weg, einen 256-Byte-Schlüssel anders zu
+übertragen.
+
+Er antwortet trotzdem `6C00`. Damit ist der nächste Verdächtige **nicht der
+Chip**, sondern der Weg dorthin: was `NFCISO7816APDU` aus Daten und
+`expectedResponseLength` zusammensetzt, sieht man nicht.
+
+Deshalb zwei weitere Formen, die die Bytes selbst bauen und über
+`NFCISO7816APDU(data:)` übergeben:
+
+```
+Fall 3E   10 86 00 00 | 00 01 08 | <264 Byte>
+Fall 4E   10 86 00 00 | 00 01 08 | <264 Byte> | 00 00
+```
+
+Sie stehen in der Probierreihenfolge **vorn**, aus genau diesem Grund: die
+Verkettungsformen sind Ausweichmanöver, die erweiterten APDU sind der
+vorgeschriebene Weg.
+
 ### Was als nächstes zu prüfen ist
 
 Mit der berichtigten Statusprüfung nennt das Gerät das Statuswort des Chips.

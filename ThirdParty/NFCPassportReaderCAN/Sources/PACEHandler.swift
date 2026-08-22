@@ -147,12 +147,53 @@ public class PACEHandler {
         // nicht die Stelle, an der man das in ein Systemprotokoll schreibt.
         Logger.pace.debug("paceKeyType - \(self.paceKeyType)" )
 
-        // First start the initial auth call
-        _ = try await tagReader.sendMSESetATMutualAuth(oid: paceOID, keyType: paceKeyType)
-            
-        let decryptedNonce = try await self.doStep1()
+        // GEAENDERT: Schritt 2 mit mehreren Uebertragungsformen versuchen.
+        //
+        // Bei klassischem DH ueber 2048 Bit ist das Datenfeld von Schritt 2
+        // 264 Byte gross - mehr als ein kurzes APDU traegt. Die italienischen
+        // Dokumente nehmen keine der naheliegenden Formen an, und jede Vermessung
+        // kostete bisher einen eigenen Bau und eine Rueckmeldung.
+        //
+        // Also alle Formen in **einem** Kartenkontakt. Zwischen den Versuchen
+        // wird PACE von vorn begonnen (MSE:Set AT und Schritt 1), weil ein
+        // abgelehnter Befehl den Zustand des Chips verdirbt - genau deshalb kam
+        // auf jede blosse Wiederholung `6985`.
+        //
+        // Passt das Datenfeld in ein kurzes APDU, gibt es nichts zu probieren:
+        // dann greift die erste Form und die Schleife endet nach einem Durchlauf.
+        // Die selbst gebauten erweiterten APDU zuerst: ein Verfahren, das 264
+        // Byte in einem Datenfeld verlangt, **muss** erweiterte APDU koennen -
+        // ein kurzes traegt 255. Wenn der Chip sie trotzdem ablehnt, ist der
+        // naechste Verdaechtige nicht er, sondern was CoreNFC daraus baut.
+        let formen : [TagReader.Oversized] = [
+            .rawExtendedLe, .rawExtendedNoLe,
+            .extendedNoLe, .chainAllChained, .chainLastPlain, .extendedWithLe,
+        ]
+        var ephemeralParams : OpaquePointer? = nil
+        var letzterFehler : Error? = nil
 
-        let ephemeralParams = try await self.doStep2(passportNonce: decryptedNonce)
+        for (index, form) in formen.enumerated() {
+            TagReader.oversized = form
+            if index > 0 {
+                TagReader.trace?("⟲ neuer Versuch, Uebertragung: \(form.rawValue)")
+            } else {
+                TagReader.trace?("· Uebertragung: \(form.rawValue)")
+            }
+            do {
+                _ = try await tagReader.sendMSESetATMutualAuth(oid: paceOID, keyType: paceKeyType)
+                let decryptedNonce = try await self.doStep1()
+                ephemeralParams = try await self.doStep2(passportNonce: decryptedNonce)
+                break
+            } catch {
+                letzterFehler = error
+                TagReader.trace?("✗ \(form.rawValue): \(error)")
+                Logger.pace.error( "PACE Step2 failed with \(form.rawValue)" )
+            }
+        }
+
+        guard let ephemeralParams else {
+            throw letzterFehler ?? NFCPassportReaderError.PACEError( "Step2", "alle Uebertragungsformen abgelehnt" )
+        }
         defer { EVP_PKEY_free( ephemeralParams ) }
 
         let (ephemeralKeyPair, passportPublicKey) = try await self.doStep3KeyExchange(ephemeralParams: ephemeralParams)
