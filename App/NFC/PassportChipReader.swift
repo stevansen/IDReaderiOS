@@ -74,6 +74,12 @@ final class PassportChipReader: ChipDocumentReader {
                     return nil
                 }
             )
+        } catch NFCPassportReaderError.UserCanceled {
+            // Das Systemblatt hat einen eigenen „Abbrechen"-Knopf, und solange es
+            // oben ist, ist der eigene nicht erreichbar. Wer ihn drueckt, will
+            // zurueck zur Maske - nicht eine Fehlermeldung mit „Erneut
+            // versuchen".
+            throw ReadCancelled()
         } catch {
             throw PassportChipReader.mapError(error, key: key)
         }
@@ -142,6 +148,8 @@ final class PassportChipReader: ChipDocumentReader {
         case .ConnectionError, .TimeOutError, .NoConnectedTag:
             return ReadError(.connectionLost, "\(libraryError)")
         case .UserCanceled:
+            // Wird in `read` vorher abgefangen; hier nur der Vollstaendigkeit
+            // halber, damit der Schalter nichts verschluckt.
             return ReadError(.connectionLost, "vom Benutzer beendet")
         case .TagNotValid, .MoreThanOneTagFound:
             return ReadError(.unsupportedTag, "\(libraryError)")

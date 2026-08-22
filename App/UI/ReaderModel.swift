@@ -22,7 +22,11 @@ enum UIStage: Equatable {
     /// `lastStep` wird mitgefuehrt, weil der Fehler als Blatt ueber dem
     /// abgedunkelten Lesescreen erscheint - der muss dafuer weiterhin seinen
     /// letzten Stand zeigen koennen.
-    case error(ReadErrorKind, lastStep: ReadStep)
+    /// `detail` ist der technische Grund, wie ihn die Lesebibliothek nennt.
+    /// Er stand bisher nur im Fehlerobjekt und wurde hier weggeworfen - womit
+    /// jeder Fehlschlag am Geraet gleich aussah und niemand sagen konnte,
+    /// woran es lag.
+    case error(ReadErrorKind, lastStep: ReadStep, detail: String)
     /// Liste der aufbewahrten Lesevorgaenge.
     case archive
 }
@@ -360,9 +364,15 @@ final class ReaderModel {
     private func run(key: AccessKey) {
         readTask?.cancel()
         readTask = Task { [reader, archive, revocation] in
+            // Wie weit der Vorgang kam. Er wurde bisher nur auf `.done` gesetzt,
+            // also stand im Fehlerfall immer „warte auf Karte" - und damit fehlte
+            // bei jedem Fehlschlag die Auskunft, die man zuerst braucht: ob es an
+            // der Schluesselaushandlung lag, an einer Datengruppe oder schon am
+            // Aufsetzen.
             var lastStep = ReadStep.waitingForCard
             do {
                 let result = try await reader.read(key: key, readPhoto: readPhoto) { [weak self] step in
+                    lastStep = step
                     guard let self, case .reading = self.stage else { return }
                     self.stage = .reading(step)
                 }
@@ -392,10 +402,15 @@ final class ReaderModel {
                 stage = .success(document, fresh: true)
             } catch is CancellationError {
                 return
+            } catch is ReadCancelled {
+                // Zurueck zur Maske, ohne Fehlerblatt. Nur wenn wir noch der
+                // laufende Vorgang sind: ein neuer Lesevorgang hat den alten
+                // abgebrochen, und der soll ihm den Bildschirm nicht wegnehmen.
+                if case .reading = stage { stage = .idle }
             } catch let error as ReadError {
-                stage = .error(error.kind, lastStep: lastStep)
+                stage = .error(error.kind, lastStep: lastStep, detail: error.detail)
             } catch {
-                stage = .error(.unknown, lastStep: lastStep)
+                stage = .error(.unknown, lastStep: lastStep, detail: "\(type(of: error))")
             }
         }
     }

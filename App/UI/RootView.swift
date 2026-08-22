@@ -148,7 +148,7 @@ struct RootView: View {
                 }
             )
 
-        case let .error(kind, lastStep):
+        case let .error(kind, lastStep, detail):
             // Der Fehler legt sich als Blatt ueber den abgedunkelten Lesescreen -
             // der Vorgang wurde unterbrochen, nicht verlassen.
             ReadingScreen(
@@ -161,6 +161,7 @@ struct RootView: View {
             .sheet(isPresented: .constant(true)) {
                 ErrorSheet(
                     kind: kind,
+                    detail: detail,
                     strings: strings,
                     onRetry: model.retry,
                     onBack: model.reset

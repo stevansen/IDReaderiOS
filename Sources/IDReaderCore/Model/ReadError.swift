@@ -52,6 +52,16 @@ public enum ReadErrorKind: Sendable, CaseIterable {
     }
 }
 
+/// Der Benutzer hat das Systemblatt geschlossen.
+///
+/// **Kein Fehler.** Er stand vorher als ``ReadErrorKind/connectionLost`` da, und
+/// das war die falsche Auskunft an der unangenehmsten Stelle: wer abbricht,
+/// bekam „Verbindung verloren" und die Frage, ob er es erneut versuchen will.
+/// Am Geraet las sich das so, als liesse sich der Lesevorgang gar nicht beenden.
+public struct ReadCancelled: Error, Sendable {
+    public init() {}
+}
+
 /// Fehler beim Lesen. ``kind`` steuert die Meldung, ``detail`` ist nur fuer
 /// Entwicklerprotokolle gedacht und enthaelt keine Personendaten.
 public struct ReadError: Error, Sendable {

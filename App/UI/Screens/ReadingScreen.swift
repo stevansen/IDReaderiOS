@@ -126,11 +126,21 @@ struct ReadingScreen: View {
 struct ErrorSheet: View {
 
     let kind: ReadErrorKind
+    /// Der technische Grund, wie ihn die Lesebibliothek nennt.
+    ///
+    /// Steht klein unter der Meldung und laesst sich antippen, um ihn zu
+    /// kopieren. Er ist nicht fuer den Bediener gedacht - der liest den Satz
+    /// darueber - sondern fuer den Satz danach: „bei mir geht es nicht". Ohne
+    /// ihn sieht jeder Fehlschlag gleich aus, und die Ferndiagnose beginnt mit
+    /// Raten. Personendaten stehen nie darin; er nennt Fehlerarten und
+    /// Statuswoerter der Karte.
+    var detail: String = ""
     let strings: Strings
     let onRetry: () -> Void
     let onBack: () -> Void
 
     @Environment(\.palette) private var palette
+    @State private var copied = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -144,6 +154,33 @@ struct ErrorSheet: View {
             }
 
             Text(strings[kind.messageKey]).font(.body)
+
+            if !detail.isEmpty {
+                Button {
+
+                    // Was kopiert wird, ist mehr als was dasteht: die Fassung
+                    // dazu, damit eine Meldung „bei mir geht es nicht" sich
+                    // einem Bau zuordnen laesst.
+                    UIPasteboard.general.string =
+                        "IDReader \(AppInfo.version) (\(AppInfo.build)) — \(detail)"
+                    copied = true
+                } label: {
+                    HStack(spacing: 6) {
+                        Image(systemName: copied ? "checkmark" : "doc.on.doc")
+                        Text(detail)
+                            .font(.system(.caption2, design: .monospaced))
+                            .multilineTextAlignment(.leading)
+                        Spacer(minLength: 0)
+                    }
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 8)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(palette.surfaceContainer, in: .rect(cornerRadius: 10))
+                }
+                .buttonStyle(.plain)
+                .foregroundStyle(palette.onSurfaceVariant)
+                .accessibilityLabel(detail)
+            }
 
             HStack(spacing: 12) {
                 Button(action: onBack) {
@@ -167,6 +204,6 @@ struct ErrorSheet: View {
         }
         .padding(24)
         .padding(.bottom, 12)
-        .presentationDetents([.height(300)])
+        .presentationDetents([.height(detail.isEmpty ? 300 : 380)])
     }
 }
