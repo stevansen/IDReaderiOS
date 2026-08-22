@@ -338,9 +338,28 @@ public class TagReader {
         // alles passt in ein kurzes APDU. Deshalb faellt es in einer Bibliothek,
         // die fast nur mit Reisepaessen benutzt wird, nicht auf.
         //
-        // `xx = 0x00` heisst nach der ueblichen Auslegung 256.
+        // **`xx = 0x00` heisst hier null, nicht 256.**
+        //
+        // Bei `61 00` (GET RESPONSE) bedeutet SW2 = 0 nach Gewohnheit 256. Bei
+        // `6C 00` nicht: dort nennt SW2 die Zahl der *verfuegbaren* Bytes, und
+        // null heisst null. Der erste Versuch dieser Korrektur hat trotzdem mit
+        // Le = 256 wiederholt - also mit genau dem Wert, den der Chip gerade
+        // beanstandet hatte. Aus dem Protokoll eines Geraets:
+        //
+        //     → 10 86 00 00 7C820104 8182010043 23A5…   264 Byte
+        //     ↻ 6C00 → Wiederholung mit Le=256
+        //     ← SW 6985                                 „conditions of use…"
+        //
+        // Der Chip sagte „ich habe null Bytes fuer dich", bekam dieselbe Frage
+        // ein zweites Mal und hat dann abgelehnt. Das war mein Fehler, nicht
+        // seiner.
+        //
+        // Dass er null Bytes hat, passt zum Befehl: `CLA 0x10` ist das
+        // Verkettungsbit - ein Zwischenglied einer Befehlskette liefert keine
+        // Antwortdaten. Die Bibliothek erwartet hier trotzdem welche, weil
+        // Reisepaesse sie an dieser Stelle liefern.
         if sw1 == 0x6C {
-            let le = sw2 == 0x00 ? 256 : Int(sw2)
+            let le = Int(sw2)
             Logger.tagReader.debug( "Retrying with Le \(le) after 6C\(binToHexRep(sw2))" )
             TagReader.trace?("↻ 6C\(String(format: "%02X", sw2)) → Wiederholung mit Le=\(le)")
             let retry = NFCISO7816APDU(

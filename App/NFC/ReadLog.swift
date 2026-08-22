@@ -38,6 +38,7 @@ final class ReadLog {
     private static let maximum = 400
 
     private var lines: [String] = []
+    private var previous: [String] = []
     private var start: Date?
     private let lock = NSLock()
 
@@ -50,8 +51,15 @@ final class ReadLog {
         }
     }
 
+    /// Der vorige Lauf bleibt stehen.
+    ///
+    /// Weil das Naheliegende nach einem Fehlschlag „Erneut versuchen" ist - und
+    /// damit war der interessante Lauf weg, bevor jemand ihn kopieren konnte.
+    /// Gehalten werden zwei: der laufende und der davor. Mehr nicht, es soll ein
+    /// Diagnosepuffer bleiben und keine Aufzeichnung.
     func beginn(_ was: String) {
         lock.lock()
+        previous = lines
         lines = []
         start = Date()
         lock.unlock()
@@ -71,19 +79,26 @@ final class ReadLog {
     var isEmpty: Bool {
         lock.lock()
         defer { lock.unlock() }
-        return lines.isEmpty
+        return lines.isEmpty && previous.isEmpty
     }
 
     var zeilen: Int {
         lock.lock()
         defer { lock.unlock() }
-        return lines.count
+        return lines.count + previous.count
     }
 
     /// Das Protokoll zum Verschicken, mit Kopf.
     func text(kopfzusatz: String = "") -> String {
         lock.lock()
-        let body = lines.joined(separator: "\n")
+        var teile: [String] = []
+        if !previous.isEmpty {
+            teile.append("···· vorheriger Lauf ····")
+            teile.append(previous.joined(separator: "\n"))
+            teile.append("···· dieser Lauf ····")
+        }
+        teile.append(lines.joined(separator: "\n"))
+        let body = teile.joined(separator: "\n")
         lock.unlock()
 
         var kopf = [

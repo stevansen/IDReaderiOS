@@ -324,6 +324,42 @@ hinein.
 Behoben: `6C xx` wird behandelt, der Befehl mit `Le = xx` wiederholt
 (`xx = 0x00` heißt nach üblicher Auslegung 256).
 
+### Was `6C00` wirklich sagt (Bau 13)
+
+Der erste Versuch, `6C xx` zu behandeln, war halb richtig. Das lückenlose
+Protokoll:
+
+```
+2.95s → 00 22 C1 A4 800A04007F00070202040101830102
+2.96s ← SW 9000                                     MSE:Set AT angenommen
+2.96s → 10 86 00 00 7C00
+2.99s ← SW 9000 7C0A8008BF431992757BF747            Schritt 1: Nonce
+3.00s → 10 86 00 00 7C820104 8182010043 23A5…       Schritt 2: 264 Byte
+3.69s ↻ 6C00 → Wiederholung mit Le=256
+3.73s ← SW 6985                                     „conditions of use…"
+```
+
+**Der Fehler war meiner.** Bei `61 00` (GET RESPONSE) heißt SW2 = 0 nach
+Gewohnheit 256. Bei `6C 00` nicht: dort nennt SW2 die Zahl der **verfügbaren**
+Bytes, und null heißt null. Wiederholt wurde trotzdem mit `Le = 256` — mit genau
+dem Wert, den der Chip gerade beanstandet hatte. Er hat dieselbe Frage ein
+zweites Mal bekommen und abgelehnt.
+
+Berichtigt: `Le = xx`, buchstäblich.
+
+**Und die Antwort passt zum Befehl.** `CLA 0x10` ist das Verkettungsbit — ein
+Zwischenglied einer Befehlskette liefert **keine** Antwortdaten. Der Chip sagt
+also die Wahrheit: null Bytes verfügbar. Die Lesebibliothek erwartet hier
+trotzdem Daten, weil Reisepässe sie an dieser Stelle liefern.
+
+Damit stehen zwei Lesarten, und der nächste Durchgang entscheidet:
+
+1. **Nur das Le war falsch.** Dann antwortet der Chip auf die berichtigte
+   Wiederholung mit `9000` und seinem Abbildungsschlüssel, und PACE läuft weiter.
+2. **Der Chip verkettet wirklich.** Dann kommt `9000` **ohne** Daten, und die
+   Antwort ist erst mit dem nächsten, unverketteten Befehl zu holen. Das wäre ein
+   Umbau des PACE-Ablaufs für den DH-Fall und kein Einzeiler mehr.
+
 ### Was als nächstes zu prüfen ist
 
 Mit der berichtigten Statusprüfung nennt das Gerät das Statuswort des Chips.
