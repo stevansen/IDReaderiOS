@@ -66,7 +66,7 @@
 "cd_digit_empty" = "Ziffer %d von 6 fehlt";
 "cd_digit_filled" = "Ziffer %d von 6 eingegeben";
 "cd_photo" = "Lichtbild aus der Karte";
-"error_connection_lost" = "Verbindung unterbrochen. Karte ruhig liegen lassen und erneut versuchen.";
+"error_connection_lost" = "Verbindung unterbrochen – das Dokument lag nicht lange genug auf. Ruhig liegen lassen, ohne zu verschieben, und erneut versuchen.";
 "error_extended_length" = "Dieses Gerät kann die CIE nicht lesen.";
 "error_no_pace" = "Diese Karte unterstützt PACE nicht. Handelt es sich um eine CIE 3.0?";
 "error_pace_unavailable" = "Der Chip liess sich nicht oeffnen: in dieser Fassung ist kein PACE-Backend eingebunden. Siehe docs/NFC-PACE.md.";
@@ -168,8 +168,8 @@
 "phase_secure" = "Sichere Verbindung aufbauen";
 "phase_verify" = "Echtheit prüfen";
 "read_without_photo" = "ohne Bild";
-"reading_instruction" = "Karte durchgehend hinter das Handy halten, bis alle Schritte abgeschlossen sind.";
-"reading_instruction_passport" = "Pass durchgehend hinter das Handy halten, bis alle Schritte abgeschlossen sind.";
+"reading_instruction" = "Karte durchgehend hinter das Handy halten, bis alle Schritte abgeschlossen sind. Das dauert etwa fünf bis zehn Sekunden.";
+"reading_instruction_passport" = "Pass durchgehend hinter das Handy halten, bis alle Schritte abgeschlossen sind. Das dauert etwa fünf bis fünfzehn Sekunden.";
 "reading_title" = "Karte auflegen";
 "reading_title_passport" = "Pass auflegen";
 "result_document_type" = "CARTA D'IDENTITÀ ELETTRONICA";

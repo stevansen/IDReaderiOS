@@ -66,7 +66,7 @@
 "cd_digit_empty" = "Cifra %d di 6 mancante";
 "cd_digit_filled" = "Cifra %d di 6 inserita";
 "cd_photo" = "Fotografia dalla carta";
-"error_connection_lost" = "Connessione interrotta. Lascia la carta ferma e riprova.";
+"error_connection_lost" = "Collegamento interrotto: il documento non è stato tenuto abbastanza a lungo. Lasciarlo appoggiato senza spostarlo e riprovare.";
 "error_extended_length" = "Questo dispositivo non può leggere la CIE.";
 "error_no_pace" = "Questa carta non supporta PACE. È una CIE 3.0?";
 "error_pace_unavailable" = "Non e' stato possibile aprire il chip: in questa versione non e' collegato alcun back end PACE. Vedi docs/NFC-PACE.md.";
@@ -168,8 +168,8 @@
 "phase_secure" = "Stabilire il canale sicuro";
 "phase_verify" = "Verificare l'autenticità";
 "read_without_photo" = "senza foto";
-"reading_instruction" = "Tieni la carta dietro il telefono finché tutti i passaggi non sono completati.";
-"reading_instruction_passport" = "Tieni il passaporto dietro il telefono finché tutti i passaggi non sono completati.";
+"reading_instruction" = "Tenere la carta dietro il telefono finché tutti i passaggi non sono conclusi. Servono circa cinque a dieci secondi.";
+"reading_instruction_passport" = "Tenere il passaporto dietro il telefono finché tutti i passaggi non sono conclusi. Servono circa cinque a quindici secondi.";
 "reading_title" = "Appoggia la carta";
 "reading_title_passport" = "Appoggia il passaporto";
 "result_document_type" = "CARTA D'IDENTITÀ ELETTRONICA";
