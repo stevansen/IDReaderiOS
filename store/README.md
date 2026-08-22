@@ -259,13 +259,7 @@ damit es nicht bei der nächsten Durchsicht als Versehen korrigiert wird.
 
 ### Was noch fehlt
 
-1. **Die Händlerangabe nach dem Digital Services Act.** Nicht über die
-   Schnittstelle sichtbar, also von Hand nachzusehen: App Store Connect →
-   Geschäftliches → Händlerstatus. Ohne Erklärung nimmt Apple die App **aus allen
-   27 EU-Storefronts** — seit dem 17. Februar 2025 automatisch, auch bei einer
-   bereits freigegebenen App. Eine kostenlose App ohne gewerbliche Tätigkeit darf
-   „kein Händler" erklären; nur erklären muss man es. Das ist jetzt der einzige
-   bekannte Riegel, der noch stehen kann.
+1. *(erledigt — siehe „Die Händlerangabe" unten.)*
 2. **Bildschirmfotos: 7 auf Deutsch, 4 auf Englisch und Italienisch.** Kein
    Riegel — Apple verlangt eines —, aber der englische und der italienische
    Eintrag zeigen den Ersthinweis, den Führerschein und die Einstellungen nicht.
@@ -299,4 +293,34 @@ schlechter als keine Überschrift.
 Zu prüfen bleibt: erklärt der Anbieter sich beim Händlerstatus als **Händler**,
 veröffentlicht Apple Name, Anschrift, Telefon und Adresse auf der Produktseite —
 dann steht der Kontakt ohnehin öffentlich, nur an einer anderen Stelle.
+
+### Die Händlerangabe nach dem Digital Services Act
+
+Sie ist **erklärt, und zwar als „kein Händler"**. Nachgewiesen ohne Anmeldung und
+ohne Rückfrage, über zwei Stücke:
+
+1. Die zweite App des Kontos, **BeerCHILLER** (`com.bierchiller.app`), steht seit
+   dem 4. August 2026 auf `READY_FOR_SALE` und ist in **allen 27 EU-Gebieten**
+   verfügbar, Frankreich eingeschlossen. Ohne Erklärung nimmt Apple eine App seit
+   dem 17. Februar 2025 automatisch aus allen EU-Storefronts. Eine App, die dort
+   steht, hat also eine.
+2. Ihre öffentliche Produktseite im deutschen Store sagt es wörtlich:
+
+   > Stefan Hellweger hat sich nicht als Händler für diese App ausgewiesen.
+
+   Das ist der Satz, den Apple zu einer **Nicht-Händler**-Erklärung zeigt. Bei
+   einer Händler-Erklärung stünden dort Name, Anschrift, Telefon und
+   E-Mail-Adresse.
+
+Die Erklärung gilt für das Konto, nicht für die einzelne App; für IDReader ist
+damit nichts zu tun. Über die Schnittstelle ist der Wert nicht abfragbar — die
+verbindliche Ansicht bleibt App Store Connect → Geschäftliches → Händlerstatus.
+
+**Was daran hängt, wenn sich etwas ändert:** „kein Händler" setzt voraus, dass die
+Verbreitung nicht gewerblich ist. Wird die App je kostenpflichtig oder bekommt sie
+Käufe in der App, muss die Erklärung auf „Händler" wechseln — und dann
+veröffentlicht Apple Name, Anschrift, Telefon und E-Mail-Adresse auf der
+Produktseite. Der Verzicht auf eine Kontaktadresse in der Datenschutzerklärung ist
+also an dieselbe Voraussetzung gebunden wie die Nicht-Händler-Erklärung: die App
+bleibt kostenlos.
 
