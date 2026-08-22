@@ -102,6 +102,18 @@ final class PassportChipReader: ChipDocumentReader {
         // nicht geprueft - und das Ergebnis sagt das dann auch.
         model.verifyPassport(masterListURL: trustBundle)
 
+        // Das Ergebnis der Echtheitspruefung in das Protokoll, aufgeschluesselt.
+        //
+        // Die Stufen stehen in `authenticity(from:)` und werden dort zu **einem**
+        // Urteil verdichtet. Fuer den Bediener ist das richtig - ein Siegel oder
+        // keines. Fuer eine Ferndiagnose ist es zu wenig: „kein Urteil" und
+        // „Pruefung nicht bestanden" haben verschiedene Ursachen, und welche
+        // Stufe gekippt ist, sagt das Siegel nicht.
+        //
+        // Hier stehen Datengruppennummern, Wahrheitswerte und die Namen von
+        // **Zertifikaten** - Behoerden, keine Personen.
+        PassportChipReader.logAuthenticity(model)
+
         ReadLog.shared.add("✓ gelesen")
         onProgress(.done)
         return ChipReadResult(
@@ -291,6 +303,51 @@ final class PassportChipReader: ChipDocumentReader {
             ofPEM: certificate.certToPEM()
         ) else { return nil }
         return SignerReference(identity)
+    }
+
+    /// Schreibt auf, woran die Echtheitspruefung haengt.
+    static func logAuthenticity(_ model: NFCPassportModel) {
+        let hashes = model.dataGroupHashes
+        let vorhanden = hashes.keys.compactMap(number(of:)).sorted()
+        let falsch = hashes.filter { !$0.value.match }.keys.compactMap(number(of:)).sorted()
+
+        ReadLog.shared.add("· Datengruppen mit Pruefsumme: \(vorhanden.isEmpty ? "keine" : vorhanden.map(String.init).joined(separator: ","))")
+        if !falsch.isEmpty {
+            ReadLog.shared.add("· Pruefsumme weicht ab bei DG: \(falsch.map(String.init).joined(separator: ","))")
+        }
+        ReadLog.shared.add(
+            "· signiert=\(model.passportCorrectlySigned)"
+            + " Kette=\(model.documentSigningCertificateVerified)"
+            + " CA erwartet=\(model.isChipAuthenticationSupported)"
+            + " CA=\(model.chipAuthenticationStatus == .success)"
+        )
+        if let signer = model.documentSigningCertificate?.getSubjectName() {
+            ReadLog.shared.add("· Signierer: \(signer)")
+        } else {
+            ReadLog.shared.add("· Signierer: keines gefunden")
+        }
+        if let anchor = model.countrySigningCertificate?.getSubjectName() {
+            ReadLog.shared.add("· Anker: \(anchor)")
+        } else {
+            ReadLog.shared.add("· Anker: keiner gefunden")
+        }
+
+        // DG12 - woher das Ausstellungsdatum kommt.
+        //
+        // Nur **ob** die Felder da sind und wie lang das rohe Datum ist. Der Wert
+        // selbst nicht: die ausstellende Stelle ist eine Gemeinde und damit
+        // schwach kennzeichnend, und das Protokoll wird verschickt. Die Laenge
+        // genuegt fuer die Frage, um die es geht - `fullDate` verlangt genau acht
+        // Ziffern und gibt sonst stillschweigend nichts zurueck.
+        if let dg12 = model.getDataGroup(.DG12) as? DataGroup12 {
+            let roh = dg12.dateOfIssue ?? ""
+            ReadLog.shared.add(
+                "· DG12 vorhanden: Ausstellungsdatum \(roh.isEmpty ? "fehlt" : "\(roh.filter(\.isNumber).count) Ziffern")"
+                + ", Stelle \(dg12.issuingAuthority == nil ? "fehlt" : "vorhanden")"
+            )
+        } else {
+            ReadLog.shared.add("· DG12: nicht auf dem Chip")
+        }
     }
 
     static func authenticity(from model: NFCPassportModel) -> Authenticity {

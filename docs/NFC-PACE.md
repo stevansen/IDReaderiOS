@@ -517,3 +517,49 @@ CIE-Spezifikation nennt DH **und** ECDH, also mehrere.
 Das ist der Verdacht. Ihn ohne Beleg einzubauen wäre falsch — die Ergänzung
 könnte den Reisepass-Pfad brechen, der heute weiter kommt als der Kartenpfad.
 Erst das Statuswort, dann die Änderung.
+
+## Es liest (Bau 18, 22. August 2026)
+
+Beide Dokumente, am Gerät, mit vollständigem Protokoll.
+
+```
+1.49s · CardAccess gelesen (1): 0.4.0.127.0.7.2.2.4.1.1 v2 Param 2 GM
+1.52s ← SW 9000                                  MSE:Set AT
+1.57s ← SW 9000 7C0A80084E39…                    Schritt 1, Nonce
+1.58s ⋯ erweitert, selbst gebaut: 264B
+2.34s ← SW 9000 7C820104 8282…                   Schritt 2, Tag 0x82
+2.35s ⋯ erweitert, selbst gebaut: 264B
+2.58s ← SW 9000 7C820104 8482…                   Schritt 3, Tag 0x84
+2.58s → 00 86 00 00 7C0A8508228136415F1ABCA2     Schritt 4, Token
+2.63s ← SW 9000 7C0A86085FA8AC8EF043F421         Tag 0x86
+2.63s · PACE erfolgreich
+```
+
+Danach greift die Weiche und es stehen nur noch Längen und Statuswörter da — dort
+fließen die Personendaten.
+
+### Was dabei nebenbei bewiesen wurde
+
+* **Chip Authentication läuft auch.** `00 22 41 A6` mit 260 Byte (Karte) bzw.
+  131 Byte (Pass) → `9000`. Das war eine offene Wette: dieselbe DH-Familie,
+  dieselbe Bibliothek.
+* **Die Datengruppen kommen vollständig.** Bei der Karte ~12 KB in DG2, also das
+  Lichtbild.
+
+### Zeiten, und was daran auffällt
+
+| | Karte | Reisepass |
+|---|---|---|
+| PACE | 1,25 s | **11,7 s** |
+| davon Schritt 1 | 0,05 s | **9,91 s** |
+| Datengruppen | 3,04 s | 3,37 s |
+| **gesamt** | **5,67 s** | **15,31 s** |
+
+Der Reisepass braucht für den ersten PACE-Schritt zehn Sekunden — und **damit
+sind alle früheren `ConnectionError` erklärt.** Der erste Versuch in dieser
+Sitzung scheiterte an genau dieser Stelle nach 0,64 s. Es war nie die Lage, es
+war immer die Geduld.
+
+Fünfzehn Sekunden ein Dokument ruhig halten ist lang. Das ist kein Fehler, aber
+es gehört in die Bedienung: die App sagt heute nicht, dass es so lange dauern
+kann.
