@@ -107,10 +107,14 @@ im Bundle liegt.
 
 ## Screenshots
 
-15 Aufnahmen, 1320×2868 — das von Apple verlangte 6,9″-Maß (iPhone 17 Pro Max).
-Deutsch vollständig, Englisch und Italienisch die vier Bildschirme, die Text
-tragen. Wer nur einen Satz hinterlegt, sollte den deutschen nehmen; Apple zeigt
-ihn dann in allen Sprachen.
+**21 Aufnahmen, sieben je Sprache**, 1320×2868 — das von Apple verlangte
+6,9″-Maß (iPhone 17 Pro Max).
+
+Bis zum 22. August 2026 waren es fünfzehn: Deutsch vollständig, Englisch und
+Italienisch nur vier. Die Begründung stand hier — „die vier Bildschirme, die Text
+tragen" — und sie trug nicht: der Ersthinweis ist der textreichste Bildschirm der
+ganzen App, und genau er fehlte. Wer den englischen Eintrag ansah, bekam die drei
+Sätze nicht zu sehen, um die es geht. Nachgezogen.
 
 | | zeigt |
 |---|---|
@@ -260,11 +264,7 @@ damit es nicht bei der nächsten Durchsicht als Versehen korrigiert wird.
 ### Was noch fehlt
 
 1. *(erledigt — siehe „Die Händlerangabe" unten.)*
-2. **Bildschirmfotos: 7 auf Deutsch, 4 auf Englisch und Italienisch.** Kein
-   Riegel — Apple verlangt eines —, aber der englische und der italienische
-   Eintrag zeigen den Ersthinweis, den Führerschein und die Einstellungen nicht.
-   Die drei fehlenden lassen sich im Simulator in der jeweiligen Sprache
-   nachziehen.
+2. *(erledigt — 21 Aufnahmen, sieben je Sprache.)*
 3. **Christian Auers eigener Beleg für Apache-2.0.** Siehe COPYRIGHT: die
    Lizenzdateien liegen in beiden Repositorien, aber beide Festschreibungen im
    Android-Repository sind von Stefan Hellweger verfasst.
@@ -323,4 +323,47 @@ veröffentlicht Apple Name, Anschrift, Telefon und E-Mail-Adresse auf der
 Produktseite. Der Verzicht auf eine Kontaktadresse in der Datenschutzerklärung ist
 also an dieselbe Voraussetzung gebunden wie die Nicht-Händler-Erklärung: die App
 bleibt kostenlos.
+
+### Was beim Nachziehen der Aufnahmen noch herauskam
+
+Drei Dinge, alle im Vorbeigehen gefunden, weil man die App dabei in einer anderen
+Sprache benutzt statt sie nur zu übersetzen:
+
+1. **Die italienische Anrede wechselte.** Drei Texte redeten den Benutzer mit „du"
+   an — `can_scan_ambiguous`, `can_scan_not_found` und der Hinweis zur Diagnose
+   („se lo copi e lo incolli tu") —, während die App sonst durchweg die Sie-Form
+   benutzt („Dica brevemente", „Decide lei"). Berichtigt. Aufgefallen ist es nur,
+   weil der Diagnose-Hinweis auf demselben Bildschirm steht wie „Vale solo per
+   questa app".
+2. **Der Anzeigename bleibt „IDReader", auch im englischen Eintrag.** Dort heißt
+   die App im Store „CIE Reader", weil „IDReader" für `en-US` belegt ist — auf
+   jedem Bildschirmfoto steht aber weiterhin „IDReader". Kein Fehler und kein
+   Riegel, aber ein Leser sieht zwei Namen. Zu ändern wäre das nur mit einem
+   zweiten Anzeigenamen im Bundle, und das ist eine Entscheidung, nicht eine
+   Korrektur.
+3. **Die Nummerierung war je Sprache verschieden.** Auf Englisch und Italienisch
+   trug der Führerschein die `05`, auf Deutsch das Teilen. Jetzt überall dieselbe
+   Reihenfolge: `01` Hinweis, `02` Ausweis, `03` Archiv, `04` Ergebnis, `05`
+   Teilen, `06` Führerschein, `07` Einstellungen.
+
+### Der Aufnahmeweg, der wirklich funktioniert
+
+Die frühere Anleitung mit `CONFIGURATION_BUILD_DIR=build/sim` scheitert heute:
+die Paketprodukte landen dann nicht dort, und der Bau bricht mit
+„NFCPassportReaderCAN_NFCPassportReaderCAN.bundle couldn't be opened" ab. Statt
+dessen ein eigener Ableitungspfad, und die Sprache über die Startargumente statt
+über die Sprachwahl in der App — so erscheint der Ersthinweis in der richtigen
+Sprache, was über die Sprachwahl nicht geht, weil er vor ihr kommt:
+
+```bash
+xcodebuild -project IDReader.xcodeproj -scheme IDReader -sdk iphonesimulator \
+    -configuration Debug CODE_SIGNING_ALLOWED=NO -derivedDataPath build/dd-sim build
+U=$(xcrun simctl list devices available | grep "17 Pro Max" | grep -o "[0-9A-F-]\{36\}")
+xcrun simctl uninstall $U com.ciereader.ios
+xcrun simctl install $U build/dd-sim/Build/Products/Debug-iphonesimulator/IDReader.app
+xcrun simctl launch $U com.ciereader.ios -IDREADER_DEMO 1 -AppleLanguages "(en)"
+xcrun simctl io $U screenshot store/screenshots/6.9-en/01-notice.png
+```
+
+Das `uninstall` ist nicht Kosmetik: der Ersthinweis kommt nur beim ersten Start.
 

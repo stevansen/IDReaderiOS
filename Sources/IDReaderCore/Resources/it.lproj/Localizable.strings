@@ -57,9 +57,9 @@
 "can_hint" = "Sei cifre in basso a destra sul fronte";
 "can_label" = "CAN";
 "can_scan" = "Fotografa la carta";
-"can_scan_ambiguous" = "Nella foto ci sono più numeri di sei cifre. Avvicinati al numero, oppure digitalo.";
+"can_scan_ambiguous" = "Nella foto ci sono più numeri di sei cifre. Si avvicini al numero, oppure lo digiti.";
 "can_scan_failed" = "Non è stato possibile leggere la foto. Digita le cifre.";
-"can_scan_not_found" = "Nella foto non c’è nessun numero di sei cifre. Inquadra il numero in basso a destra sul fronte.";
+"can_scan_not_found" = "Nella foto non c’è nessun numero di sei cifre. Inquadri il numero in basso a destra sul fronte.";
 "can_scan_taken" = "Letto dalla foto. Se le cifre sono giuste lo dirà la lettura della carta.";
 "can_scan_working" = "Lettura della foto…";
 "can_scan_wrong_side" = "La foto mostra la zona a lettura ottica. Il CAN è sul fronte, in basso a destra.";
@@ -75,7 +75,7 @@
 "error_copy_log" = "Copia il registro (%d righe)";
 "settings_diagnostics" = "Diagnostica";
 "settings_diagnostics_empty" = "Nessuna lettura in questa sessione.";
-"settings_diagnostics_hint" = "Il registro dell’ultima lettura — i comandi inviati al chip e le sue risposte. Resta solo in memoria, viene svuotato a ogni nuova lettura e non è scritto in alcun file. Dopo l’apertura del canale sicuro contiene solo lunghezze e parole di stato, quindi nessun dato personale. Esce dal dispositivo solo se lo copi e lo incolli tu.";
+"settings_diagnostics_hint" = "Il registro dell’ultima lettura — i comandi inviati al chip e le sue risposte. Resta solo in memoria, viene svuotato a ogni nuova lettura e non è scritto in alcun file. Dopo l’apertura del canale sicuro contiene solo lunghezze e parole di stato, quindi nessun dato personale. Esce dal dispositivo solo se lo copia e lo incolla lei.";
 "error_unsupported_tag" = "L'oggetto rilevato non è una smart card leggibile.";
 "error_wrong_can" = "CAN errato. Controlla il numero di 6 cifre sul fronte della carta.";
 "error_wrong_mrz_key" = "I tre campi non aprono il chip. Confronta numero del passaporto, data di nascita e data di scadenza con la pagina dei dati.";
