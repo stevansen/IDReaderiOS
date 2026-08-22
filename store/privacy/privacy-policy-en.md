@@ -191,6 +191,22 @@ that moment.
 Where such a message goes, and what the mail application does with it, is outside
 the control of this app.
 
+### The diagnostic log
+
+Settings → Diagnostics holds the log of the last read: the commands sent to the
+chip and its answers. It lives **in memory only**, is overwritten by every new
+read, is in no file and in no backup, and is gone when the app closes.
+
+It holds **no personal data**, and that is not a matter of intent but a switch at
+the single point every command passes through: while the connection to the chip is
+not yet secured, the full traffic is in there — applet selection, protocol
+identifiers, ephemeral keys and nonces. Once it is secured, only command headers,
+lengths and status words are recorded. That is precisely where the personal data
+flows. It also holds the names of the **certificates** involved — those are
+issuing authorities, not people.
+
+The log leaves the device only if you copy it and send it yourself.
+
 ### Permissions
 
 The app asks for two:
@@ -221,6 +237,7 @@ days is a default, not a finding.
 
 ### Changes
 
-This policy describes the state as of 21 August 2026 and applies from version 1.8
+This policy describes the state as of 22 August 2026 and applies from version 1.8
 of the iOS release. It will be updated when the behaviour of the app changes — most
-recently for data minimisation and for the revocation-list fetch.
+recently for data minimisation, for the revocation-list fetch and for the
+diagnostic log.

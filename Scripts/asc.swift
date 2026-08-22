@@ -314,6 +314,14 @@ func setzeTexte() async throws {
         var infoFelder: [String: Any] = [:]
         if let name = feld(ordner, "name") { infoFelder["name"] = name }
         if let sub = feld(ordner, "subtitle") { infoFelder["subtitle"] = sub }
+        // Die Datenschutz-Adresse haengt ebenfalls an der App und nicht an der
+        // Fassung - sie gilt fuer den Eintrag, nicht fuer eine Auslieferung.
+        // Quelle ist `store/<locale>/privacy-url.txt`, damit ein `git diff`
+        // zeigt, wohin der Eintrag zeigt: eine Adresse, die auf ein Dokument
+        // verweist, das sich mit der App aendert, gehoert neben das Dokument.
+        if let datenschutz = feld(ordner, "privacy-url") {
+            infoFelder["privacyPolicyUrl"] = datenschutz
+        }
 
         if let id = vorhandeneInfo[locale] {
             if !infoFelder.isEmpty {

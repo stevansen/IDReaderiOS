@@ -204,6 +204,23 @@ dabei auswählt.
 Wohin eine so verschickte Nachricht gelangt und wie das Mailprogramm damit
 umgeht, liegt außerhalb des Einflussbereichs dieser App.
 
+### Das Diagnoseprotokoll
+
+Unter Einstellungen → Diagnose steht das Protokoll des letzten Lesevorgangs: die
+Befehle an den Chip und seine Antworten. Es liegt **nur im Arbeitsspeicher**, wird
+bei jedem neuen Lesevorgang überschrieben, steht in keiner Datei und in keiner
+Sicherung und geht mit dem Beenden der App verloren.
+
+Es enthält **keine Personendaten**, und das ist keine Absicht, sondern eine Weiche
+an der einzigen Stelle, durch die jeder Befehl läuft: solange die Verbindung zum
+Chip noch nicht gesichert ist, steht der vollständige Verkehr darin — Auswahl des
+Applets, Verfahrensangaben, flüchtige Schlüssel und Zufallswerte. Sobald sie
+gesichert ist, stehen nur noch Befehlskopf, Längen und Statuswörter darin. Genau
+dort fließen die Personendaten. Zusätzlich stehen darin die Namen der beteiligten
+**Zertifikate** — das sind ausstellende Stellen, keine Personen.
+
+Das Protokoll verlässt das Gerät nur, wenn Sie es kopieren und selbst versenden.
+
 ### Berechtigungen
 
 Die App verlangt zwei Berechtigungen:
@@ -234,6 +251,6 @@ dem Bediener obliegt und dass 30 Tage eine Vorgabe und kein Befund sind.
 
 ### Änderungen
 
-Diese Erklärung beschreibt den Stand vom 21. August 2026 und gilt ab
+Diese Erklärung beschreibt den Stand vom 22. August 2026 und gilt ab
 Version 1.8 der iOS-Fassung. Bei Änderungen am Verhalten der App wird sie
-angepasst — zuletzt für die Datenminimierung und für den Abruf der Sperrliste.
+angepasst — zuletzt für die Datenminimierung, für den Abruf der Sperrliste und für das Diagnoseprotokoll.

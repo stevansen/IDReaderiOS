@@ -197,6 +197,23 @@ sceglie in quel momento.
 Dove arrivi un messaggio così inviato e come lo tratti il programma di posta è
 fuori dal controllo di questa app.
 
+### Il registro diagnostico
+
+In Impostazioni → Diagnostica si trova il registro dell'ultima lettura: i comandi
+inviati al chip e le sue risposte. Risiede **solo nella memoria di lavoro**, viene
+sovrascritto a ogni nuova lettura, non compare in alcun file né in alcun backup e
+si perde alla chiusura dell'app.
+
+Non contiene **dati personali**, e non per intenzione ma per un bivio collocato
+nell'unico punto attraversato da ogni comando: finché la connessione al chip non è
+protetta, vi compare l'intero traffico — selezione dell'applet, identificativi di
+protocollo, chiavi effimere e valori casuali. Da quando è protetta, restano solo
+intestazione del comando, lunghezze e parole di stato. È lì che passano i dati
+personali. Vi compaiono inoltre i nomi dei **certificati** coinvolti: sono enti
+emittenti, non persone.
+
+Il registro lascia il dispositivo solo se lo copia e lo invia lei stesso.
+
 ### Autorizzazioni
 
 L'app richiede due autorizzazioni:
@@ -228,6 +245,7 @@ valore predefinito e non un accertamento.
 
 ### Modifiche
 
-Questa informativa descrive lo stato al 21 agosto 2026 e vale dalla versione 1.8
+Questa informativa descrive lo stato al 22 agosto 2026 e vale dalla versione 1.8
 della release iOS. Sarà aggiornata in caso di modifiche al comportamento dell'app —
-da ultimo per la minimizzazione dei dati e per lo scaricamento della lista di revoca.
+da ultimo per la minimizzazione dei dati, per lo scaricamento della lista di
+revoca e per il registro diagnostico.
