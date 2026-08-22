@@ -588,6 +588,119 @@ func haengeBauAn(_ nummer: String?) async throws {
     print("Damit hat der Eintrag ein Icon: der Store nimmt es aus dem Bau.")
 }
 
+/// Legt eine Adresse als Tester in eine Gruppe.
+///
+/// Fuer eine **interne** Gruppe muss die Adresse schon Benutzer des Kontos sein;
+/// fuer eine externe genuegt die Adresse.
+func fuegeTesterHinzu(email: String, vorname: String, nachname: String, gruppe gesucht: String) async throws {
+    let gruppen = rows(try await call("GET", "apps/\(appID)/betaGroups?limit=20"))
+    guard let gruppe = gruppen.first(where: {
+        attr($0, "name").caseInsensitiveCompare(gesucht) == .orderedSame
+    }) else {
+        let liste = gruppen.map { attr($0, "name") }.joined(separator: ", ")
+        throw Fehler("Gruppe \(gesucht) gibt es nicht. Vorhanden: \(liste)")
+    }
+
+    let vorhandene = rows(try await call(
+        "GET", "betaGroups/\(ident(gruppe))/betaTesters?limit=50"
+    ))
+    if vorhandene.contains(where: {
+        attr($0, "email").caseInsensitiveCompare(email) == .orderedSame
+    }) {
+        print("\(email) ist schon in \(attr(gruppe, "name")).")
+        return
+    }
+
+    let antwort = try await call("POST", "betaTesters", body: [
+        "data": [
+            "type": "betaTesters",
+            "attributes": [
+                "email": email,
+                "firstName": vorname,
+                "lastName": nachname,
+            ],
+            "relationships": [
+                "betaGroups": ["data": [["type": "betaGroups", "id": ident(gruppe)]]],
+            ],
+        ],
+    ])
+    print("\(email) → Gruppe \(attr(gruppe, "name")) (\(ident(one(antwort)))).")
+}
+
+/// Laedt eine Adresse als Benutzer des Entwicklerkontos ein.
+///
+/// ## Warum das mehr ist, als es klingt
+///
+/// Ein **interner** Tester in TestFlight muss Benutzer des Kontos sein - eine
+/// beliebige Adresse geht dort nicht. Wer also jemanden intern testen lassen
+/// will, gibt ihm Kontozugang, und das ist eine andere Entscheidung als „einen
+/// Tester hinzufuegen". Ein externer Tester braucht das nicht; dafuer muss der
+/// Bau einmal durch Apples Beta-Pruefung.
+///
+/// Deshalb hier die kleinste Ausstattung, die den Zweck erfuellt:
+///
+/// * Rolle `DEVELOPER` - die kleinste, mit der TestFlight-intern moeglich ist.
+/// * `allAppsVisible: false` und nur diese App sichtbar. Sonst saehe die
+///   eingeladene Person jede App des Kontos.
+/// * `provisioningAllowed: false` - keine Zertifikate, keine Profile.
+///
+/// Die Einladung geht als Mail an die Adresse und laeuft nach 7 Tagen ab.
+func ladeBenutzerEin(email: String, vorname: String, nachname: String) async throws {
+    let vorhandene = rows(try await call("GET", "users?limit=50"))
+    if vorhandene.contains(where: {
+        attr($0, "username").caseInsensitiveCompare(email) == .orderedSame
+    }) {
+        print("\(email) ist schon Benutzer des Kontos.")
+        return
+    }
+    // Eine abgelaufene Einladung bleibt in der Liste stehen. Sie als „schon
+    // offen" zu lesen waere falsch: sie laesst sich nicht mehr annehmen, und
+    // wer sich darauf verlaesst, wartet auf eine Mail, die nichts mehr bewirkt.
+    let offene = rows(try await call("GET", "userInvitations?limit=50"))
+    if let alt = offene.first(where: {
+        attr($0, "email").caseInsensitiveCompare(email) == .orderedSame
+    }) {
+        let ablauf = ISO8601DateFormatter().date(from: attr(alt, "expirationDate"))
+            ?? ISO8601DateFormatter().date(
+                from: String(attr(alt, "expirationDate").prefix(19)) + "Z"
+            )
+        if let ablauf, ablauf < Date() {
+            // Wegraeumen ist schoener, aber nicht noetig - und ein Schluessel
+            // ohne Benutzerverwaltung darf es nicht. Dann eben stehen lassen
+            // und die neue Einladung daneben stellen.
+            do {
+                try await call("DELETE", "userInvitations/\(ident(alt))")
+                print("Abgelaufene Einladung von \(attr(alt, "expirationDate")) weggeraeumt.")
+            } catch {
+                print("Abgelaufene Einladung liess sich nicht wegraeumen, versuche es trotzdem.")
+            }
+        } else {
+            print("Fuer \(email) ist schon eine gueltige Einladung offen (\(ident(alt))).")
+            return
+        }
+    }
+
+    let antwort = try await call("POST", "userInvitations", body: [
+        "data": [
+            "type": "userInvitations",
+            "attributes": [
+                "email": email,
+                "firstName": vorname,
+                "lastName": nachname,
+                "roles": ["DEVELOPER"],
+                "allAppsVisible": false,
+                "provisioningAllowed": false,
+            ],
+            "relationships": [
+                "visibleApps": ["data": [["type": "apps", "id": appID]]],
+            ],
+        ],
+    ])
+    print("Einladung an \(email) verschickt (\(ident(one(antwort)))).")
+    print("Rolle DEVELOPER, nur diese App sichtbar, keine Zertifikatsrechte.")
+    print("Sie laeuft nach 7 Tagen ab, wenn sie nicht angenommen wird.")
+}
+
 /// Beantwortet die Ausfuhrfrage fuer einen Bau.
 ///
 /// Ohne sie steht der Bau in TestFlight auf „Fehlende Compliance" und laesst
@@ -799,6 +912,21 @@ do {
     case "screenshots": try await ladeBilder()
     case "attach-build":
         try await haengeBauAn(argumente.count > 1 ? argumente[1] : nil)
+    case "add-tester":
+        guard argumente.count > 4 else {
+            throw Fehler("Aufruf: add-tester <mail> <Vorname> <Nachname> <Gruppe>")
+        }
+        try await fuegeTesterHinzu(
+            email: argumente[1], vorname: argumente[2],
+            nachname: argumente[3], gruppe: argumente[4]
+        )
+    case "invite-user":
+        guard argumente.count > 3 else {
+            throw Fehler("Aufruf: invite-user <mail> <Vorname> <Nachname>")
+        }
+        try await ladeBenutzerEin(
+            email: argumente[1], vorname: argumente[2], nachname: argumente[3]
+        )
     case "export-compliance":
         guard argumente.count > 1 else { throw Fehler("Baunummer fehlt.") }
         try await setzeAusfuhrangabe(argumente[1], ausgenommen: true)
