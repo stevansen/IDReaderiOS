@@ -111,12 +111,21 @@ public class TagReader {
         return try await send( cmd: cmd )
     }
     
+    /// GEAENDERT: `lastMSESetAT` haelt fest, was gesendet wurde.
+    ///
+    /// Nicht fuer den Ablauf, sondern fuer die Ferndiagnose: welche Datenobjekte
+    /// im MSE:Set AT standen, ist von aussen sonst nicht zu sehen, und genau
+    /// daran haengt der Verdacht, dass dem Chip die Angabe der
+    /// Domaenenparameter (Tag 0x84) fehlt.
+    public private(set) var lastMSESetAT : String = ""
+
     func sendMSESetATMutualAuth( oid: String, keyType: UInt8 ) async throws -> ResponseAPDU {
         
         let oidBytes = oidToBytes(oid: oid, replaceTag: true)
         let keyTypeBytes = wrapDO( b: 0x83, arr:[keyType])
         
         let data = oidBytes + keyTypeBytes
+        lastMSESetAT = "MSE:SetAT Tags 0x80+0x83, \(data.count)B"
             
         let cmd = NFCISO7816APDU(instructionClass: 00, instructionCode: 0x22, p1Parameter: 0xC1, p2Parameter: 0xA4, data: Data(data), expectedResponseLength: -1)
         
@@ -285,7 +294,20 @@ public class TagReader {
             
         }
         
-        if rep.sw1 != 0x90 && rep.sw2 != 0x00 {
+        // GEAENDERT: `&&` → `||`.
+        //
+        // Im Original stand hier `rep.sw1 != 0x90 && rep.sw2 != 0x00`. Damit
+        // rutscht **jedes** Statuswort durch, dessen zweites Byte 0x00 ist -
+        // 0x6D00 „instruction not supported", 0x6A00 „wrong parameters",
+        // 0x6E00, 0x6900, 0x6F00. Der Aufrufer bekommt dann keinen Fehler,
+        // sondern leere Daten, und scheitert eine Zeile spaeter beim Auspacken
+        // der erwarteten TLV-Struktur.
+        //
+        // Genau das war am Geraet zu sehen: die CIE meldete
+        // `InvalidASN1Value`, wo eigentlich die Absage des Chips haette stehen
+        // muessen. Der Fehler war nicht, dass die Antwort unlesbar war - es gab
+        // keine Antwort, nur eine verschluckte Absage.
+        if !(rep.sw1 == 0x90 && rep.sw2 == 0x00) {
             Logger.tagReader.error( "Error reading tag: sw1 - 0x\(binToHexRep(sw1)), sw2 - 0x\(binToHexRep(sw2))" )
             let tagError: NFCPassportReaderError
             if (rep.sw1 == 0x63 && rep.sw2 == 0x00) {
