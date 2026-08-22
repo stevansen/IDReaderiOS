@@ -29,7 +29,8 @@ den Fehlversuch.
 **„Verbindung unterbrochen"** — die Karte muss während des ganzen Vorgangs
 ruhig liegen. Legen Sie das Telefon flach hin und die Karte darauf. Die
 NFC-Antenne sitzt bei den meisten iPhones im oberen Drittel der Rückseite. Mit
-Lichtbild dauert das Lesen 10 bis 20 Sekunden.
+Lichtbild dauert das Lesen etwa fünf bis zehn Sekunden, beim Reisepass bis
+fünfzehn.
 
 **„Diese Karte unterstützt PACE nicht"** — dann ist es keine CIE 3.0.
 
@@ -73,7 +74,8 @@ non-blocking password: a failed attempt costs nothing but the attempt.
 
 **"Connection interrupted"** — the card must stay still throughout. Lay the phone
 flat and the card on top. On most iPhones the NFC antenna sits in the upper third
-of the back. Reading with the photograph takes 10 to 20 seconds.
+of the back. Reading with the photograph takes about five to ten seconds, up to
+fifteen for a passport.
 
 **"This card does not support PACE"** — then it is not a CIE 3.0.
 
@@ -119,7 +121,7 @@ tentativo.
 **«Connessione interrotta»** — la carta deve restare ferma per tutta la lettura.
 Appoggi il telefono in piano e la carta sopra. Sulla maggior parte degli iPhone
 l'antenna NFC si trova nel terzo superiore del retro. Con la fotografia la lettura
-richiede da 10 a 20 secondi.
+richiede circa da cinque a dieci secondi, fino a quindici per il passaporto.
 
 **«Questa carta non supporta PACE»** — allora non è una CIE 3.0.
 

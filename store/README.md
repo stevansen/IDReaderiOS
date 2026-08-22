@@ -259,10 +259,13 @@ damit es nicht bei der nächsten Durchsicht als Versehen korrigiert wird.
 
 ### Was noch fehlt
 
-1. **Der Verantwortliche in der Datenschutzerklärung.** In allen drei Fassungen
-   stehen dort noch `<<Name>>` und `<<E-Mail>>`. Eine Rollenadresse soll es
-   werden — bis sie da ist, zeigt die gesetzte Adresse auf ein Dokument mit zwei
-   Lücken. **Vor der Einreichung zu füllen**, sonst liest der Prüfer sie.
+1. **Die Händlerangabe nach dem Digital Services Act.** Nicht über die
+   Schnittstelle sichtbar, also von Hand nachzusehen: App Store Connect →
+   Geschäftliches → Händlerstatus. Ohne Erklärung nimmt Apple die App **aus allen
+   27 EU-Storefronts** — seit dem 17. Februar 2025 automatisch, auch bei einer
+   bereits freigegebenen App. Eine kostenlose App ohne gewerbliche Tätigkeit darf
+   „kein Händler" erklären; nur erklären muss man es. Das ist jetzt der einzige
+   bekannte Riegel, der noch stehen kann.
 2. **Bildschirmfotos: 7 auf Deutsch, 4 auf Englisch und Italienisch.** Kein
    Riegel — Apple verlangt eines —, aber der englische und der italienische
    Eintrag zeigen den Ersthinweis, den Führerschein und die Einstellungen nicht.
@@ -271,4 +274,29 @@ damit es nicht bei der nächsten Durchsicht als Versehen korrigiert wird.
 3. **Christian Auers eigener Beleg für Apache-2.0.** Siehe COPYRIGHT: die
    Lizenzdateien liegen in beiden Repositorien, aber beide Festschreibungen im
    Android-Repository sind von Stefan Hellweger verfasst.
+
+### Die Kontaktadresse ist absichtlich keine
+
+Gefragt war, ob sie weggelassen werden kann. Sie kann, und sie ist es:
+
+* **Apple** verlangt in Richtlinie 5.1.1(i) drei Dinge von einer
+  Datenschutzerklärung — welche Daten erhoben werden, dass Dritte gleichwertig
+  schützen, und wie man Einwilligung widerruft oder Löschung verlangt. Eine
+  Adresse ist nicht darunter. Erreichbarkeit verlangt Richtlinie 1.5, und zwar
+  über die **Support-Adresse**; die zeigt auf dieses Repository, und `SUPPORT.md`
+  nennt die Fehler- und Fragenverwaltung.
+* **Die Grundverordnung** richtet die Auskunftspflicht an den Verantwortlichen.
+  Der ist hier nicht der Entwickler: die Daten verlassen das Gerät nicht, es gibt
+  keinen Server, kein Analysewerkzeug, keine Übermittlung. Wer nichts verarbeitet,
+  ist für nichts verantwortlich — und eine Adresse an dieser Stelle behauptete
+  eine Zuständigkeit, die nicht besteht.
+
+Der Abschnitt ist deshalb **nicht gelöscht, sondern ersetzt**: er sagt jetzt, wer
+der Verantwortliche ist (die Stelle, die die App einsetzt), warum hier keine
+Adresse steht, und wohin Fragen zur App gehen. Eine Überschrift ohne Inhalt wäre
+schlechter als keine Überschrift.
+
+Zu prüfen bleibt: erklärt der Anbieter sich beim Händlerstatus als **Händler**,
+veröffentlicht Apple Name, Anschrift, Telefon und Adresse auf der Produktseite —
+dann steht der Kontakt ohnehin öffentlich, nur an einer anderen Stelle.
 

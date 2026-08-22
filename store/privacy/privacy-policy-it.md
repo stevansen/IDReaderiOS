@@ -21,7 +21,8 @@ nel repository Android). Tre cose sono dovute cambiare, e tutte tre sono promess
 Chi modifica questo testo deve aggiornare la pagina pubblicata e accanto a essa le
 versioni tedesca e inglese.
 
-**Da completare prima della pubblicazione:** i punti contrassegnati con `<<…>>`.
+**Nessun segnaposto residuo.** Il testo è completo; perché non contenga un
+indirizzo di contatto è argomentato nella sezione sul titolare.
 
 Tutto ciò che segue la linea è il testo da pubblicare.
 
@@ -227,8 +228,24 @@ dati sulla salute.
 
 ### Titolare del trattamento
 
-<<Nome>>
-<<E-mail>>
+**Non lo sviluppatore.** I dati letti non lasciano il dispositivo; non esiste
+alcun server dello sviluppatore, nessuno strumento di analisi e nessuna
+trasmissione a terzi. Lo sviluppatore non tratta quindi alcun dato personale
+proveniente da quest'app e non ha accesso ad alcuno di essi, nemmeno su richiesta.
+
+Titolare del trattamento ai sensi del Regolamento generale sulla protezione dei
+dati è l'ente o la persona **che utilizza l'app** per leggere un documento.
+Determina finalità e mezzi del trattamento, informa l'interessato e risponde alle
+richieste di accesso, rettifica e cancellazione.
+
+Per questo qui **non compare un indirizzo di contatto per i diritti
+dell'interessato**: un indirizzo in questo punto affermerebbe una competenza che
+non esiste e allontanerebbe la richiesta da chi può rispondervi. Chi ha esibito il
+documento si rivolge a chi lo ha letto.
+
+Le domande sull'app stessa e su questa informativa vanno al registro delle
+segnalazioni del repository del codice sorgente:
+<https://github.com/stevansen/IDReaderiOS/issues>.
 
 ### Diritti dell'interessato
 

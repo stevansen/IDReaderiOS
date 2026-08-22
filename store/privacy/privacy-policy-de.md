@@ -27,7 +27,8 @@ mussten sich ändern, und alle drei betreffen Zusagen:
 Wer diesen Text ändert, muss die veröffentlichte Seite anpassen und die
 italienische und englische Fassung daneben.
 
-**Vor der Veröffentlichung auszufüllen:** die mit `<<…>>` markierten Stellen.
+**Keine Platzhalter mehr.** Der Text ist vollständig; warum darin keine
+Kontaktadresse steht, begründet der Abschnitt zum Verantwortlichen selbst.
 
 Alles unterhalb der Linie ist der zu veröffentlichende Text.
 
@@ -234,8 +235,24 @@ Kalender oder Gesundheitsdaten.
 
 ### Verantwortlich für die Datenverarbeitung
 
-<<Name>>
-<<E-Mail>>
+**Nicht der Entwickler.** Die gelesenen Daten verlassen das Gerät nicht; es gibt
+keinen Server des Entwicklers, kein Analysewerkzeug und keine Übermittlung an
+Dritte. Der Entwickler verarbeitet damit keine personenbezogenen Daten aus dieser
+App und hat auf keine Zugriff — auch nicht auf Verlangen.
+
+Verantwortlicher im Sinne der Datenschutz-Grundverordnung ist die Stelle oder die
+Person, **die die App einsetzt** und damit ein Dokument liest. Sie bestimmt Zweck
+und Mittel der Verarbeitung, sie unterrichtet die betroffene Person, und sie
+beantwortet Auskunfts-, Berichtigungs- und Löschungsverlangen.
+
+Hier steht deshalb **keine Kontaktadresse für Betroffenenrechte**: eine Adresse an
+dieser Stelle würde eine Zuständigkeit behaupten, die nicht besteht, und die
+Anfrage von der Stelle weglenken, die sie beantworten kann. Wer den Ausweis
+vorgelegt hat, wendet sich an die Stelle, die ihn gelesen hat.
+
+Fragen zur App selbst und zu dieser Erklärung gehen an die Fehler- und
+Fragenverwaltung des Quelltext-Repositoriums:
+<https://github.com/stevansen/IDReaderiOS/issues>.
 
 ### Rechte der betroffenen Person
 

@@ -20,7 +20,8 @@ the Android repository). Three things had to change, and all three are promises:
 Anyone changing this text must update the published page and the German and
 Italian versions alongside it.
 
-**To fill in before publishing:** the places marked `<<…>>`.
+**No placeholders left.** The text is complete; why it carries no contact
+address is argued in the section on the controller itself.
 
 Everything below the rule is the text to publish.
 
@@ -220,8 +221,23 @@ or health data.
 
 ### Controller
 
-<<Name>>
-<<E-mail>>
+**Not the developer.** The data that is read does not leave the device; there is
+no developer server, no analytics tool and no transfer to third parties. The
+developer therefore processes no personal data from this app and has access to
+none — not even on request.
+
+The controller under the General Data Protection Regulation is the body or the
+person **who uses the app** to read a document. They determine the purposes and
+means of the processing, they inform the data subject, and they answer requests
+for access, rectification and erasure.
+
+There is therefore **no contact address here for data-subject rights**: an address
+at this point would claim a responsibility that does not exist, and would steer
+the request away from the party able to answer it. Whoever presented the document
+should approach the party who read it.
+
+Questions about the app itself and about this policy go to the issue tracker of
+the source repository: <https://github.com/stevansen/IDReaderiOS/issues>.
 
 ### Rights of the data subject
 
