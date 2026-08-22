@@ -174,19 +174,28 @@ geleert, damit nicht bei jedem Lauf dieselben ein zweites Mal erscheinen.
   falsch.
 * **„IDReader" ist für `en-US` von einem fremden Konto belegt.** Siehe unten.
 
-## Offen: der englische Name
+## Zwei Namen, und warum
 
-Der Name ist im App Store **je Sprache** eindeutig. Für Italienisch (die
-Hauptsprache) und Deutsch ist „IDReader" frei und gesetzt. Für `en-US` nicht:
+Der Name ist im App Store **je Sprache eindeutig**. „IDReader" ist für `en-US`
+von einem fremden Konto belegt:
 
 > The app name you entered is already being used. If you have trademark rights
 > to this name and would like it released for your use, submit a claim.
 
-Beim Anlegen einer Sprache verlangt Apple einen Namen, also fehlt die
-englische Sprache im Eintrag ganz — und damit im englischen Store der
-Untertitel, die Beschreibung, die Stichworte und die Bildschirmfotos. Der
-**Name** selbst fehlt nicht: ohne englische Sprache zeigt der Store den
-italienischen, und der ist derselbe.
+Deshalb heißt die App im englischen Store **„CIE Reader"** und in den anderen
+beiden „IDReader". Zwei Namen für eine App sind kein Versehen, sondern die Folge
+davon, dass der eine Name in einer Sprache nicht zu haben ist. `name.txt` je
+Ordner ist die Quelle.
 
-Zu entscheiden ist ein anderer englischer Name. `name.txt` in `en-US` bleibt
-bis dahin auf „IDReader" stehen, damit die Frage sichtbar bleibt.
+Der Anspruch auf „IDReader" für Englisch ließe sich bei Apple anmelden — dafür
+braucht es Markenrechte an dem Namen. Ohne die bleibt es bei den zwei Namen.
+
+## Noch zu überlegen
+
+* **`en-US`-Stichworte:** dort steht „CIE Reader" noch in `keywords.txt`. Der
+  App-Name wird von Apple ohnehin indexiert, das kostet also 11 von 100
+  Zeichen umsonst — anders als bei `de-DE` und `it`, wo der Name „IDReader"
+  heißt und das Stichwort seine Arbeit tut. Nicht geändert, weil das Stichwort
+  ausdrücklich gewünscht war.
+* **Vier statt sieben Bilder** für `en-US` und `it`. Dem deutschen Satz fehlen
+  Hinweis, Teilen und Einstellungen nicht; den anderen zwei schon.

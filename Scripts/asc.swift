@@ -297,25 +297,22 @@ func setzeTexte() async throws {
 
     let supportURL = "https://github.com/stevansen/IDReaderiOS"
 
-    // Welche Sprache die Hauptsprache ist, entscheidet, wo der **Name** stehen
-    // darf.
+    // Der Name kommt je Sprache aus `store/<locale>/name.txt`, und das ist hier
+    // keine Formalie.
     //
-    // Er ist im App Store je Sprache eindeutig, und „IDReader" ist fuer en-US
-    // schon von einem fremden Konto belegt - der Versuch endete in „The app name
-    // you entered is already being used". Fuer die Nebensprachen braucht es ihn
-    // auch nicht: fehlt er dort, zeigt der Store den Namen der Hauptsprache, und
-    // genau das ist gewollt. Der Name der App ist in allen drei `name.txt`
-    // derselbe.
+    // Er ist im App Store **je Sprache eindeutig**, und „IDReader" ist fuer
+    // en-US von einem fremden Konto belegt - der Versuch endete in „The app name
+    // you entered is already being used". Deshalb heisst die App im englischen
+    // Store „CIE Reader" und in den anderen beiden „IDReader". Zwei Namen fuer
+    // eine App sind kein Versehen, sondern die Folge davon, dass der eine Name
+    // in einer Sprache nicht zu haben ist.
     let appRow = one(try await call("GET", "apps/\(appID)"))
-    let hauptsprache = attr(appRow, "primaryLocale")
-    print("Hauptsprache: \(hauptsprache) - nur dort wird der Name gesetzt")
+    print("Hauptsprache: \(attr(appRow, "primaryLocale"))")
 
     for (locale, ordner) in sprachen {
         // --- Name, Untertitel: hängen an der App, nicht an der Fassung -----
         var infoFelder: [String: Any] = [:]
-        if locale == hauptsprache, let name = feld(ordner, "name") {
-            infoFelder["name"] = name
-        }
+        if let name = feld(ordner, "name") { infoFelder["name"] = name }
         if let sub = feld(ordner, "subtitle") { infoFelder["subtitle"] = sub }
 
         if let id = vorhandeneInfo[locale] {
@@ -333,9 +330,6 @@ func setzeTexte() async throws {
             // Also: melden und weitermachen. Die Fassungstexte - Beschreibung,
             // Stichworte, Werbetext - haengen nicht daran.
             infoFelder["locale"] = locale
-            if infoFelder["name"] == nil {
-                infoFelder["name"] = feld(ordner, "name") ?? "IDReader"
-            }
             do {
                 try await call("POST", "appInfoLocalizations", body: [
                     "data": [
