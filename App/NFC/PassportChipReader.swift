@@ -329,12 +329,21 @@ final class PassportChipReader: ChipDocumentReader {
         if !falsch.isEmpty {
             ReadLog.shared.add("· Pruefsumme weicht ab bei DG: \(falsch.map(String.init).joined(separator: ","))")
         }
+        // Die Beschriftungen folgen der Bedeutung, nicht den Namen der
+        // Bibliothek - siehe den Kommentar in `authenticity(from:)`.
         ReadLog.shared.add(
-            "· signiert=\(model.passportCorrectlySigned)"
-            + " Kette=\(model.documentSigningCertificateVerified)"
+            "· SOD-Signatur=\(model.documentSigningCertificateVerified)"
+            + " Kette=\(model.passportCorrectlySigned)"
             + " CA erwartet=\(model.isChipAuthenticationSupported)"
             + " CA=\(model.chipAuthenticationStatus == .success)"
         )
+        // Und der Grund, wenn eine Stufe kippt. Die Bibliothek faengt jeden
+        // Pruefungsfehler ab und legt ihn hier ab, statt ihn zu werfen - ohne
+        // diese Zeile ist der Wahrheitswert das Ende der Auskunft. Die Texte sind
+        // festverdrahtet oder OpenSSL-Meldungen, keine Personendaten.
+        for fehler in model.verificationErrors {
+            ReadLog.shared.add("· Pruefungsfehler: \(fehler)")
+        }
         if let signer = model.documentSigningCertificate?.getSubjectName() {
             ReadLog.shared.add("· Signierer: \(signer)")
         } else {
@@ -374,8 +383,25 @@ final class PassportChipReader: ChipDocumentReader {
             .sorted()
 
         let dataGroupsIntact = !hashes.isEmpty && mismatched.isEmpty
-        let signatureValid = model.passportCorrectlySigned
-        let chainTrusted = model.documentSigningCertificateVerified
+        // Achtung, die beiden Namen der Bibliothek sagen das Gegenteil dessen,
+        // was sie bedeuten - und ich habe sie beim Wort genommen:
+        //
+        // * `passportCorrectlySigned` wird am Ende von
+        //   `validateAndExtractSigningCertificates` gesetzt, also **nachdem** die
+        //   Kette bis zu einer hinterlegten CSCA aufgegangen ist. Das ist der
+        //   Anker, nicht die Signatur.
+        // * `documentSigningCertificateVerified` wird in
+        //   `ensureReadDataNotBeenTamperedWith` gesetzt, wenn die **Signatur des
+        //   Security Objects** gegen das Dokumentzertifikat aufgeht. Das ist die
+        //   Signatur, nicht das Zertifikat.
+        //
+        // Vertauscht hoben sich die beiden Fehler gegenseitig auf, solange beide
+        // Stufen zutrafen - beim Reisepass. Bei der Identitaetskarte, wo genau
+        // eine der beiden kippt, nannte die App die falsche Ursache: „kein
+        // hinterlegter Anker", obwohl der Anker gefunden wurde und die Kette
+        // aufging. Am Geraet gemessen, Bau 19.
+        let signatureValid = model.documentSigningCertificateVerified
+        let chainTrusted = model.passportCorrectlySigned
         let chipExpected = model.isChipAuthenticationSupported
         let chipAuthenticated = model.chipAuthenticationStatus == .success
 

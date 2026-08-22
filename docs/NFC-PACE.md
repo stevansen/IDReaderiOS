@@ -616,3 +616,66 @@ gescheiterten Lauf davor (`ConnectionError` nach 4,03 s) brach die Verbindung
 mitten in Schritt 2 ab. **Die Geduld bleibt der Rat, aber die Zahl ist keine
 Eigenschaft des Dokuments.**
 
+## Die Identitätskarte hat kein Siegel — warum (Bau 19)
+
+Zwei gelungene Läufe je Dokument, und der Unterschied steht in **einer** Zeile:
+
+| | Identitätskarte | Reisepass |
+|---|---|---|
+| Datengruppen mit Prüfsumme | 1, 2, 11, 12, 14 | 1, 2, 14 |
+| Prüfsummen weichen ab | keine | keine |
+| Kette bis zur CSCA | **geht auf** | geht auf |
+| **Signatur des Security Objects** | **geht nicht auf** | geht auf |
+| Chip Authentication | erfolgreich | erfolgreich |
+| Signierer | `CN=eIdentityCardSigner`, OU CNSD | `CN=ePassportSigner`, OU Staatspolizei |
+| Anker | `Italian Country Signer CA`, OU Italian National Police | `Italian Country Signer CA`, OU State Police |
+| gesamt | 6,52 s | 5,51 s |
+
+Italien führt also **zwei getrennte Zweige** — Karte über die Direzione Centrale
+per i Servizi Demografici, Pass über die Staatspolizei —, und für beide liegt
+eine CSCA im mitgelieferten Bündel. Die fehlende Vertrauenskette war **nicht**
+die Ursache; sie war meine Vermutung, und sie war falsch.
+
+### Der eigentliche Fehler lag in meiner Zuordnung
+
+Die Lesebibliothek führt zwei Wahrheitswerte, deren Namen jeweils das sagen, was
+der andere bedeutet:
+
+```swift
+// gesetzt, nachdem die KETTE bis zu einer CSCA aufgegangen ist
+self.passportCorrectlySigned = true
+// gesetzt, nachdem die SIGNATUR des Security Objects aufgegangen ist
+documentSigningCertificateVerified = true
+```
+
+Ich habe sie beim Wort genommen und vertauscht zugeordnet. **Solange beide Stufen
+zutreffen, hebt sich das gegenseitig auf** — und beim Reisepass treffen beide zu.
+Bei der Karte kippt genau eine, und dann nannte die App die falsche Ursache:
+„kein hinterlegter Vertrauensanker", obwohl der Anker gefunden wurde.
+
+Zwei irreführende Namen und ein vertauschtes Paar ergaben einen Bericht, der
+gestimmt hätte, wenn nie etwas schiefgeht. Genau derselbe Fehlertyp wie `AppType`
+und wie der Hinweis zur Datenminimierung: eine Aussage, die nur im Normalfall
+stimmt und im Fehlerfall in die Irre führt — also dann, wenn man sie braucht.
+
+### Was noch offen ist
+
+Warum die SOD-Signatur der Karte nicht aufgeht, sagt der Wahrheitswert nicht. Die
+Bibliothek fängt jeden Prüfungsfehler ab und legt ihn in `verificationErrors`
+ab, statt ihn zu werfen — die App las diese Liste nie. Sie tut es jetzt:
+
+```
+· Pruefungsfehler: …
+```
+
+Zwei Kandidaten stehen im Code von `verifyAndReturnSODEncapsulatedData`, und
+welcher es ist, entscheidet der nächste Kartenkontakt und nicht eine Überlegung:
+`messageDigest Hash doesn't hatch that of the signed attributes` oder `Unable to
+verify signature for signed attributes`. Der erste hieße, dass der Inhalt anders
+gehasht wird als erwartet; der zweite, dass die Signaturprüfung selbst scheitert
+— etwa an einem Verfahren, das der handgeschriebene Pfad nicht kennt. Für diesen
+Fall gibt es in der Bibliothek einen zweiten, über OpenSSL-CMS laufenden Pfad
+(`useCMSVerification: true`), den die App bisher nicht nimmt.
+
+**Erst messen.**
+

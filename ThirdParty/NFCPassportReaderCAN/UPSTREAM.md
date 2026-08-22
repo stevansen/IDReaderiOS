@@ -368,3 +368,22 @@ verständlich — die haben die besten Aussichten. Nummer 4 braucht die Begründ
 aus `docs/EU-EID-STANDARDS.md`. Nummer 5 ist eine Beobachtung, keine Diagnose:
 ich weiß nicht, welche Seite vom Standard abweicht, nur dass die selbst gebaute
 Form funktioniert.
+
+## Zwei Namen, die das Gegenteil sagen
+
+Kein Fehler im Verhalten, und trotzdem hat er mich einen Bau gekostet — deshalb
+steht er hier:
+
+| Eigenschaft | Wird gesetzt, wenn | Klingt wie |
+|---|---|---|
+| `passportCorrectlySigned` | die **Kette** bis zu einer CSCA in der Masterliste aufgeht (`validateAndExtractSigningCertificates`) | „die Signatur ist gut" |
+| `documentSigningCertificateVerified` | die **Signatur des Security Objects** gegen das Dokumentzertifikat aufgeht (`ensureReadDataNotBeenTamperedWith`) | „das Zertifikat ist geprüft" |
+
+Beide bedeuten das, was der andere Name sagt. Wer sie beim Wort nimmt, ordnet sie
+vertauscht zu — und **solange beide Stufen zutreffen, fällt das nicht auf.** Beim
+italienischen Reisepass gehen beide auf, bei der Identitätskarte kippt genau
+eine; erst dort nannte die App die falsche Ursache.
+
+Für einen Pull Request taugt das nur als Umbenennung mit Übergangsfrist, und die
+ist eine Entscheidung des Projekts, nicht ein Fehlerbericht. Aufgeschrieben ist
+es hier, damit die nächste Zuordnung nicht wieder an den Namen hängt.
