@@ -143,6 +143,7 @@ struct ErrorSheet: View {
     @State private var copied = false
 
     var body: some View {
+        ScrollView {
         VStack(alignment: .leading, spacing: 16) {
             HStack(spacing: 12) {
                 Image(systemName: "exclamationmark.triangle.fill")
@@ -214,6 +215,11 @@ struct ErrorSheet: View {
         }
         .padding(24)
         .padding(.bottom, 12)
-        .presentationDetents([.height(detail.isEmpty ? 300 : 380)])
+        }
+        .scrollBounceBehavior(.basedOnSize)
+        // Die Wegmarken koennen lang werden. Ein Blatt mit fester Hoehe schneidet
+        // dann genau die Auskunft ab, um die es geht - also mitwachsen lassen und
+        // rollen, wenn es nicht passt.
+        .presentationDetents(detail.isEmpty ? [.height(300)] : [.medium, .large])
     }
 }

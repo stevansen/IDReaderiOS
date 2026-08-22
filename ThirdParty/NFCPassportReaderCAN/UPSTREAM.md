@@ -8,6 +8,31 @@ Dieser Ordner ist **nicht unser Code**. Er ist eine geänderte Kopie von
 
 Drei Dateien sind geändert, alle übrigen 36 sind Byte für Byte das Original.
 
+## Vierte Änderung: der PACE-Grund wird nicht mehr verschluckt
+
+`PassportReader.startReading` fängt einen PACE-Fehler ab, protokolliert „PACE
+Failed - falling back to BAC" und macht weiter. Für einen Reisepass geht das
+meist gut aus. Für eine Karte **ohne** BAC-Rückfall — die CIE — bleibt am Ende
+nur `InvalidDataPassed("PACE failed and the access key does not allow a BAC
+fallback")`, und darin steht kein Wort dazu, woran PACE scheiterte.
+
+Am Gerät ist das der Unterschied zwischen einer Diagnose und dem Raten. Zwei
+Rückmeldungen aus dem Betatest waren deshalb nicht zu deuten, und die
+naheliegende Erklärung — falsch eingetippter Schlüssel — hat sich als falsch
+erwiesen, nachdem der Benutzer ihn von Hand eingegeben hatte.
+
+Geändert:
+
+* ein Feld `paceFailureReason`, das den abgefangenen Fehler behält;
+* die Meldung beim fehlenden BAC-Rückfall nennt ihn.
+
+Das Verhalten für den MRZ-Fall bleibt unverändert: dort wird weiter auf BAC
+zurückgefallen, und die Meldung entsteht gar nicht.
+
+**Nicht** gepatcht wurde der Tracking-Delegat: den gibt es schon
+(`PassportReaderTrackingDelegate`), und die Wegmarken der App hängen daran —
+siehe `App/NFC/ReadTrail.swift`.
+
 ## Warum eine Kopie und kein Paketverweis
 
 Weil die Bibliothek genau das nicht kann, was die italienische CIE 3.0 braucht:

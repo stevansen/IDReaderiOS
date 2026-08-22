@@ -69,6 +69,8 @@ public class PassportReader : NSObject {
     private var bacHandler : BACHandler?
     private var caHandler : ChipAuthenticationHandler?
     private var paceHandler : PACEHandler?
+    /// GEAENDERT: warum PACE gescheitert ist, damit es nicht nur im Systemlog steht.
+    private var paceFailureReason : Error?
     private var mrzKey : String = ""
 
     /// Womit der Chip geoeffnet wird.
@@ -327,6 +329,14 @@ extension PassportReader {
             } catch {
                 trackingDelegate?.paceFailed()
 
+                // GEAENDERT: den Grund behalten.
+                //
+                // Das Original verschluckt ihn hier - es protokolliert „PACE
+                // Failed" und macht mit BAC weiter. Fuer einen Reisepass geht das
+                // meist gut aus; fuer eine Karte ohne BAC-Rueckfall bleibt am Ende
+                // nur „PACE failed", ohne ein Wort dazu, woran. Am Geraet ist das
+                // der Unterschied zwischen einer Diagnose und dem Raten.
+                paceFailureReason = error
                 passport.PACEStatus = .failed
                 Logger.passportReader.error( "PACE Failed - falling back to BAC" )
             }
@@ -341,7 +351,9 @@ extension PassportReader {
         // Zeichenkette los und scheiterte an einer Stelle, die nichts mehr mit
         // der eigentlichen Ursache zu tun hatte.
         if passport.PACEStatus != .success && !accessKey.allowsBACFallback {
-            throw NFCPassportReaderError.InvalidDataPassed( "PACE failed and the access key does not allow a BAC fallback" )
+            // GEAENDERT: mit dem Grund, den das Original weggeworfen hat.
+            let reason = paceFailureReason.map { "\($0)" } ?? "kein Grund erfasst"
+            throw NFCPassportReaderError.InvalidDataPassed( "PACE fehlgeschlagen: \(reason)" )
         }
 
         if passport.PACEStatus != .success {

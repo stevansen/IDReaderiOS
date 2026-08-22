@@ -30,6 +30,8 @@ final class PassportChipReader: ChipDocumentReader {
     private let strings: Strings
     private let trustBundle: URL?
     private var reader: PassportReader?
+    /// Wird stark gehalten: die Bibliothek haelt ihren Delegaten schwach.
+    private var trail: ReadTrail?
 
     init(strings: Strings, trustBundle: URL? = CscaTrustStore.bundleURL()) {
         self.strings = strings
@@ -45,6 +47,11 @@ final class PassportChipReader: ChipDocumentReader {
     ) async throws -> ChipReadResult {
         let reader = PassportReader()
         self.reader = reader
+        // Die Wegmarken. Sie kosten nichts, solange nichts schiefgeht, und sind
+        // das Einzige, was ohne Kabel am Geraet zu holen ist.
+        let trail = ReadTrail()
+        reader.trackingDelegate = trail
+        self.trail = trail
         defer { self.reader = nil }
 
         onProgress(.waitingForCard)
@@ -74,7 +81,7 @@ final class PassportChipReader: ChipDocumentReader {
                     return nil
                 }
             )
-        } catch NFCPassportReaderError.UserCanceled {
+        } catch let error as NFCPassportReaderError where isCancel(error) {
             // Das Systemblatt hat einen eigenen „Abbrechen"-Knopf, und solange es
             // oben ist, ist der eigene nicht erreichbar. Wer ihn drueckt, will
             // zurueck zur Maske - nicht eine Fehlermeldung mit „Erneut
@@ -83,6 +90,7 @@ final class PassportChipReader: ChipDocumentReader {
         } catch {
             throw PassportChipReader.mapError(error, key: key)
                 .adding(key.shape)
+                .adding(trail.summary)
         }
 
         onProgress(.verifying)
@@ -96,6 +104,12 @@ final class PassportChipReader: ChipDocumentReader {
             data: documentData(from: model),
             signer: PassportChipReader.signer(from: model)
         )
+    }
+
+    /// Ob dieser Fehler ein Abbruch des Benutzers ist.
+    private func isCancel(_ error: NFCPassportReaderError) -> Bool {
+        if case .UserCanceled = error { return true }
+        return false
     }
 
     func abort() {
