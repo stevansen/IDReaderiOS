@@ -518,6 +518,12 @@ Das ist der Verdacht. Ihn ohne Beleg einzubauen wäre falsch — die Ergänzung
 könnte den Reisepass-Pfad brechen, der heute weiter kommt als der Kartenpfad.
 Erst das Statuswort, dann die Änderung.
 
+> **Nachtrag: der Verdacht war unbegründet.** Beide Dokumente lesen mit
+> `800A…830101` bzw. `830102` und **ohne** Tag 0x84. Der Chip bietet nur einen
+> Satz an — `EF.CardAccess` nennt genau eine PACEInfo. Aufgeschrieben geblieben,
+> weil das Statuswort ihn in einem Kartenkontakt erledigt hat und eine
+> eingebaute Vermutung dafür einen ganzen Bau gekostet hätte.
+
 ## Es liest (Bau 18, 22. August 2026)
 
 Beide Dokumente, am Gerät, mit vollständigem Protokoll.
@@ -563,3 +569,50 @@ war immer die Geduld.
 Fünfzehn Sekunden ein Dokument ruhig halten ist lang. Das ist kein Fehler, aber
 es gehört in die Bedienung: die App sagt heute nicht, dass es so lange dauern
 kann.
+
+## Was die Dokumente wirklich führen (Bau 19)
+
+Der zweite Messpunkt, und er beantwortet eine Frage, die vorher nur geraten
+werden konnte: **wie viel steht überhaupt auf dem Chip?** Das signierte
+Sicherheitsobjekt nennt jede vorhandene Datengruppe, und Bau 19 schreibt sie mit.
+
+```
+· Datengruppen mit Pruefsumme: 1,2,14
+· signiert=true Kette=true CA erwartet=true CA=true
+· Signierer: C=IT,O=Ministry of Interior,OU=National Electronic Center of State
+             Police,serialNumber=0012,CN=ePassportSigner
+· Anker:     C=IT,O=Ministry of Interior,OU=National Electronic Center of State
+             Police,CN=Italian Country Signer CA
+· DG12: nicht auf dem Chip
+```
+
+**Der italienische Reisepass führt drei Datengruppen: DG1, DG2, DG14.** Kein
+DG11, kein DG12. Alles, was die App über die Person zeigt, kommt damit aus der
+MRZ in DG1 — Name, Geburtsdatum, Geschlecht, Staatsangehörigkeit, Nummer,
+Ablauf — plus dem Lichtbild. **Das Ausstellungsdatum steht gedruckt auf der
+Datenseite und ist über NFC nicht zu holen.** Es fehlte nicht in der App, es
+fehlt auf dem Chip.
+
+Das ist auch die Antwort auf „lese ich alles?": DG7, DG13, DG15 und DG16 werden
+nicht angefordert — und sie sind auch nicht da. Es bleibt nichts liegen.
+
+Alle vier Echtheitsstufen gehen auf, und die Kette trifft eine der neun
+mitgelieferten CSCA. Damit ist Auftrag 5 aus
+[`REWORK_PROMPT.md`](../REWORK_PROMPT.md) für den Reisepass erledigt: Passive
+Authentication und Chip Authentication sind am echten Chip belegt, nicht nur
+gegen erfundene Datensätze.
+
+### Und schneller ist er geworden
+
+| | Bau 18 | Bau 19 |
+|---|---|---|
+| PACE Schritt 1 (Nonce) | 9,91 s | **0,25 s** |
+| PACE gesamt | 11,7 s | 3,65 s |
+| **gesamt** | 15,31 s | **8,84 s** |
+
+Derselbe Pass, dasselbe Gerät, dieselbe Fassung des Lesecodes. Die zehn Sekunden
+in Schritt 1 waren also nicht der Chip, sondern die Lage auf dem Gehäuse — beim
+gescheiterten Lauf davor (`ConnectionError` nach 4,03 s) brach die Verbindung
+mitten in Schritt 2 ab. **Die Geduld bleibt der Rat, aber die Zahl ist keine
+Eigenschaft des Dokuments.**
+

@@ -342,6 +342,32 @@ extension DocumentExportTests {
         #expect(value == "nicht im Dokument")
     }
 
+    /// Und eine dritte Auskunft, weil es sie wirklich gibt: der italienische
+    /// Reisepass fuehrt kein DG12. Das Ausstellungsdatum steht **gedruckt** auf
+    /// der Datenseite und nicht auf dem Chip. Am Geraet gemessen - das
+    /// Sicherheitsobjekt nennt nur DG1, DG2 und DG14.
+    ///
+    /// „Nicht im Dokument" waere hier falsch, und eine fehlende Zeile liest sich
+    /// als Versehen der App. Bei einem Datensatz aus einem Foto sagt nichts
+    /// etwas ueber einen Chip, also steht dort auch keine Zeile.
+    @Test("ohne DG12 sagt der Bericht: nicht auf dem Chip")
+    func chipWithoutIssueDate() {
+        let export = DocumentExport(strings: Strings(language: .de))
+
+        var vomChip = Sample.chipData(documentCode: "P")
+        vomChip.dateOfIssue = nil
+        let bericht = export.structure(Sample.record(vomChip))
+
+        func zeile(_ record: ExportRecord) -> String? {
+            record.sections.flatMap(\.rows).first { $0.label == "Ausgestellt am" }?.value
+        }
+        #expect(zeile(bericht) == "nicht auf dem Chip")
+
+        var vomFoto = vomChip
+        vomFoto.provenance = .photo
+        #expect(zeile(export.structure(Sample.record(vomFoto))) == nil)
+    }
+
     /// Der JSON-Export speist einen Einsatzbericht. Für einen aufbewahrten
     /// Datensatz ist die Adresse nicht mehr da — und dann gehört dort null hin
     /// und keine Auskunft in Prosa.

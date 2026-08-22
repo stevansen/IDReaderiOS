@@ -357,6 +357,16 @@ struct ResultScreen: View {
             tile(strings[.labelDateOfExpiry], data.dateOfExpiry, mono: true)
             if let issue = data.dateOfIssue {
                 tile(strings[.labelDateOfIssue], issue, mono: true)
+            } else if data.provenance == .chip {
+                // Die Kachel bleibt stehen und sagt, warum sie leer ist - wie
+                // gleich darunter die der Steuernummer.
+                //
+                // Der italienische Reisepass fuehrt kein DG12: das
+                // Ausstellungsdatum steht **gedruckt** auf der Datenseite und
+                // nicht auf dem Chip. Eine fehlende Kachel liest sich als
+                // Versehen der App, „nicht im Dokument" waere eine falsche
+                // Aussage ueber das Dokument - also der Satz, der zutrifft.
+                tile(strings[.labelDateOfIssue], strings[.valueNotOnChip], mono: false)
             }
             if let cf = data.codiceFiscale {
                 tile(strings[.labelCodiceFiscale], cf, mono: true)

@@ -103,6 +103,7 @@ public enum StringKey: String, Sendable, CaseIterable {
     case valueProvenancePhoto = "value_provenance_photo"
     case valueMissing = "value_missing"
     case valueNotRetained = "value_not_retained"
+    case valueNotOnChip = "value_not_on_chip"
     case retentionMinimisedHint = "retention_minimised_hint"
     case retentionAllHint = "retention_all_hint"
     case genderMale = "gender_male"

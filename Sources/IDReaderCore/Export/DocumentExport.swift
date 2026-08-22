@@ -123,6 +123,12 @@ public struct DocumentExport: Sendable {
         documentRows.append(row(.labelDateOfExpiry, data.dateOfExpiry))
         if let dateOfIssue = data.dateOfIssue {
             documentRows.append(row(.labelDateOfIssue, dateOfIssue))
+        } else if data.provenance == .chip {
+            // Eine fehlende Zeile im Bericht liest sich als Versehen, „nicht im
+            // Dokument" waere eine Aussage ueber das Dokument, die nicht stimmt:
+            // der italienische Reisepass traegt das Ausstellungsdatum gedruckt
+            // auf der Datenseite und fuehrt kein DG12. Also die dritte Auskunft.
+            documentRows.append(row(.labelDateOfIssue, strings[.valueNotOnChip]))
         }
         // Die ausstellende Gemeinde steht in Suedtirol zweisprachig auf der Karte.
         if let authority = BilingualText.pick(data.issuingAuthority, preferGerman: preferGerman) {

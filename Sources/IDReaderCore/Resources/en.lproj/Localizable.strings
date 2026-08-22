@@ -242,5 +242,6 @@
 "stored_copy_notice" = "Stored copy from %@ — not read from the card just now.";
 "stored_delete" = "Delete";
 "value_missing" = "not in the document";
+"value_not_on_chip" = "not on the chip";
 "value_not_retained" = "read, not retained";
 "value_provenance_photo" = "Photograph, text recognition, not verified";

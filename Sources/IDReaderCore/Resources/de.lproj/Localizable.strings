@@ -242,5 +242,6 @@
 "stored_copy_notice" = "Gespeicherte Kopie vom %@ — nicht gerade von der Karte gelesen.";
 "stored_delete" = "Löschen";
 "value_missing" = "nicht im Dokument";
+"value_not_on_chip" = "nicht auf dem Chip";
 "value_not_retained" = "gelesen, nicht gespeichert";
 "value_provenance_photo" = "Foto, Texterkennung, nicht geprüft";

@@ -242,5 +242,6 @@
 "stored_copy_notice" = "Copia conservata del %@ — non letta adesso dalla carta.";
 "stored_delete" = "Elimina";
 "value_missing" = "non presente nel documento";
+"value_not_on_chip" = "non presente sul chip";
 "value_not_retained" = "letto, non conservato";
 "value_provenance_photo" = "Fotografia, riconoscimento del testo, non verificato";

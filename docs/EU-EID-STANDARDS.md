@@ -146,6 +146,32 @@ Am Gerät genau diese Meldung. Schritt 2 hat für DH einen eigenen Zweig
 (`doDHMappingAgreement`), Schritt 3 und 4 haben keinen. Das ist die verbleibende
 Lücke, und sie ist umschrieben und endlich.
 
+**Sie ist geschlossen.** `makeEphemeralKeyPair(from:)` erzeugt das flüchtige Paar
+jetzt je nach `EVP_PKEY_get_base_id` als DH oder EC; der Rest von Schritt 3 und
+ganz Schritt 4 waren schon verfahrensneutral. Seither lesen beide Dokumente.
+
+## 3a. Was auf den Dokumenten wirklich steht
+
+Am Gerät gemessen, aus dem **signierten** Sicherheitsobjekt — also nicht, was
+lesbar war, sondern was das Dokument führt:
+
+| | Reisepass IT |
+|---|---|
+| Datengruppen | **DG1, DG2, DG14** |
+| DG11 (Wohnsitz, Steuernummer, Beruf, …) | nicht vorhanden |
+| DG12 (ausstellende Stelle, Ausstellungsdatum) | nicht vorhanden |
+| Passive Authentication | geht auf, Kette bis zur italienischen CSCA |
+| Chip Authentication | angeboten und erfolgreich |
+
+Das ist wenig, und es ist die Regel und nicht die Ausnahme: ICAO 9303 verlangt
+**nur DG1 und DG2**. Alles darüber ist dem ausstellenden Staat freigestellt.
+
+Die Folge für jede App, die einen Pass liest: **das Ausstellungsdatum ist über
+NFC nicht zu bekommen.** Es steht gedruckt auf der Datenseite, nicht in der MRZ
+und nicht auf dem Chip. Wer es braucht, liest es mit dem Auge oder mit der
+Kamera — und eine App, die an dieser Stelle einfach nichts anzeigt, sieht aus,
+als hätte sie etwas übersehen.
+
 ## 4. Was das für die App heißt
 
 **Der Weg ist tragfähig.** Nach dem Durchbruch in Schritt 2 ist bewiesen, dass
