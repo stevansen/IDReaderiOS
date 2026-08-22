@@ -363,6 +363,18 @@ extension PassportReader {
                 trackingDelegate?.bacSucceeded()
             } catch {
                 trackingDelegate?.bacFailed()
+                // GEAENDERT: den PACE-Grund mitgeben.
+                //
+                // Beim MRZ-Schluessel faellt der Ablauf auf BAC zurueck, und
+                // dessen Fehler verdeckt danach, warum PACE gescheitert ist -
+                // dabei ist das die eigentliche Ursache. Am Geraet stand deshalb
+                // beim Reisepass nur `SW 6985`, die Absage von BAC, und die
+                // Auskunft ueber PACE fehlte ganz.
+                if let reason = paceFailureReason {
+                    throw NFCPassportReaderError.InvalidDataPassed(
+                        "BAC: \(error) — PACE davor: \(reason)"
+                    )
+                }
                 throw error
             }
         }

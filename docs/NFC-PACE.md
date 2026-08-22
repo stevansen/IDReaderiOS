@@ -256,6 +256,40 @@ Deshalb hieß es `InvalidASN1Value`: nicht die Antwort war unlesbar, es gab
 **keine** Antwort — nur eine verschluckte Absage. Berichtigt zu
 `if !(rep.sw1 == 0x90 && rep.sw2 == 0x00)`.
 
+### Was der Chip wirklich anbietet (Bau 9, Reisepass)
+
+```
+SW 6985 · MRZ(Nr 9, Geb 6, Abl 6) · Chip erkannt → PACE begonnen
+→ CardAccess gelesen (1): 0.4.0.127.0.7.2.2.4.1.1 v2 Param 2 GM
+→ PACE gescheitert → BAC begonnen → BAC gescheitert
+```
+
+**Damit ist die Kryptografie der Karte endgültig geklärt**, und alle Vermutungen
+über eine Fehlinterpretation sind erledigt:
+
+| | |
+|---|---|
+| Verfahren | `id-PACE-DH-GM-3DES-CBC-CBC` — klassisches DH, kein ECDH |
+| Version | 2 |
+| Domänenparameter | **2** = `GFp 2048/256`, RFC 5114 §2.3 |
+| Abbildung | Generic Mapping |
+
+Kennung und Parametersatz sind **widerspruchsfrei**: DH-Verfahren, DH-Parameter.
+Und Parametersatz 2 ist genau der, den das amtliche `cie-mrtd-dotnet-sdk`
+als einzigen akzeptiert. Der italienische **Reisepass** meldet dasselbe wie die
+Karte — beide Dokumente wollen den DH-Pfad.
+
+Auf dem Papier führt die Bibliothek ihn: `createMappingKey` ruft für
+Parametersatz 2 `DH_get_2048_256()`, `getParameterSpec` bildet 0/1/2 richtig ab,
+und `doDHMappingAgreement` rechnet die Abbildung. Trotzdem scheitert PACE. Warum,
+sagt erst ein sauberer Durchgang mit berichtigter Statusprüfung.
+
+Ein Verdacht, ausdrücklich als solcher: RFC-5114-Parameter tragen ein `q`
+(Untergruppenordnung). OpenSSL macht daraus einen Schlüssel vom Typ
+**`EVP_PKEY_DHX`** statt `EVP_PKEY_DH`, und `DH_get_2048_256()` ist seit
+OpenSSL 3.0 veraltet. Beides sind Stellen, an denen ein Pfad brechen kann, der
+mit Reisepässen — die ECDH nehmen — nie befahren wird.
+
 ### Was als nächstes zu prüfen ist
 
 Mit der berichtigten Statusprüfung nennt das Gerät das Statuswort des Chips.
