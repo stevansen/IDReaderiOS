@@ -190,6 +190,25 @@ Ordner ist die Quelle.
 Der Anspruch auf „IDReader" für Englisch ließe sich bei Apple anmelden — dafür
 braucht es Markenrechte an dem Namen. Ohne die bleibt es bei den zwei Namen.
 
+## Das App-Icon
+
+Es gibt **kein Feld dafür**. Auf iOS nimmt der Store das Icon aus dem Bau —
+`App/Assets.xcassets/AppIcon.appiconset/icon-1024.png` wird beim Archivieren
+mitgegeben, und `altool --validate-app` fällt durch, wenn es fehlt.
+
+Solange aber **kein Bau an der Fassung hängt**, hat der Eintrag kein Icon und
+zeigt das grau gerasterte Platzhalterquadrat. Genau so war es hier: drei Bauten
+hochgeladen, die Fassung fertig beschriftet, `appStoreVersions/…/build` aber
+`null`. Nicht das Icon fehlte, die Verbindung.
+
+```bash
+swift Scripts/asc.swift attach-build      # den höchsten gültigen Bau
+swift Scripts/asc.swift attach-build 3    # einen bestimmten
+```
+
+Danach steht das Icon in der App-Liste. Ein neuer Bau muss wieder angehängt
+werden — das Hochladen allein tut es nicht.
+
 ## Noch zu überlegen
 
 * **`en-US`-Stichworte:** dort steht „CIE Reader" noch in `keywords.txt`. Der

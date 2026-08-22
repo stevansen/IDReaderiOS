@@ -90,7 +90,13 @@ hat.
 swift Scripts/asc.swift show
 swift Scripts/asc.swift metadata
 swift Scripts/asc.swift screenshots
+swift Scripts/asc.swift attach-build
 ```
+
+**Der letzte Befehl ist der, den man vergisst.** Ein App-Icon lädt man auf iOS
+nicht hoch — der Store nimmt es aus dem Bau. Hängt kein Bau an der Fassung, hat
+der Eintrag kein Icon, und die App-Liste zeigt ein graues Platzhalterquadrat.
+Hochladen allein verbindet nichts.
 
 Dieselben zwei Umgebungsvariablen wie beim Hochladen. Der Schlüssel wird über
 seinen **Pfad** gelesen, nie über eine Kommandozeile, und weder er noch der

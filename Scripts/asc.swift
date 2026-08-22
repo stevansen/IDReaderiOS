@@ -539,6 +539,56 @@ func ladeBilder() async throws {
 }
 
 // ---------------------------------------------------------------------------
+// Der Bau an der Fassung
+// ---------------------------------------------------------------------------
+
+/// Haengt einen Bau an den Fassungsdatensatz.
+///
+/// ## Warum das die Antwort auf „setze das App-Icon" ist
+///
+/// Auf iOS gibt es kein Feld, in das man ein Icon laedt. Der Store nimmt es aus
+/// dem Bau - `Assets.xcassets/AppIcon.appiconset/icon-1024.png` wird beim
+/// Archivieren mitgegeben. Solange aber **kein Bau an der Fassung haengt**, hat
+/// der Eintrag kein Icon und zeigt das grau gerasterte Platzhalterquadrat.
+///
+/// Genau so war es hier: drei Baeume hochgeladen, Fassung 1.8 fertig beschriftet,
+/// `appStoreVersions/…/build` aber `null`. Nicht das Icon fehlte, die Verbindung.
+func haengeBauAn(_ nummer: String?) async throws {
+    let version = try await inflightVersion()
+    let versionID = ident(version)
+
+    let baeume = rows(try await call(
+        "GET",
+        "apps/\(appID)/builds?limit=20&fields[builds]=version,processingState,expired"
+    ))
+    let brauchbar = baeume.filter {
+        attr($0, "processingState") == "VALID"
+            && (($0["attributes"] as? [String: Any])?["expired"] as? Bool) != true
+    }
+    guard !brauchbar.isEmpty else {
+        throw Fehler("Kein gueltiger, nicht abgelaufener Bau vorhanden.")
+    }
+
+    // Ohne Angabe der hoechste; sonst der genannte.
+    let gewaehlt: [String: Any]
+    if let nummer {
+        guard let treffer = brauchbar.first(where: { attr($0, "version") == nummer }) else {
+            let liste = brauchbar.map { attr($0, "version") }.joined(separator: ", ")
+            throw Fehler("Bau \(nummer) ist nicht brauchbar. Verfuegbar: \(liste)")
+        }
+        gewaehlt = treffer
+    } else {
+        gewaehlt = brauchbar.max { (Int(attr($0, "version")) ?? 0) < (Int(attr($1, "version")) ?? 0) }!
+    }
+
+    try await call("PATCH", "appStoreVersions/\(versionID)/relationships/build", body: [
+        "data": ["type": "builds", "id": ident(gewaehlt)],
+    ])
+    print("Fassung \(attr(version, "versionString")) → Bau \(attr(gewaehlt, "version")) angehaengt.")
+    print("Damit hat der Eintrag ein Icon: der Store nimmt es aus dem Bau.")
+}
+
+// ---------------------------------------------------------------------------
 // Bedienungshilfen-Angaben
 // ---------------------------------------------------------------------------
 
@@ -646,6 +696,8 @@ do {
         guard argumente.count > 1 else { throw Fehler("Kategorie fehlt.") }
         try await setzeKategorie(argumente[1])
     case "screenshots": try await ladeBilder()
+    case "attach-build":
+        try await haengeBauAn(argumente.count > 1 ? argumente[1] : nil)
     case "accessibility":
         try await setzeBedienungshilfen(veroeffentlichen: argumente.contains("--publish"))
     case "delete":
