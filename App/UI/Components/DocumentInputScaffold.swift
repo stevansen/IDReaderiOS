@@ -26,9 +26,12 @@ struct DocumentInputScaffold<Content: View>: View {
     let onOpenArchive: () -> Void
     let onOpenSettings: () -> Void
     let strings: Strings
-    #if DEBUG
+    /// Nur im Debug-Bau benutzt - die Eigenschaft steht aber in **beiden**
+    /// Fassungen. Sie hinter `#if DEBUG` zu setzen war ein Fehler: die
+    /// Aufrufstelle in `RootView` uebergibt sie unbedingt, also uebersetzte der
+    /// Debug-Bau und der Release-Bau nicht. Gefunden hat es erst
+    /// `Scripts/archive.sh`, das gegen Release baut.
     var onShowErrorSheet: (() -> Void)?
-    #endif
     @ViewBuilder var content: (DocumentMode, Int) -> Content
 
     /// Wer die schon gewaehlte Art noch einmal antippt, will die Maske von vorn.

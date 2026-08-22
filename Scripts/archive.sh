@@ -28,6 +28,18 @@ echo
 echo "==> Tests"
 swift test
 
+# Der Release-Bau, bevor archiviert wird.
+#
+# Grund: ein `#if DEBUG` an der falschen Stelle uebersetzt im Debug-Bau und im
+# Release-Bau nicht. Genau das ist passiert - gefunden hat es der Archivlauf,
+# also nach dem Festschreiben. Ein eigener Schritt hier nennt es beim Namen,
+# statt es im Archivprotokoll zu verstecken.
+echo
+echo "==> Release-Bau (faengt Debug-only-Fehler)"
+xcodebuild -project IDReader.xcodeproj -scheme "$SCHEME" \
+	-configuration Release -destination 'generic/platform=iOS' \
+	-allowProvisioningUpdates build > /dev/null
+
 echo
 echo "==> Archiv"
 rm -rf "$ARCHIVE" "$EXPORT"
