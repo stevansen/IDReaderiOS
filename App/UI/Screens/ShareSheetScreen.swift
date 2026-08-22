@@ -140,7 +140,7 @@ struct ShareSheetScreen: View {
                         .padding(.top, 8)
                     } else {
                         Text(export.build(documents, format: .json))
-                            .font(.system(size: 11, design: .monospaced))
+                            .font(.system(.caption2, design: .monospaced))
                             .textSelection(.enabled)
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding(.top, 8)
@@ -156,7 +156,7 @@ struct ShareSheetScreen: View {
 
     private func statement(_ text: String) -> some View {
         HStack(spacing: 6) {
-            Image(systemName: "checkmark").font(.system(size: 11))
+            Image(systemName: "checkmark").font(.caption2)
             Text(text).font(.footnote)
         }
         .foregroundStyle(palette.onSurfaceVariant)

@@ -118,7 +118,7 @@ struct CanInputScreen: View {
         HStack(spacing: 8) {
             if model.canIsValid && model.canSource == .scanned {
                 Image(systemName: "camera")
-                    .font(.system(size: 14))
+                    .font(.footnote)
                     .foregroundStyle(palette.onSurfaceVariant)
             }
             Text(strings[keyOrigin])
@@ -206,7 +206,7 @@ private struct DigitBoxes: View {
                 Text(digit)
                     .font(AppType.monoDigitBox)
                     .frame(maxWidth: .infinity)
-                    .frame(height: 56)
+                    .frame(minHeight: 56)
                     .background(
                         scanned && filled ? palette.secondaryContainer : palette.surfaceContainer,
                         in: .rect(cornerRadius: 10)
@@ -270,7 +270,7 @@ private struct Keypad: View {
             onDigit(Character(digit))
         } label: {
             Text(digit)
-                .font(.system(size: 22, design: .monospaced))
+                .font(.system(.title3, design: .monospaced))
                 .frame(maxWidth: .infinity, minHeight: 48)
         }
     }
@@ -304,16 +304,44 @@ struct ReadButtons: View {
     let onStartReading: (Bool) -> Void
 
     @Environment(\.palette) private var palette
+    @Environment(\.dynamicTypeSize) private var typeSize
 
+    /// Bei den Bedienungshilfen-Groessen stehen die beiden Wege **untereinander**
+    /// und nicht mehr als ein geteilter Knopf.
+    ///
+    /// Nebeneinander lief die Beschriftung dort in das Vorlaufzeichen hinein -
+    /// „Read card▶▶", ineinander gezeichnet. Der optische Zusammenhalt des einen
+    /// Knopfes ist ein Entwurfsgedanke; ihn gegen zwei ineinanderlaufende
+    /// Beschriftungen zu verteidigen waere die falsche Reihenfolge.
     var body: some View {
+        if typeSize.isAccessibilitySize {
+            VStack(spacing: 8) {
+                withPhoto
+                    .clipShape(.rect(cornerRadius: 26))
+                fastOnly
+                    .clipShape(.rect(cornerRadius: 26))
+            }
+            .buttonStyle(.plain)
+            .foregroundStyle(enabled ? palette.onPrimary : palette.onSurfaceVariant)
+            .disabled(!enabled)
+        } else {
+            splitButton
+        }
+    }
+
+    private var splitButton: some View {
         HStack(spacing: 2) {
             Button {
                 onStartReading(true)
             } label: {
+                // Kein `lineLimit(1)`: bei grosser Schrift stand hier
+                // „Read card" halb unter dem Vorlaufzeichen. Die Beschriftung
+                // einer Handlung darf wachsen, der Knopf waechst mit.
                 Label(label, systemImage: "person.crop.square")
                     .font(.headline)
-                    .lineLimit(1)
+                    .multilineTextAlignment(.leading)
                     .frame(maxWidth: .infinity, minHeight: 52)
+                    .padding(.vertical, 6)
             }
             .background(
                 enabled ? palette.primary : palette.surfaceContainerHigh,
@@ -324,9 +352,15 @@ struct ReadButtons: View {
             Button {
                 onStartReading(false)
             } label: {
+                // Dieselbe senkrechte Polsterung wie die Beschriftung links,
+                // damit beide Haelften von selbst gleich hoch sind. Ein
+                // `maxHeight: .infinity` waere hier falsch: die Zeile wuerde
+                // dann alles nehmen, was die Karte hergibt, und der geteilte
+                // Knopf faellt auseinander - am Simulator gesehen.
                 Image(systemName: "forward.fill")
                     .frame(width: 62)
                     .frame(minHeight: 52)
+                    .padding(.vertical, 6)
             }
             .background(
                 enabled ? palette.primary : palette.surfaceContainerHigh,
@@ -338,6 +372,33 @@ struct ReadButtons: View {
         .buttonStyle(.plain)
         .foregroundStyle(enabled ? palette.onPrimary : palette.onSurfaceVariant)
         .disabled(!enabled)
+    }
+
+    /// Der breite Weg, mit Lichtbild.
+    private var withPhoto: some View {
+        Button {
+            onStartReading(true)
+        } label: {
+            Label(label, systemImage: "person.crop.square")
+                .font(.headline)
+                .frame(maxWidth: .infinity, minHeight: 52)
+                .padding(.vertical, 6)
+        }
+        .background(enabled ? palette.primary : palette.surfaceContainerHigh)
+    }
+
+    /// Der schnelle Weg, ohne. Untereinander bekommt er seine Beschriftung in
+    /// Worten - das Zeichen allein war nur neben dem breiten Knopf verstaendlich.
+    private var fastOnly: some View {
+        Button {
+            onStartReading(false)
+        } label: {
+            Label(fastLabel, systemImage: "forward.fill")
+                .font(.headline)
+                .frame(maxWidth: .infinity, minHeight: 52)
+                .padding(.vertical, 6)
+        }
+        .background(enabled ? palette.primary : palette.surfaceContainerHigh)
     }
 }
 
@@ -358,10 +419,14 @@ struct PrimaryActionButton: View {
                 } else {
                     Image(systemName: systemImage)
                 }
-                Text(title).lineLimit(1)
+                // Auch hier ohne `lineLimit`: „Photograph the card" wurde zu
+                // „Photograp…", und was der Knopf tut, stand dann nicht mehr
+                // darauf.
+                Text(title).multilineTextAlignment(.center)
             }
             .font(.body.weight(.medium))
             .frame(maxWidth: .infinity, minHeight: 48)
+            .padding(.vertical, 6)
         }
         .buttonStyle(.plain)
         .foregroundStyle(palette.onPrimaryContainer)

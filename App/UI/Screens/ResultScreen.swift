@@ -21,6 +21,7 @@ struct ResultScreen: View {
     let onShare: () -> Void
 
     @Environment(\.palette) private var palette
+    @Environment(\.dynamicTypeSize) private var typeSize
     @State private var authenticityShown = false
 
     private var data: DocumentData { document.data }
@@ -155,7 +156,7 @@ struct ResultScreen: View {
             // waere eine falsche.
             VStack(spacing: 4) {
                 Image(systemName: "photo.badge.exclamationmark")
-                Text(photo.mimeType).font(.system(size: 9, design: .monospaced))
+                Text(photo.mimeType).font(.system(.caption2, design: .monospaced))
             }
             .frame(width: 78, height: 100)
             .background(palette.onPrimary.opacity(0.12), in: .rect(cornerRadius: 8))
@@ -199,7 +200,7 @@ struct ResultScreen: View {
     private var minimisationNotice: some View {
         HStack(alignment: .top, spacing: 8) {
             Image(systemName: "eye.slash")
-                .font(.system(size: 13))
+                .font(.footnote)
                 .padding(.top, 2)
             Text(strings[.retentionMinimisedHint]).font(.footnote)
             Spacer(minLength: 0)
@@ -227,7 +228,7 @@ struct ResultScreen: View {
         let check = document.revocation
         VStack(alignment: .leading, spacing: 6) {
             HStack(spacing: 8) {
-                Image(systemName: revocationSymbol).font(.system(size: 13))
+                Image(systemName: revocationSymbol).font(.footnote)
                 Text(strings[.revocationHeading]).font(AppType.cardHeading)
                 Spacer(minLength: 0)
             }
@@ -309,11 +310,22 @@ struct ResultScreen: View {
         content: Color,
         @ViewBuilder trailing: () -> Trailing
     ) -> some View {
-        HStack(alignment: .top, spacing: 10) {
-            Image(systemName: symbol).padding(.top, 2)
-            Text(text).font(.footnote)
-            Spacer(minLength: 0)
-            trailing()
+        // Bei den Bedienungshilfen-Groessen steht der Knopf **unter** dem Satz.
+        // Daneben blieb dem Satz eine Spalte von zwei Woertern Breite, und
+        // „Gespeicherte Fassung vom … - nicht neu gelesen" endete unter der
+        // Knopfleiste. Am Simulator gesehen.
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(alignment: .top, spacing: 10) {
+                Image(systemName: symbol).padding(.top, 2)
+                Text(text).font(.footnote)
+                Spacer(minLength: 0)
+                if !typeSize.isAccessibilitySize {
+                    trailing()
+                }
+            }
+            if typeSize.isAccessibilitySize {
+                trailing()
+            }
         }
         .padding(12)
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -358,6 +370,11 @@ struct ResultScreen: View {
         .padding(12)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(palette.surfaceContainer, in: .rect(cornerRadius: 12))
+        // Ein Element, nicht zwei. Sonst hoert die Vorlesefunktion beim ersten
+        // Wischen „Geburtsdatum" und beim zweiten „07.04.1968" - man muss sich
+        // die Bezeichnung merken, waehrend man zum Wert wischt, und bei
+        // sechzehn Kacheln ist das keine Auskunft mehr.
+        .accessibilityElement(children: .combine)
     }
 
     /// Die uebrigen Angaben, sofern das Dokument sie fuehrt. Auf den allermeisten
@@ -507,6 +524,8 @@ struct AuthenticitySheet: View {
         .background(palette.surface)
     }
 
+    /// Eine Zeile des Echtheitsblatts - Zeichen, Bezeichnung und Begruendung
+    /// gehoeren zusammen und werden als ein Element vorgelesen.
     private func checkRow(_ label: String, detail: String?, passed: Bool) -> some View {
         HStack(alignment: .top, spacing: 12) {
             Image(systemName: passed ? "checkmark.seal.fill" : "xmark.seal.fill")
@@ -523,6 +542,7 @@ struct AuthenticitySheet: View {
             Spacer(minLength: 0)
         }
         .padding(14)
+        .accessibilityElement(children: .combine)
     }
 
     private var dataGroupDetail: String {

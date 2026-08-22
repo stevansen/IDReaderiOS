@@ -34,12 +34,13 @@ struct DocumentInputScaffold<Content: View>: View {
     /// diesen Zaehler und fangen mit ihm neu an.
     @State private var resetCount = 0
     @Environment(\.palette) private var palette
+    /// Nur fuer eine Entscheidung gebraucht: waagerecht oder untereinander.
+    @Environment(\.dynamicTypeSize) private var typeSize
 
     var body: some View {
         VStack(spacing: 0) {
             header
-            content(mode, resetCount)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            stage
                 .id(mode)
                 .transition(.asymmetric(
                     insertion: .move(edge: forward ? .trailing : .leading).combined(with: .opacity),
@@ -47,6 +48,38 @@ struct DocumentInputScaffold<Content: View>: View {
                 ))
         }
         .animation(.easeInOut(duration: 0.22), value: mode)
+    }
+
+    /// Die Maske - und bei den Bedienungshilfen-Schriftgroessen in einem
+    /// Rollbereich.
+    ///
+    /// ## Warum nicht immer
+    ///
+    /// Die Masken sind darauf gebaut, **ohne Rollen** auszukommen: beide Schritte
+    /// gleichzeitig sichtbar, der Ziffernblock unten festgesetzt. Das ist die
+    /// Entscheidung der Android-Fassung und sie ist richtig - wer ein Dokument in
+    /// der Hand haelt, hat keine Hand zum Wischen.
+    ///
+    /// Sie hoert bei grosser Systemschrift auf zu funktionieren, und zwar nicht
+    /// harmlos. Am Simulator mit der groessten Bedienungshilfen-Schrift stand da
+    /// „No NFC av… / This device h…": SwiftUI hat keinen Platz, also kuerzt es,
+    /// und gekuerzt wurde die **Fehlermeldung**, die erklaert, warum die App
+    /// gerade nichts tun kann. Ein Rollbereich ist unbequem; eine unlesbare
+    /// Begruendung ist schlimmer.
+    ///
+    /// Bei normaler Schrift bleibt alles, wie es war - kein Rollbereich, damit
+    /// `Spacer` und der festgesetzte Ziffernblock weiter tun, was sie sollen.
+    @ViewBuilder private var stage: some View {
+        if typeSize.isAccessibilitySize {
+            ScrollView {
+                content(mode, resetCount)
+                    .frame(maxWidth: .infinity)
+            }
+            .scrollBounceBehavior(.basedOnSize)
+        } else {
+            content(mode, resetCount)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+        }
     }
 
     @State private var previous: DocumentMode = .identityCard
@@ -117,36 +150,28 @@ struct DocumentInputScaffold<Content: View>: View {
     /// traegt aber die Farbe allein die Auswahl, und das ist nach WCAG 1.4.1 zu
     /// wenig. Deshalb steht die gewaehlte Beschriftung **fett**. Dieselbe Auskunft,
     /// ohne Symbol.
+    /// Bei den Bedienungshilfen-Schriftgroessen stehen die drei Beschriftungen
+    /// **untereinander**.
+    ///
+    /// Nebeneinander gehen sie dort nicht: am Simulator mit der groessten
+    /// Systemschrift stand da „ID | Passp… | Licence". Ein abgeschnittener
+    /// Schalter ist schlimmer als ein hoher - er verschweigt, was er tut, und
+    /// zwar genau demjenigen, der die grosse Schrift eingestellt hat, weil er
+    /// schlecht sieht.
+    ///
+    /// Deshalb keine feinere Gewichtung, sondern ein anderer Aufbau. Die Grenze
+    /// zieht `DynamicTypeSize/isAccessibilitySize` und nicht eine geratene
+    /// Punktzahl.
     private var modeSwitch: some View {
-        WeightedRow(spacing: 4) {
-            ForEach(DocumentMode.switchable) { entry in
-                let selected = entry == mode
-                Button {
-                    previous = mode
-                    onModeChange(entry)
-                } label: {
-                    Text(strings[entry.labelKey])
-                        .font(.footnote)
-                        .fontWeight(selected ? .bold : .medium)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.8)
-                        .frame(maxWidth: .infinity, minHeight: 40)
-                        .background(
-                            selected ? palette.surface : .clear,
-                            in: .rect(cornerRadius: 18)
-                        )
-                        .foregroundStyle(
-                            selected ? palette.primary : palette.onPrimaryContainer
-                        )
+        Group {
+            if typeSize.isAccessibilitySize {
+                VStack(spacing: 4) {
+                    ForEach(DocumentMode.switchable) { entry in
+                        modeButton(entry, wrapping: true)
+                    }
                 }
-                .buttonStyle(.plain)
-                // Die Breite folgt der Wortlaenge, nicht gleichen Dritteln:
-                // „Führerschein" passt in ein Drittel nicht, und ein
-                // abgeschnittenes Wort ist als Schalterbeschriftung schlechter als
-                // ein schmalerer Nachbar. Der Sockel verhindert, dass „Pass"
-                // daneben auf ein Drittel dieser Breite schrumpft und kaum noch zu
-                // treffen ist.
-                .weight(WeightedRow.base + Double(strings[entry.labelKey].count))
+            } else {
+                horizontalModeSwitch
             }
         }
         .padding(3)
@@ -157,6 +182,46 @@ struct DocumentInputScaffold<Content: View>: View {
         }
     }
 
+    private var horizontalModeSwitch: some View {
+        WeightedRow(spacing: 4) {
+            ForEach(DocumentMode.switchable) { entry in
+                modeButton(entry, wrapping: false)
+                    // Die Breite folgt der Wortlaenge, nicht gleichen Dritteln:
+                    // „Führerschein" passt in ein Drittel nicht, und ein
+                    // abgeschnittenes Wort ist als Schalterbeschriftung schlechter
+                    // als ein schmalerer Nachbar. Der Sockel verhindert, dass
+                    // „Pass" daneben auf ein Drittel dieser Breite schrumpft und
+                    // kaum noch zu treffen ist.
+                    .weight(WeightedRow.base + Double(strings[entry.labelKey].count))
+            }
+        }
+    }
+
+    private func modeButton(_ entry: DocumentMode, wrapping: Bool) -> some View {
+        let selected = entry == mode
+        return Button {
+            previous = mode
+            onModeChange(entry)
+        } label: {
+            Text(strings[entry.labelKey])
+                .font(.footnote)
+                .fontWeight(selected ? .bold : .medium)
+                .lineLimit(wrapping ? nil : 1)
+                .minimumScaleFactor(wrapping ? 1 : 0.8)
+                .multilineTextAlignment(.center)
+                .frame(maxWidth: .infinity, minHeight: 40)
+                .background(
+                    selected ? palette.surface : .clear,
+                    in: .rect(cornerRadius: 18)
+                )
+                .foregroundStyle(
+                    selected ? palette.primary : palette.onPrimaryContainer
+                )
+        }
+        .buttonStyle(.plain)
+    }
+
+
     /// Der Zugang zum Archiv, rechts neben dem Umschalter.
     ///
     /// Sichtbar ist nur die Anzahl. Wer die App aufmacht, soll nicht sofort sehen,
@@ -166,7 +231,7 @@ struct DocumentInputScaffold<Content: View>: View {
     private var archivePill: some View {
         Button(action: onOpenArchive) {
             HStack(spacing: 6) {
-                Image(systemName: "lock.fill").font(.system(size: 13))
+                Image(systemName: "lock.fill").font(.footnote)
                 Text("\(archiveCount)").font(AppType.actionSmall)
             }
             .padding(.horizontal, 13)

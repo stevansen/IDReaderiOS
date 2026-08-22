@@ -292,29 +292,49 @@ extension EnvironmentValues {
 
 /// Schriftstile, die ueber das Systemraster hinausgehen.
 ///
-/// Der Entwurf benutzt 11, 13, 15, 17 und 20 Punkt. Alle Stile sind relativ zu
-/// einem Textstil angelegt (`relativeTo:`), damit sie mit der Systemschrift
-/// mitwachsen - das war unter Compose durch `sp` selbstverstaendlich und ist es
-/// hier nicht.
+/// ## Was hier lange falsch war
+///
+/// Der Kommentar an dieser Stelle behauptete, alle Stile seien mit `relativeTo:`
+/// an einen Textstil gebunden und wuechsen mit der Systemschrift mit. Der Code
+/// tat es nicht: er benutzte `Font.system(size:)`, und das ist in SwiftUI eine
+/// **feste** Groesse. Am Simulator mit der groessten Bedienungshilfen-Schrift
+/// war das Ergebnis eindeutig - „No NFC available" wuchs, weil es einen
+/// semantischen Stil hatte, „Eingabe" und „Fertig" daneben blieben klein, und
+/// die Kaesten waren fuer die kleinen Groessen bemessen.
+///
+/// Eine Aussage im Kommentar, die der Code nicht einhaelt, ist schlimmer als
+/// keine: sie beendet die Suche an der Stelle, an der der Fehler liegt.
+///
+/// ## Was jetzt gilt
+///
+/// Jeder Stil ist ein **Textstil**, nicht eine Punktzahl. Der Entwurf benutzt
+/// 11, 13, 15, 17 und 20 Punkt, und das ist kein Zufall - es sind genau die
+/// Vorgabegroessen von `caption2`, `footnote`, `subheadline`, `body` und
+/// `title3`. Bei normaler Systemschrift sieht deshalb nichts anders aus als
+/// vorher; bei jeder anderen wachsen alle Stile gemeinsam.
+///
+/// Unter Compose war das durch `sp` selbstverstaendlich. Hier muss man es
+/// hinschreiben.
 enum AppType {
-    /// Beschriftung der grossen Knoepfe und der Titelzeile.
-    static let actionLarge = Font.system(size: 17, weight: .medium)
-    /// Beschriftung der kleinen Knoepfe: „Ändern", „Eingabe".
-    static let actionSmall = Font.system(size: 13, weight: .medium)
+    /// Beschriftung der grossen Knoepfe und der Titelzeile. 17 pt = `body`.
+    static let actionLarge = Font.system(.body, weight: .medium)
+    /// Beschriftung der kleinen Knoepfe: „Ändern", „Eingabe". 13 pt = `footnote`.
+    static let actionSmall = Font.system(.footnote, weight: .medium)
     /// Die zweite Zeile im geteilten Leseknopf, und der Vorbehalt „ungeprüft".
     ///
-    /// Der Entwurf hatte hier zuerst 9 Punkt und ist auf 11 gegangen. Kleiner
-    /// darf es nicht werden: bei 200 Prozent Systemschrift steht dieser Text
-    /// neben einem 17-Punkt-Geschwister in derselben Knopfhoehe.
-    static let microLabel = Font.system(size: 11, weight: .medium)
-    /// Der Titel eines eigenen Bildschirms - im Archiv „5 Scans".
-    static let screenTitle = Font.system(size: 20, weight: .medium)
-    /// Die Versalzeile ueber einer Tagesgruppe im Archiv.
-    static let groupLabel = Font.system(size: 11, weight: .medium)
-    /// Ueberschrift einer Schrittkarte.
-    static let cardHeading = Font.system(size: 15, weight: .medium)
-    /// Die Ziffer in der nummerierten Marke.
-    static let stepBadge = Font.system(size: 13, weight: .bold)
+    /// Der Entwurf hatte hier zuerst 9 Punkt und ist auf 11 gegangen - das ist
+    /// `caption2`. Kleiner darf es nicht werden: dieser Text steht neben einem
+    /// `body`-Geschwister in derselben Knopfhoehe, und der Abstand zwischen den
+    /// beiden Stilen waechst mit der Systemschrift mit.
+    static let microLabel = Font.system(.caption2, weight: .medium)
+    /// Der Titel eines eigenen Bildschirms - im Archiv „5 Scans". 20 pt = `title3`.
+    static let screenTitle = Font.system(.title3, weight: .medium)
+    /// Die Versalzeile ueber einer Tagesgruppe im Archiv. 11 pt = `caption2`.
+    static let groupLabel = Font.system(.caption2, weight: .medium)
+    /// Ueberschrift einer Schrittkarte. 15 pt = `subheadline`.
+    static let cardHeading = Font.system(.subheadline, weight: .medium)
+    /// Die Ziffer in der nummerierten Marke. 13 pt = `footnote`.
+    static let stepBadge = Font.system(.footnote, weight: .bold)
 
     /// Die Schrift der abgelesenen Werte.
     ///
@@ -322,14 +342,23 @@ enum AppType {
     /// und weil sich Ziffern dann untereinander ausrichten. Anders als unter
     /// Android braucht es dafuer keinen Notbehelf: `SF Mono` liegt auf dem
     /// System, und `.monospaced` erreicht sie.
-    static func mono(_ size: CGFloat, tracking: CGFloat = 0) -> Font {
-        .system(size: size, weight: .regular, design: .monospaced)
+    ///
+    /// Auch hier ein Textstil und keine Punktzahl. Die vier gewaehlten Stile
+    /// liegen bei normaler Schrift bis auf zwei Punkt auf den Entwurfsgroessen
+    /// (14, 16, 18, 24); das ist der Preis dafuer, dass sie mitwachsen, und er
+    /// ist billiger als eine Ziffernreihe, die bei grosser Schrift abgeschnitten
+    /// wird.
+    static func mono(_ style: Font.TextStyle) -> Font {
+        .system(style, design: .monospaced)
     }
 
     /// Die CAN in der Schluesselzeile: weit gesperrt, damit sich sechs Ziffern
-    /// zaehlen lassen.
-    static let monoCan = mono(18)
-    static let monoRowValue = mono(14)
-    static let monoField = mono(16)
-    static let monoDigitBox = mono(24)
+    /// zaehlen lassen. 18 pt → `body`.
+    static let monoCan = mono(.body)
+    /// Der Wert in einer Ergebniszeile. 14 pt → `footnote`.
+    static let monoRowValue = mono(.footnote)
+    /// Ein Eingabefeld der Passmaske. 16 pt → `callout`.
+    static let monoField = mono(.callout)
+    /// Die einzelne Ziffer im CAN-Kasten. 24 pt → `title2`.
+    static let monoDigitBox = mono(.title2)
 }

@@ -65,7 +65,7 @@ struct AuthenticityMark: View {
         case .unverifiable:
             HStack(spacing: 3) {
                 Image(systemName: "exclamationmark.circle.fill")
-                    .font(.system(size: 12))
+                    .font(.caption)
                 Text(strings[.authenticityUnverifiedShort])
                     .font(AppType.microLabel)
                     .lineLimit(1)

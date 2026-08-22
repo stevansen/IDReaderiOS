@@ -26,6 +26,7 @@ Commit `7ab0d20`, Version 1.8 / versionCode 11.
 | CSCA-Vertrauensanker als PEM-Bündel für die Kettenprüfung | erzeugt | 2 Tests |
 | Datenschutz-Gegenstücke (Sicherung, Dateischutz, App-Umschalter, Zwischenablage, Netzprüfung) | gebaut | `Scripts/check-no-network.sh` |
 | Lizenz: Apache-2.0 | umgestellt, **Christians Zustimmung fehlt noch** | [LICENCE-CHOICE.md](LICENCE-CHOICE.md) |
+| Bedienungshilfen: Schriftgrößen, Vorlesefunktion, Kontrast | geprüft und nachgebessert | [ACCESSIBILITY.md](ACCESSIBILITY.md) |
 | Sperrprüfung: CRL lesen, Signatur prüfen, ablegen, offline abgleichen, offene Prüfungen nachholen, Datum am Datensatz | gebaut, **gegen die echte italienische CRL durchlaufen** | 29 Tests; im Simulator geholt, geprüft und angezeigt |
 
 **Fassung 1.8 (Build 2) liegt seit dem 21. August 2026 in App Store Connect**

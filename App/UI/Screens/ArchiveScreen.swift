@@ -168,7 +168,7 @@ struct ArchiveScreen: View {
                         .foregroundStyle(DocumentPalette.tint(mode, dark: palette.isDark).content)
                     Text(record.data.fullName)
                         .font(.subheadline.weight(.semibold))
-                        .lineLimit(1)
+                        .lineLimit(2)
                     Text(record.data.documentNumber)
                         .font(AppType.monoRowValue)
                         .foregroundStyle(palette.onSurfaceVariant)
@@ -208,10 +208,10 @@ struct ArchiveScreen: View {
         HStack(spacing: 4) {
             switch record.revocation?.outcome {
             case .revoked:
-                Image(systemName: "xmark.seal").font(.system(size: 10))
+                Image(systemName: "xmark.seal")
                 Text(strings[.revocationRevoked])
             case .notRevoked:
-                Image(systemName: "checkmark.seal").font(.system(size: 10))
+                Image(systemName: "checkmark.seal")
                 Text(
                     strings.format(
                         .revocationCheckedAt,
@@ -219,15 +219,15 @@ struct ArchiveScreen: View {
                     )
                 )
             case .noListForIssuer:
-                Image(systemName: "questionmark.circle").font(.system(size: 10))
+                Image(systemName: "questionmark.circle")
                 Text(strings[.revocationNoList])
             case nil:
-                Image(systemName: "clock").font(.system(size: 10))
+                Image(systemName: "clock")
                 Text(strings[.revocationPending])
             }
         }
         .font(AppType.microLabel)
-        .lineLimit(1)
+        .lineLimit(2)
         .foregroundStyle(
             record.revocation?.outcome == .revoked ? palette.error : palette.onSurfaceVariant
         )

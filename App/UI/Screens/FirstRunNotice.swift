@@ -168,7 +168,7 @@ struct SettingsScreen: View {
                         .contentShape(.rect)
                 }
                 .accessibilityLabel(strings[.actionBack])
-                Text(strings[.menuSettings]).font(AppType.screenTitle).lineLimit(1)
+                Text(strings[.menuSettings]).font(AppType.screenTitle).lineLimit(2)
                 Spacer(minLength: 0)
             }
             .padding(.horizontal, 8)
