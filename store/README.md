@@ -218,3 +218,57 @@ werden — das Hochladen allein tut es nicht.
   ausdrücklich gewünscht war.
 * **Vier statt sieben Bilder** für `en-US` und `it`. Dem deutschen Satz fehlen
   Hinweis, Teilen und Einstellungen nicht; den anderen zwei schon.
+
+---
+
+## Was am 22. August 2026 nachgesehen und gesetzt wurde
+
+Die Prüfung ist über die Schnittstelle gelaufen, nicht über den Browser — jede
+Zeile unten ist ein gelesener Wert, keine Erinnerung.
+
+| | Stand |
+|---|---|
+| Preis | **kostenlos**, war schon gesetzt (Grundgebiet ITA, Kundenpreis 0,0) |
+| Gebiete | **41 europäische**, Frankreich ausgenommen — so gewollt, siehe unten |
+| Datenschutz-Adresse | gesetzt, je Sprache auf `store/privacy/privacy-policy-<lang>.md` im Repository |
+| Altersfreigabe | **war vollständig unbeantwortet.** Beantwortet, Ergebnis 4+ |
+| Inhalte Dritter | **war leer.** Gesetzt auf „keine" |
+| Prüfkontakt | war gesetzt |
+| Ausfuhrangabe | je Bau gesetzt |
+| Bedienungshilfen | Entwurf, absichtlich nicht veröffentlicht |
+
+Die beiden mittleren Zeilen waren **Riegel vor jeder Einreichung**: ohne
+Altersfreigabe und ohne die Erklärung zu Inhalten Dritter nimmt App Store Connect
+keine Einreichung an, und keine von beiden meldet sich von selbst. Gesetzt mit
+
+```bash
+swift Scripts/asc.swift age-rating
+swift Scripts/asc.swift content-rights
+```
+
+### Die Gebiete: 41 und nicht 26
+
+Der Auftrag lautete „EU außer Frankreich". Beim Nachsehen war Frankreich schon
+ausgenommen und die App in 41 europäischen Gebieten verfügbar: den 26
+EU-Staaten plus fünfzehn außerhalb — Schweiz, Norwegen, Island, Vereinigtes
+Königreich, Ukraine, Türkei, Westbalkan, Moldau, Belarus, Russland.
+
+Nachgefragt und **so bestätigt**. Südtirol hat Nachbarn außerhalb der EU, und ein
+Werkzeug, das ein Dokument prüft, ist dort so nützlich wie hier. Aufgeschrieben,
+damit es nicht bei der nächsten Durchsicht als Versehen korrigiert wird.
+
+### Was noch fehlt
+
+1. **Der Verantwortliche in der Datenschutzerklärung.** In allen drei Fassungen
+   stehen dort noch `<<Name>>` und `<<E-Mail>>`. Eine Rollenadresse soll es
+   werden — bis sie da ist, zeigt die gesetzte Adresse auf ein Dokument mit zwei
+   Lücken. **Vor der Einreichung zu füllen**, sonst liest der Prüfer sie.
+2. **Bildschirmfotos: 7 auf Deutsch, 4 auf Englisch und Italienisch.** Kein
+   Riegel — Apple verlangt eines —, aber der englische und der italienische
+   Eintrag zeigen den Ersthinweis, den Führerschein und die Einstellungen nicht.
+   Die drei fehlenden lassen sich im Simulator in der jeweiligen Sprache
+   nachziehen.
+3. **Christian Auers eigener Beleg für Apache-2.0.** Siehe COPYRIGHT: die
+   Lizenzdateien liegen in beiden Repositorien, aber beide Festschreibungen im
+   Android-Repository sind von Stefan Hellweger verfasst.
+

@@ -354,6 +354,22 @@ final class PassportChipReader: ChipDocumentReader {
         if let detail = model.sodVerificationDetail {
             ReadLog.shared.add("· SOD-Signatur: \(detail)")
         }
+        // Das Format des Lichtbildes - Typ und Groesse, nie die Bilddaten.
+        //
+        // Es prueft eine Aussage in der Datenschutzerklaerung: dort steht, dass
+        // das Bild auf der Karte als JPEG 2000 vorliegt, dass iOS dafuer keinen
+        // Decoder mitbringt und dass die App es deshalb nicht anzeigt und nicht
+        // speichert. Das stand bisher aus der Spezifikation da und war am Geraet
+        // nie nachgesehen. Eine Zusage, die niemand geprueft hat, ist eine
+        // Vermutung im Rechtstext.
+        if let dg2 = model.getDataGroup(.DG2) as? DataGroup2, !dg2.imageData.isEmpty {
+            let bild = FaceImageDecoder.decode(Data(dg2.imageData), declaredMimeType: nil)
+            ReadLog.shared.add(
+                "· Lichtbild: \(bild?.mimeType ?? "nicht erkannt")"
+                + ", \(dg2.imageData.count) Byte"
+                + ", \(bild?.jpegData == nil ? "nicht anzeigbar" : "anzeigbar")"
+            )
+        }
         if let signer = model.documentSigningCertificate?.getSubjectName() {
             ReadLog.shared.add("· Signierer: \(signer)")
         } else {

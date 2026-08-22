@@ -741,6 +741,107 @@ func setzeAusfuhrangabe(_ nummer: String, ausgenommen: Bool) async throws {
     print("Bau \(nummer): Ausfuhrangabe gesetzt (nicht-freigestellte Verschluesselung = \(!ausgenommen)).")
 }
 
+/// Setzt die Erklaerung zu Inhalten Dritter.
+///
+/// Ebenfalls leer vorgefunden, ebenfalls ein Riegel vor jeder Einreichung.
+///
+/// Gesetzt wird **keine Inhalte Dritter**. Gefragt ist, ob die App Inhalte zeigt
+/// oder abruft, die einem anderen gehoeren - Musik, Filme, Buecher, fremde
+/// Datenbestaende. Diese App zeigt die Angaben des Dokuments, das vor dem Gerraet
+/// liegt, und sonst nichts.
+///
+/// Drei Dinge liegen bei, und keines ist gemeint: die italienischen
+/// CSCA-Zertifikate sind oeffentliche Dokumente des italienischen Staates,
+/// unveraendert weitergegeben; zwei Material-Symbols-Glyphen stehen unter
+/// Apache-2.0, die Rechte sind also erteilt; der uebrige fremde Code ist Code und
+/// kein Inhalt. Alles davon steht in THIRD-PARTY-NOTICES.md.
+///
+/// Auch das ist eine Erklaerung an Apple. Wer sie anders trifft, ruft
+/// `content-rights fremd` auf.
+func setzeInhalteDritter(_ fremd: Bool) async throws {
+    try await call("PATCH", "apps/\(appID)", body: [
+        "data": [
+            "type": "apps",
+            "id": appID,
+            "attributes": [
+                "contentRightsDeclaration":
+                    fremd ? "USES_THIRD_PARTY_CONTENT" : "DOES_NOT_USE_THIRD_PARTY_CONTENT",
+            ],
+        ],
+    ])
+    print("Inhalte Dritter: \(fremd ? "ja, Rechte liegen vor" : "keine").")
+}
+
+/// Beantwortet den Fragebogen zur Altersfreigabe.
+///
+/// ## Warum das hier steht und nicht im Browser
+///
+/// Beim Nachsehen war er **vollstaendig unbeantwortet** - jedes Feld `null`,
+/// `appStoreAgeRating` ebenso. Ohne ihn nimmt Apple keine Einreichung an, und im
+/// Browser sind es fuenfundzwanzig Klicks, die niemand nachvollziehen kann.
+///
+/// Die Antworten sind fuer diese App nicht strittig: sie liest einen Ausweis und
+/// sagt, ob die Signaturen aufgehen. Kein Werbenetz, keine fremden Inhalte, kein
+/// Browser, keine Nachrichten, kein Gluecksspiel, keine Gewalt. Genau das steht
+/// unten, Feld fuer Feld - und es ist eine **Erklaerung an Apple**, fuer die der
+/// Anbieter einsteht. Deshalb keine Sammelzuweisung, sondern jede Angabe
+/// benannt.
+///
+/// `ageAssurance` ist Pflichtangabe und steht auf **nein**, mit Begruendung an der
+/// Zeile selbst: ob eine App, die ein vorgelegtes Ausweisdokument liest, damit
+/// eine Altersverifikation anbietet, ist eine Aussage ueber den Zweck und keine
+/// ueber den Inhalt. Sie gehoert dem Anbieter, und sie steht an einer Stelle.
+func setzeAltersfreigabe() async throws {
+    let info = try await appInfoID()
+
+    // Haeufigkeitsangaben: NONE, INFREQUENT_OR_MILD, FREQUENT_OR_INTENSE.
+    let keine = "NONE"
+    let stufen = [
+        "alcoholTobaccoOrDrugUseOrReferences", "contests",
+        "gamblingSimulated", "gunsOrOtherWeapons", "horrorOrFearThemes",
+        "matureOrSuggestiveThemes", "medicalOrTreatmentInformation",
+        "profanityOrCrudeHumor", "sexualContentGraphicAndNudity",
+        "sexualContentOrNudity", "violenceCartoonOrFantasy",
+        "violenceRealistic", "violenceRealisticProlongedGraphicOrSadistic",
+    ]
+    // Ja/Nein-Angaben.
+    let schalter = [
+        "advertising", "gambling", "healthOrWellnessTopics", "lootBox",
+        "messagingAndChat",
+        "parentalControls", "socialMedia", "socialMediaAgeRestricted",
+        "unrestrictedWebAccess", "userGeneratedContent",
+    ]
+
+    var felder: [String: Any] = [:]
+    for name in stufen { felder[name] = keine }
+    for name in schalter { felder[name] = false }
+
+    // `ageAssurance` ist Pflichtangabe - ohne sie nimmt die Schnittstelle den
+    // Fragebogen nicht an. Gesetzt wird **nein**, und die Begruendung gehoert
+    // dazu: gefragt ist, ob die App das Alter **ihres Benutzers** feststellt, um
+    // Inhalte zu beschraenken. Diese App tut das nicht. Sie liest ein Dokument,
+    // das jemand anderer vorlegt, und schraenkt gar nichts ein. Dass in den
+    // gelesenen Angaben ein Geburtsdatum steht, macht daraus keine
+    // Altersverifikation - es ist ein Feld des Dokuments, kein Tuerwaechter.
+    //
+    // Wer das anders sieht, aendert genau diese Zeile; es ist eine Aussage ueber
+    // den Zweck der App und die trifft der Anbieter.
+    felder["ageAssurance"] = false
+
+    try await call("PATCH", "ageRatingDeclarations/\(info)", body: [
+        "data": [
+            "type": "ageRatingDeclarations",
+            "id": info,
+            "attributes": felder,
+        ],
+    ])
+    print("Altersfreigabe beantwortet: \(stufen.count) Haeufigkeitsangaben auf NONE,")
+    print("\(schalter.count) Ja/Nein-Angaben auf nein.")
+    print("`ageAssurance` = nein: die App stellt nicht das Alter ihres Benutzers")
+    print("fest, sie liest ein vorgelegtes Dokument. Aussage ueber den Zweck -")
+    print("wer sie anders trifft, aendert sie in dieser Funktion.")
+}
+
 /// Genau den einen Bau holen, nach seiner Nummer.
 ///
 /// Vorher listeten vier Stellen `apps/<id>/builds?limit=20` und suchten darin.
@@ -959,6 +1060,9 @@ do {
     case "test-build":
         guard argumente.count > 2 else { throw Fehler("Aufruf: test-build <Nummer> <Gruppe>") }
         try await gibZumTest(argumente[1], gruppe: argumente[2])
+    case "age-rating": try await setzeAltersfreigabe()
+    case "content-rights":
+        try await setzeInhalteDritter(argumente.count > 1 && argumente[1] == "fremd")
     case "accessibility":
         try await setzeBedienungshilfen(veroeffentlichen: argumente.contains("--publish"))
     case "delete":
