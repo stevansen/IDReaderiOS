@@ -60,11 +60,33 @@ final class ReadTrail: PassportReaderTrackingDelegate {
     /// hängt der Lesevorgang an OpenSSL; steht keine, ist es kein PACE-Chip und
     /// eine CIE 3.0 dann auch nicht.
     func readCardAccess(cardAccess: CardAccess) {
-        let anzahl = cardAccess.securityInfos.count
-        let kennungen = cardAccess.securityInfos
-            .map { $0.getObjectIdentifier() }
-            .joined(separator: ",")
-        add("CardAccess gelesen (\(anzahl) SecurityInfo: \(kennungen))")
+        let teile = cardAccess.securityInfos.map { info -> String in
+            let kennung = info.getObjectIdentifier()
+            guard let pace = info as? PACEInfo else { return kennung }
+            // Die drei Werte, an denen der Ablauf haengt.
+            //
+            // Der Verfahrensname bestimmt, ob mit DH oder ECDH gerechnet wird;
+            // die Parameterkennung, ueber welcher Gruppe oder Kurve. Passen die
+            // beiden nicht zueinander - etwa DH als Verfahren und eine
+            // brainpool-Kurve als Parameter -, dann rechnet die Bibliothek mit
+            // dem falschen Verfahren, der Chip antwortet unerwartet, und heraus
+            // kommt genau das `InvalidASN1Value`, das am Geraet zu sehen war.
+            //
+            // Genau diese Unstimmigkeit ist von aussen nicht anders zu sehen.
+            let parameter = pace.getParameterId().map(String.init) ?? "keine"
+            // `description()` der Bibliothek ist `internal` - also selbst
+            // benennen, statt einen fuenften Eingriff in fremden Code dafuer zu
+            // machen.
+            let abbildung: String
+            switch try? pace.getMappingType() {
+            case .some(.GM): abbildung = "GM"
+            case .some(.IM): abbildung = "IM"
+            case .some(.CAM): abbildung = "CAM"
+            default: abbildung = "Abbildung unbekannt"
+            }
+            return "\(kennung) v\(pace.getVersion()) Param \(parameter) \(abbildung)"
+        }
+        add("CardAccess gelesen (\(cardAccess.securityInfos.count)): \(teile.joined(separator: " | "))")
     }
 
     func paceStarted() { add("PACE begonnen") }
