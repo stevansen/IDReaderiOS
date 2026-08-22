@@ -15,6 +15,22 @@ ausdrückliche Anforderung, **nie während eines Lesevorgangs**: der Zeitpunkt e
 Anfrage wäre sonst selbst eine Mitteilung. Abschaltbar in den Einstellungen; aus
 ist die App vollständig offline.
 
+**Wo dieser Satz überall stehen muss, und wo er zweimal fehlte.** Eine Zusage
+„offline" lebt nicht an einer Stelle. Sie stand in der App, in drei
+Store-Beschreibungen, drei Werbetexten, drei Datenschutzerklärungen, im
+Ausfuhrdossier und in diesem Papier. Beim Einbau der Sperrprüfung sind die
+Beschreibungen, die Erklärungen und der erste Hinweis nachgezogen worden — die
+**Werbetexte** und der Satz auf dem **Echtheitsblatt in der App** nicht. Beide
+sagten weiter „kein Netzzugriff", und die Werbetexte standen so bereits im Store.
+Am 22. August 2026 berichtigt.
+
+Die Lehre steht hier, weil sie sich wiederholen wird: wer eine solche Zusage
+ändert, sucht nicht nach dem Wort „offline", sondern nach **jeder Stelle, an der
+die App über sich selbst spricht**. Zwölf sind es allein von denen, die ein
+Benutzer zu sehen bekommt: drei Stellen in der App, drei Store-Beschreibungen,
+drei Werbetexte, drei Datenschutzerklärungen. Dazu kommen README,
+Ausfuhrdossier, `Scripts/check-no-network.sh` und dieses Papier.
+
 Genau deshalb CRL und nicht OCSP. Bei OCSP geht die Seriennummer des gerade
 geprüften Zertifikats mit hinaus, also ein Hinweis darauf, welches Dokument
 jemand in der Hand hält. Eine CRL wird als Ganzes geholt und danach **offline**

@@ -41,7 +41,7 @@
 "authenticity_check_hashes" = "Data groups unchanged";
 "authenticity_check_signature" = "Security object signature valid";
 "authenticity_details_title" = "Authenticity check";
-"authenticity_explainer" = "Checked against the bundled Italian CSCA certificates. No network, no revocation lookup.";
+"authenticity_explainer" = "Computed on the device, against the bundled Italian CSCA certificates. Whether the signing certificate has been revoked is not what the seal says — the revocation list says that, and it stands on its own.";
 "authenticity_fail_anchor" = "The card's certificate belongs to no bundled Italian authority.";
 "authenticity_fail_chain" = "The certificate chain is invalid.";
 "authenticity_fail_chip" = "The data is genuine, but the chip did not prove it is the original. That is how a copy behaves onto which the data groups of a real card were written.";

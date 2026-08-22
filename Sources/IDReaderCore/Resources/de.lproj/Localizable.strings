@@ -41,7 +41,7 @@
 "authenticity_check_hashes" = "Datengruppen unverändert";
 "authenticity_check_signature" = "Signatur des Sicherheitsobjekts gültig";
 "authenticity_details_title" = "Echtheitsprüfung";
-"authenticity_explainer" = "Geprüft wird gegen die hinterlegten italienischen CSCA-Zertifikate. Ohne Netzwerk, ohne Sperrlistenabfrage.";
+"authenticity_explainer" = "Gerechnet wird auf dem Gerät, gegen die hinterlegten italienischen CSCA-Zertifikate. Ob das Signierzertifikat gesperrt wurde, sagt das Siegel nicht — dafür steht die Sperrliste, und die steht für sich.";
 "authenticity_fail_anchor" = "Das Zertifikat der Karte gehört zu keiner hinterlegten italienischen Stelle.";
 "authenticity_fail_chain" = "Die Zertifikatskette ist ungültig.";
 "authenticity_fail_chip" = "Die Daten sind echt, aber der Chip hat nicht nachgewiesen, dass er das Original ist. Genau so verhält sich eine Kopie, auf die die Datengruppen eines echten Ausweises geschrieben wurden.";

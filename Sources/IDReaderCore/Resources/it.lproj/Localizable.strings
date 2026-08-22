@@ -41,7 +41,7 @@
 "authenticity_check_hashes" = "Gruppi di dati invariati";
 "authenticity_check_signature" = "Firma dell'oggetto di sicurezza valida";
 "authenticity_details_title" = "Verifica di autenticità";
-"authenticity_explainer" = "La verifica avviene con i certificati CSCA italiani inclusi nell'app. Senza rete e senza consultare le liste di revoca.";
+"authenticity_explainer" = "Il calcolo avviene sul dispositivo, con i certificati CSCA italiani inclusi nell'app. Se il certificato di firma sia stato revocato non lo dice il sigillo: lo dice la lista di revoca, che sta a sé.";
 "authenticity_fail_anchor" = "Il certificato della carta non appartiene a nessuna autorità italiana inclusa.";
 "authenticity_fail_chain" = "La catena di certificati non è valida.";
 "authenticity_fail_chip" = "I dati sono autentici, ma il chip non ha dimostrato di essere l'originale. È esattamente il comportamento di una copia su cui sono stati scritti i gruppi di dati di una carta vera.";

@@ -1,1 +1,1 @@
-Legge il chip della carta di identità italiana e dei passaporti via NFC e verifica offline che il documento sia autentico. Nessun accesso alla rete.
+Legge il chip della carta d'identità e dei passaporti via NFC e verifica sul dispositivo che sia autentico. I dati restano qui: dalla rete arriva solo la lista di revoca.

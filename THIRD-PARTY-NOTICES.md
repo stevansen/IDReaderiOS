@@ -45,4 +45,5 @@ Recorded because the reasoning cost effort and would otherwise be lost:
   `xmark.seal.fill`), part of the platform.
 * **Play Core `app-update-ktx`** (Android Software Development Kit Licence) —
   forced update through the Play Store. No counterpart: the App Store has no
-  in-app equivalent, and the app takes no network access to build one.
+  in-app equivalent, and the app adds no network access to build one. (It has
+  exactly one, for the revocation list — see `docs/DATA-PROTECTION.md`.)
