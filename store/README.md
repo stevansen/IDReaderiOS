@@ -144,3 +144,49 @@ xcrun simctl io <UDID> screenshot store/screenshots/6.9-de/01-hinweis.png
 
 Kein Rahmen, kein Text im Bild, kein Gerätebild darum. Apple erlaubt das, aber es
 verdeckt, was die App zeigt — und was sie zeigt, ist hier das Argument.
+
+## Eintragen: nicht mehr von Hand
+
+Seit dem 22. August 2026 schreibt [`../Scripts/asc.swift`](../Scripts/asc.swift)
+diesen Ordner über die App Store Connect API in den Eintrag. Damit ist `store/`
+die Quelle und der Eintrag das Abbild — vorher war es ein Ordner, den niemand
+angewendet hat.
+
+```bash
+export ASC_KEY_ID=… ASC_ISSUER_ID=…
+swift Scripts/asc.swift show            # was heute im Eintrag steht
+swift Scripts/asc.swift set-version 1.8
+swift Scripts/asc.swift category UTILITIES
+swift Scripts/asc.swift metadata        # Name, Untertitel, Beschreibung, Stichworte, Werbetext
+swift Scripts/asc.swift screenshots     # aus screenshots/<größe>-<sprache>/
+```
+
+Jeder Lauf schreibt denselben Zustand; die Bildschirmfotos werden vorher
+geleert, damit nicht bei jedem Lauf dieselben ein zweites Mal erscheinen.
+
+### Drei Dinge, die dabei herauskamen
+
+* **Die API kennt kein `APP_IPHONE_69`.** 1320 × 2868 gehört in das
+  6,7-Zoll-Fach; im Store heißt es „6,7 Zoll oder 6,9 Zoll". Durchprobiert, die
+  API listet die zulässigen Werte im Fehler auf.
+* **Eine Sprache in den App-Informationen anzulegen legt die
+  Fassungsübersetzung mit an.** Eine Liste, die vorher geholt wurde, ist danach
+  falsch.
+* **„IDReader" ist für `en-US` von einem fremden Konto belegt.** Siehe unten.
+
+## Offen: der englische Name
+
+Der Name ist im App Store **je Sprache** eindeutig. Für Italienisch (die
+Hauptsprache) und Deutsch ist „IDReader" frei und gesetzt. Für `en-US` nicht:
+
+> The app name you entered is already being used. If you have trademark rights
+> to this name and would like it released for your use, submit a claim.
+
+Beim Anlegen einer Sprache verlangt Apple einen Namen, also fehlt die
+englische Sprache im Eintrag ganz — und damit im englischen Store der
+Untertitel, die Beschreibung, die Stichworte und die Bildschirmfotos. Der
+**Name** selbst fehlt nicht: ohne englische Sprache zeigt der Store den
+italienischen, und der ist derselbe.
+
+Zu entscheiden ist ein anderer englischer Name. `name.txt` in `en-US` bleibt
+bis dahin auf „IDReader" stehen, damit die Frage sichtbar bleibt.

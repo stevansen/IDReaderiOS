@@ -78,6 +78,29 @@ keine von beiden liegt im Repository, weil es öffentlich ist. Für sich allein 
 sie nutzlos — der eigentliche Schlüssel ist die `.p8`-Datei, und die liest `altool`
 selbst.
 
+## Der Store-Eintrag: über die API, nicht über Klicken
+
+`store/` war lange ein Ordner, den niemand angewendet hat.
+[`../Scripts/asc.swift`](../Scripts/asc.swift) schreibt ihn jetzt über die
+App Store Connect API in den Eintrag — damit ist `store/` die Quelle, der
+Eintrag das Abbild, und ein `git diff` zeigt, was sich am Ladenschild geändert
+hat.
+
+```bash
+swift Scripts/asc.swift show
+swift Scripts/asc.swift metadata
+swift Scripts/asc.swift screenshots
+```
+
+Dieselben zwei Umgebungsvariablen wie beim Hochladen. Der Schlüssel wird über
+seinen **Pfad** gelesen, nie über eine Kommandozeile, und weder er noch der
+erzeugte Token werden ausgegeben — der Token ist zwanzig Minuten lang ein
+Vollzugriff auf das Konto.
+
+Was dabei herauskam, steht in [`../store/README.md`](../store/README.md):
+insbesondere, dass der **englische Name** noch fehlt, weil „IDReader" für
+`en-US` von einem fremden Konto belegt ist.
+
 ## Dann läuft es in zwei Befehlen
 
 ```bash

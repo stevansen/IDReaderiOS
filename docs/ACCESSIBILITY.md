@@ -123,5 +123,31 @@ Apples eigener segmentierter Umschalter ist genauso hoch.
 3. **„Fette Schrift", „Kontrast erhöhen", „Bewegung reduzieren"** sind nicht
    geprüft. Die App hat genau eine Bewegung — den Übergang zwischen den
    Masken, 0,22 s — und die gehört an `accessibilityReduceMotion` gebunden.
-4. **Die Bedienungshilfen-Angaben im App Store** dürfen erst gesetzt werden,
-   soweit sie hier belegt sind. Was nicht geprüft ist, wird nicht angekreuzt.
+4. **Das iPad.** Der Bau läuft dort auch — `CFBundleIcons~ipad` ist gesetzt —,
+   geprüft wurde nichts. Deshalb gibt es für das iPad **keine**
+   Bedienungshilfen-Angabe im Store: eine, die von einer nicht geprüften
+   Geräteklasse behauptet, was auf einer anderen geprüft wurde, wäre genau der
+   Fehler, den dieses Papier oben anderen vorwirft. Ein erster Lauf hatte sie
+   angelegt; sie ist wieder gelöscht.
+
+## Was im App Store steht
+
+Gesetzt über `swift Scripts/asc.swift accessibility`, **als Entwurf** — das
+Veröffentlichen ist eine öffentliche Zusage und braucht `--publish`.
+
+Angekreuzt, weil belegt:
+
+| Angabe | Belegt durch |
+|---|---|
+| Größerer Text | Alle drei Masken, Archiv und Ergebnis bei der größten Bedienungshilfen-Schrift, hell und dunkel, am Simulator durchgesehen |
+| Ausreichender Kontrast | `Scripts/contrast.py`, 66 Werte über sechs Paletten |
+| Nicht nur Farbe | Das Echtheitsurteil steht in Worten neben jedem Zeichen |
+| Dunkle Oberfläche | Drei dunkle Paletten, am Simulator gesehen |
+
+Nicht angekreuzt, und zwar bewusst: **Vorlesefunktion** (Beschriftungen sind da,
+am Gerät mit eingeschaltetem VoiceOver ist nichts durchgesprochen),
+**Sprachsteuerung** (ungeprüft), **Bewegung reduzieren** (nicht gebaut),
+**Untertitel** und **Audiodeskription** (die App hat keine Medien).
+
+Eine falsche Angabe dort wäre nicht ein Haken zu viel: sie steht im Store, und
+jemand richtet sich danach.
