@@ -21,6 +21,11 @@ struct ReadingScreen: View {
     let onCancel: () -> Void
 
     @Environment(\.palette) private var palette
+    /// „Bewegung reduzieren" ist eine Einstellung, die jemand aus einem Grund
+    /// setzt - Schwindel, Migraene, Reisekrankheit. Die pulsierenden Ringe sind
+    /// das einzige Dauerhafte an Bewegung in dieser App, und sie stehen genau
+    /// dort, wo man laenger hinsieht als anderswo.
+    @Environment(\.accessibilityReduceMotion) private var wenigerBewegung
     @State private var pulse = false
 
     var body: some View {
@@ -35,11 +40,12 @@ struct ReadingScreen: View {
                         Circle()
                             .stroke(palette.tapAccent.opacity(0.18), lineWidth: 1.5)
                             .frame(width: 150 + CGFloat(ring) * 55)
-                            .scaleEffect(pulse ? 1.06 : 0.97)
+                            .scaleEffect(wenigerBewegung ? 1 : (pulse ? 1.06 : 0.97))
                             .animation(
-                                .easeInOut(duration: 1.8)
-                                    .repeatForever()
-                                    .delay(Double(ring) * 0.25),
+                                wenigerBewegung ? nil
+                                    : .easeInOut(duration: 1.8)
+                                        .repeatForever()
+                                        .delay(Double(ring) * 0.25),
                                 value: pulse
                             )
                     }
@@ -88,6 +94,19 @@ struct ReadingScreen: View {
         }
         .opacity(dimmed ? 0.45 : 1)
         .onAppear { pulse = true }
+        // Der Fortschritt wird **gesprochen**, nicht nur angezeigt.
+        //
+        // Wer ein Dokument an die Rueckseite haelt, sieht den Bildschirm nicht -
+        // das gilt fuer jeden, und mit eingeschalteter Vorlesefunktion ist es die
+        // einzige Rueckmeldung, die ankommt. Eine Zeile, die sich aendert, meldet
+        // VoiceOver nicht von selbst; dafuer braucht es die Ankuendigung.
+        //
+        // An der Stufe aufgehaengt und nicht am Schritt: es sind vier Stufen und
+        // ein Dutzend Schritte, und wer bei jedem Datengruppenwechsel etwas hoert,
+        // hoert am Ende nichts mehr.
+        .onChange(of: step.phase) { _, phase in
+            AccessibilityNotification.Announcement(strings[label(phase)]).post()
+        }
     }
 
     private func phaseRow(_ phase: ReadPhase) -> some View {

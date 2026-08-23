@@ -42,6 +42,7 @@ struct DocumentInputScaffold<Content: View>: View {
     @Environment(\.palette) private var palette
     /// Nur fuer eine Entscheidung gebraucht: waagerecht oder untereinander.
     @Environment(\.dynamicTypeSize) private var typeSize
+    @Environment(\.accessibilityReduceMotion) private var wenigerBewegung
 
     var body: some View {
         VStack(spacing: 0) {
@@ -53,7 +54,10 @@ struct DocumentInputScaffold<Content: View>: View {
                     removal: .move(edge: forward ? .leading : .trailing).combined(with: .opacity)
                 ))
         }
-        .animation(.easeInOut(duration: 0.22), value: mode)
+        // Der einzige Uebergang der App, und auch er weicht, wenn „Bewegung
+        // reduzieren" gesetzt ist. Der Wechsel geschieht dann sofort - was
+        // gewechselt hat, sagt der Umschalter darueber.
+        .animation(wenigerBewegung ? nil : .easeInOut(duration: 0.22), value: mode)
     }
 
     /// Die Maske - und bei den Bedienungshilfen-Schriftgroessen in einem
