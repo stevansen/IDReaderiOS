@@ -113,16 +113,25 @@ Apples eigener segmentierter Umschalter ist genauso hoch.
 
 ## Was offen ist
 
-1. **Am Gerät mit eingeschaltetem VoiceOver durchgesprochen** ist noch nichts.
-   Der Simulator zeigt die Beschriftungen, nicht die Reihenfolge, in der man sie
-   hört, und nicht, wie sich das Lesen einer Karte anhört, während die
-   Rückmeldung wechselt.
-2. **Die Rückmeldungen während des Lesens** (`ReadStep`) sollten als
-   `accessibilityAnnouncement` gesprochen werden. Heute stehen sie nur da. Wer
-   die Karte an die Rückseite hält, sieht den Bildschirm nicht.
-3. **„Fette Schrift", „Kontrast erhöhen", „Bewegung reduzieren"** sind nicht
-   geprüft. Die App hat genau eine Bewegung — den Übergang zwischen den
-   Masken, 0,22 s — und die gehört an `accessibilityReduceMotion` gebunden.
+1. ~~Am Gerät mit eingeschaltetem VoiceOver durchgesprochen~~ — **erledigt am
+   23. August 2026**, an Bau 22, und dabei **ein Dokument gelesen**. Das ist die
+   Prüfung, auf die es bei Apples Angabe ankommt: dort heißt „VoiceOver", dass die
+   *wesentlichen* Funktionen benutzbar sind, und die wesentliche Funktion dieser
+   App ist der Lesevorgang. `supportsVoiceover` steht seither auf `true`.
+2. ~~Die Rückmeldungen während des Lesens sollten gesprochen werden~~ —
+   **eingebaut.** `AccessibilityNotification.Announcement` bei jedem Wechsel der
+   **Stufe**, nicht des Schritts: es sind vier Stufen und ein Dutzend Schritte,
+   und wer bei jedem Datengruppenwechsel etwas hört, hört am Ende nichts mehr.
+   Wer ein Dokument an die Rückseite hält, sieht den Bildschirm nicht — das gilt
+   für jeden, und mit eingeschalteter Vorlesefunktion ist es die einzige
+   Rückmeldung, die ankommt.
+3. **„Bewegung reduzieren" wirkt jetzt** — und die Zählung im alten Text war
+   falsch: die App hat **zwei** Bewegungen, nicht eine. Der Übergang zwischen den
+   Masken (0,22 s) und die pulsierenden Ringe des Lesescreens, die dauerhaft
+   laufen und genau dort stehen, wo man länger hinsieht als anderswo. Beide
+   weichen ganz, statt schneller zu werden.
+
+   **„Fette Schrift" und „Kontrast erhöhen"** sind weiterhin nicht geprüft.
 4. **Das iPad.** Der Bau läuft dort auch — `CFBundleIcons~ipad` ist gesetzt —,
    geprüft wurde nichts. Deshalb gibt es für das iPad **keine**
    Bedienungshilfen-Angabe im Store: eine, die von einer nicht geprüften
@@ -151,3 +160,40 @@ am Gerät mit eingeschaltetem VoiceOver ist nichts durchgesprochen),
 
 Eine falsche Angabe dort wäre nicht ein Haken zu viel: sie steht im Store, und
 jemand richtet sich danach.
+
+## Warum die Angabe im Store trotzdem Entwurf ist
+
+Nicht aus Vorsicht, sondern weil es nicht geht: **veröffentlichen lässt sich eine
+Bedienungshilfen-Angabe nur für Geräte, für die eine Fassung live im App Store
+ist.** IDReader war nie veröffentlicht — es gibt kein Produktblatt, auf dem die
+Angabe stehen könnte.
+
+Beide Wege über die Schnittstelle sind probiert, beide werden abgewiesen:
+
+```
+PATCH accessibilityDeclarations/<id>   { "state": "PUBLISHED" }
+  → The attribute 'state' can not be included in a 'UPDATE' operation
+POST  accessibilityDeclarations        { "state": "PUBLISHED", … }
+  → The attribute 'state' can not be included in a 'CREATE' operation
+```
+
+`Scripts/asc.swift accessibility --publish` sagt das jetzt selbst, statt an einer
+Fehlermeldung zu scheitern, die nach einem Fehler im Werkzeug aussieht. Der
+Entwurf bleibt gespeichert; nach der ersten Freigabe genügt derselbe Befehl.
+
+## Was in welchem Bau steckt
+
+Eine Angabe im Store beschreibt das Programm, das der Leser herunterlädt — nicht
+den Quelltext. Deshalb:
+
+| Angabe | Stand | belegt durch |
+|---|---|---|
+| Größerer Text, Kontrast, nicht nur Farbe, dunkle Oberfläche | `true` | Simulator, alle Masken, hell und dunkel |
+| **VoiceOver** | `true` | Gerät, Bau 22, mit gelesenem Dokument |
+| **Bewegung reduzieren** | noch `false` | eingebaut nach Bau 23 — wird umgestellt, sobald ein Bau damit an der Fassung hängt |
+| Sprachsteuerung, Untertitel, Audiodeskription | `false` | nicht geprüft bzw. nicht zutreffend |
+
+Die dritte Zeile ist der Grund für diese Tabelle. Die Änderung ist geschrieben,
+geprüft und festgeschrieben — und sie ist in keinem Bau, den jemand installieren
+kann. Eine Zusage darüber wäre heute unwahr.
+

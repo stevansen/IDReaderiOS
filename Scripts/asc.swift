@@ -952,8 +952,21 @@ func setzeBedienungshilfen(veroeffentlichen: Bool) async throws {
         "supportsSufficientContrast": true,
         "supportsDifferentiateWithoutColorAlone": true,
         "supportsDarkInterface": true,
-        "supportsVoiceover": false,
+        // Am Geraet durchgesprochen, mit eingeschalteter Vorlesefunktion, und
+        // dabei ein Dokument gelesen - das ist die Pruefung, auf die es bei
+        // dieser Angabe ankommt: Apple versteht darunter, dass die
+        // **wesentlichen** Funktionen benutzbar sind, und die wesentliche
+        // Funktion dieser App ist der Lesevorgang.
+        "supportsVoiceover": true,
+        // Sprachsteuerung ist etwas anderes als die Vorlesefunktion und wurde
+        // nicht geprueft.
         "supportsVoiceControl": false,
+        // Eingebaut, aber **noch nicht im angehaengten Bau**: die pulsierenden
+        // Ringe und der Uebergang zwischen den Masken weichen seit dem Bau nach
+        // 23, wenn „Bewegung reduzieren" gesetzt ist. Diese Angabe wird erst
+        // umgestellt, wenn ein Bau mit dieser Aenderung an der Fassung haengt -
+        // sonst behauptet die Erklaerung etwas ueber ein Programm, das der Leser
+        // herunterlaedt und das es dort nicht tut.
         "supportsReducedMotion": false,
         "supportsCaptions": false,
         "supportsAudioDescriptions": false,
@@ -996,16 +1009,34 @@ func setzeBedienungshilfen(veroeffentlichen: Bool) async throws {
         print("Als Entwurf gespeichert. Zum Veroeffentlichen: accessibility --publish")
         return
     }
-    for row in rows(try await call("GET", "apps/\(appID)/accessibilityDeclarations?limit=50")) {
-        try await call("PATCH", "accessibilityDeclarations/\(ident(row))", body: [
-            "data": [
-                "type": "accessibilityDeclarations",
-                "id": ident(row),
-                "attributes": ["state": "PUBLISHED"],
-            ],
-        ])
+    // Veroeffentlichen geht erst, wenn die App im Store steht.
+    //
+    // Beide Wege sind probiert und beide weist die Schnittstelle ab: `state` darf
+    // weder in einem `UPDATE` noch in einem `CREATE` vorkommen. Der Grund steht
+    // in Apples Hilfe und ist keine Einschraenkung der Schnittstelle, sondern der
+    // Sache: **veroeffentlichen kann man eine Angabe nur fuer Geraete, fuer die
+    // eine Fassung live im Store ist.** Es gibt kein Produktblatt, auf dem sie
+    // stehen koennte.
+    //
+    // Also nicht scheitern, sondern es sagen.
+    let lebende = rows(try await call(
+        "GET",
+        "apps/\(appID)/appStoreVersions?limit=20&fields[appStoreVersions]=appStoreState"
+    )).filter { attr($0, "appStoreState") == "READY_FOR_SALE" }
+
+    guard !lebende.isEmpty else {
+        print("""
+            Noch nicht zu veroeffentlichen: die App hat keine Fassung im Store.
+            Apple laesst eine Bedienungshilfen-Angabe nur fuer Geraete
+            veroeffentlichen, fuer die eine Fassung live ist - vorher gibt es kein
+            Produktblatt, auf dem sie stehen koennte.
+
+            Die Angaben sind als Entwurf gespeichert und gehen nicht verloren.
+            Nach der ersten Freigabe hier noch einmal mit --publish laufen lassen.
+            """)
+        return
     }
-    print("Veroeffentlicht.")
+    print("Fassung im Store vorhanden - Veroeffentlichen ueber App Store Connect.")
 }
 
 // ---------------------------------------------------------------------------
