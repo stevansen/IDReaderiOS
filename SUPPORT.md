@@ -34,9 +34,11 @@ fünfzehn.
 
 **„Diese Karte unterstützt PACE nicht"** — dann ist es keine CIE 3.0.
 
-**Das Lichtbild bleibt leer.** Bekannt und noch offen: auf der italienischen Karte
-liegt es als JPEG 2000 vor, und iOS bringt dafür keinen Decoder mit. Die App zeigt
-an dieser Stelle das erkannte Format an, statt stillschweigend nichts zu zeigen.
+**Das Lichtbild bleibt leer.** Auf Karte und Pass liegt es als JPEG 2000 vor, und
+iOS liest dieses Format — normalerweise erscheint das Bild also. Bleibt die Stelle
+leer, wurde im schnellen Lesemodus gelesen, der es auslässt. Bei einem Format, das
+sich nicht lesen lässt, zeigt die App das erkannte Format an, statt
+stillschweigend nichts zu zeigen.
 
 **Die Erkennung liest ein Feld falsch.** Beim Führerschein sind alle Felder frei
 bearbeitbar, und das ist Absicht: es gibt dort keine Prüfziffer und keinen Chip,
@@ -79,9 +81,10 @@ fifteen for a passport.
 
 **"This card does not support PACE"** — then it is not a CIE 3.0.
 
-**The facial image stays empty.** Known and still open: on the Italian card it is
-JPEG 2000, and iOS ships no decoder for it. The app shows the detected format
-instead of silently showing nothing.
+**The facial image stays empty.** On the card and in the passport it is JPEG 2000,
+and iOS reads that format — normally the image appears. If the place stays empty,
+the fast read mode was used, which leaves it out. Where a format cannot be read,
+the app shows the detected format instead of silently showing nothing.
 
 **Recognition misreads a field.** On the driving licence every field can be
 edited, deliberately: there is no check digit and no chip to contradict it. Check
@@ -125,9 +128,10 @@ richiede circa da cinque a dieci secondi, fino a quindici per il passaporto.
 
 **«Questa carta non supporta PACE»** — allora non è una CIE 3.0.
 
-**La fotografia resta vuota.** Noto e ancora aperto: sulla carta italiana è in
-JPEG 2000, e iOS non dispone di un decodificatore. L'app mostra il formato
-rilevato invece di non mostrare nulla in silenzio.
+**La fotografia resta vuota.** Sulla carta e nel passaporto è in JPEG 2000, e iOS
+legge questo formato — normalmente l'immagine compare. Se il posto resta vuoto, si
+è letto in modalità rapida, che la omette. Se un formato non è leggibile, l'app
+mostra il formato rilevato invece di non mostrare nulla in silenzio.
 
 **Il riconoscimento sbaglia un campo.** Sulla patente tutti i campi sono
 modificabili, ed è voluto: non c'è cifra di controllo né chip che contraddica.

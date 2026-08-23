@@ -5,10 +5,18 @@ import UniformTypeIdentifiers
 
 /// Decodiert das Lichtbild aus DG2.
 ///
-/// DG2 der CIE haelt das Gesichtsbild als **JPEG 2000**, und iOS bringt dafuer -
-/// wie Android - keinen oeffentlichen Decoder mit. Die Android-Fassung bindet
-/// OpenJPEG als Bibliothek ein; hier ist diese Stelle noch offen (siehe
-/// docs/ANDROID-TO-IOS.md).
+/// DG2 haelt das Gesichtsbild als **JPEG 2000** - auf der Karte wie im Reisepass,
+/// am Geraet gemessen (iOS 26.6: `image/jp2`, rund 10 KB).
+///
+/// **iOS liest das Format.** Das war die Annahme, die hier lange das Gegenteil
+/// behauptete: die Android-Fassung bindet OpenJPEG ein, weil Android es nicht
+/// kann, und daraus war geschlossen worden, iOS koenne es auch nicht. ImageIO
+/// kann es. Nachgesehen hat das erst eine Zeile im Protokoll, die Typ, Groesse
+/// und Lesbarkeit mitschreibt - vorher stand die Behauptung in fuenf Dateien,
+/// darunter der Datenschutzerklaerung und der Store-Beschreibung.
+///
+/// Deshalb bleibt der Zweig fuer das Nichtlesbare trotzdem stehen: welche Formate
+/// ImageIO kann, ist eine Eigenschaft des Betriebssystems und keine Zusage.
 ///
 /// Das Format wird an den **Magic Bytes** erkannt und nicht am MIME-Typ aus DG2:
 /// das Feld ist auf manchen Karten falsch gesetzt, unter Android gemessen. Beide
@@ -27,8 +35,8 @@ enum FaceImageDecoder {
         guard !bytes.isEmpty else { return nil }
         let detected = detectFormat(bytes) ?? declaredMimeType ?? "application/octet-stream"
 
-        // Was ImageIO von sich aus lesen kann - auf iOS ist das JPEG und PNG,
-        // JPEG 2000 nicht.
+        // Was ImageIO von sich aus lesen kann. Gefragt wird es, statt es zu
+        // wissen: die Liste der Formate gehoert dem Betriebssystem.
         if let source = CGImageSourceCreateWithData(bytes as CFData, nil),
            CGImageSourceGetCount(source) > 0,
            CGImageSourceCreateImageAtIndex(source, 0, nil) != nil {

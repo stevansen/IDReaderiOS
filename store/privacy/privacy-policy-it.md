@@ -54,11 +54,14 @@ Le impronte digitali **non** vengono lette. Si trovano in un gruppo di dati
 protetto da Extended Access Control, che richiede il certificato di un sistema di
 ispezione. L'app non ne ha e non ne chiede.
 
-**Sulla fotografia in questa versione:** sulla carta di identità italiana è in
-JPEG 2000, e iOS non dispone di un decodificatore. L'app quindi al momento non può
-mostrarla e non la conserva; mostra invece il formato rilevato. Quando un
-decodificatore sarà integrato, la fotografia verrà trattata come descritto, e
-questa informativa sarà aggiornata prima.
+**Sulla fotografia:** sulla carta di identità italiana e nel passaporto è in
+**JPEG 2000**. iOS 26 sa leggere questo formato; l'app mostra l'immagine e la
+conserva cifrata come gli altri campi. Se un formato non è leggibile, l'app mostra
+al suo posto il formato rilevato, invece di non mostrare nulla in silenzio.
+
+La fotografia lascia il dispositivo **soltanto** con l'invio per e-mail della
+versione leggibile, e per questo viene ridimensionata e convertita in un normale
+JPEG. Non è mai contenuta in una copia negli appunti né nella versione JSON.
 
 ### Presupposto di ogni lettura
 

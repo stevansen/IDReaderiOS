@@ -33,7 +33,7 @@ Un record così non porta alcun sigillo — né grigio né barrato, ma la riserv
 LA FOTOGRAFIA
 La lettura rapida la esclude, quella completa la include.
 
-Una limitazione per ora: sulla carta italiana è in JPEG 2000, e iOS non ha un decodificatore. L'app mostra allora il formato rilevato invece di non mostrare nulla in silenzio. Il decodificatore è in lavorazione.
+Sulla carta e nel passaporto è in JPEG 2000. iOS legge questo formato; se un formato non è leggibile, l'app mostra il formato rilevato invece di non mostrare nulla in silenzio.
 
 ARCHIVIO
 I documenti letti restano sul dispositivo per 30 giorni e poi si cancellano da sé. Un record per persona. Più record possono essere esportati insieme, come testo leggibile o come JSON.

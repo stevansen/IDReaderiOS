@@ -798,3 +798,47 @@ Erst die vierte Änderung war ein Instrument statt einer Vermutung, und die hat 
 in einem Kartenkontakt entschieden. Das ist dieselbe Lehre wie bei PACE, und ich
 habe sie zweimal gebraucht.
 
+## Bau 23: das Verfahren hat einen Namen, und das Lichtbild eine Überraschung
+
+```
+· SOD-Signatur: direkt [rsassaPss]: „Unable to verify signature for signed
+                attributes" - dafuer CMS
+· Lichtbild: image/jp2, 10078 Byte, anzeigbar
+```
+
+**Erstens: es ist RSASSA-PSS**, und damit ist der Fund von Bau 21 vollständig
+belegt. Der handgeschriebene Prüfpfad *setzt* die PSS-Polsterung — und scheitert
+trotzdem, weil er im selben Atemzug den Digest fest auf SHA-256 stellt:
+
+```swift
+if digestType.contains("sha256") || digestType.contains("rsassapss") { digest = "sha256" }
+```
+
+Bei `rsassaPss` steht der Digest nicht im Namen des Verfahrens, sondern in seinen
+**Parametern** — und die liest dieser Pfad nicht. Ein Dokument mit PSS über SHA-384
+oder SHA-512 fällt deshalb durch. `CMS_verify` liest die Parameter und bestätigt
+dieselbe Signatur. Genau das ist Punkt 7 in
+[`UPSTREAM.md`](../ThirdParty/NFCPassportReaderCAN/UPSTREAM.md), jetzt mit dem
+Namen des Verfahrens dahinter.
+
+**Zweitens, und das war nicht die erwartete Antwort: `anzeigbar`.**
+
+Die Zeile war gebaut, um eine Zusage zu bestätigen. Sie hat sie widerlegt. **iOS
+liest JPEG 2000** — ImageIO decodiert das DG2 von Karte und Pass, das Lichtbild
+erscheint und wird verschlüsselt aufbewahrt.
+
+Die Gegenbehauptung stand an **fünf** Stellen: in der Datenschutzerklärung (drei
+Sprachen), in der Store-Beschreibung (drei Sprachen), in `SUPPORT.md` (drei
+Sprachen), in zwei Quelltextkommentaren und in zwei Papieren. Sie stammte aus
+einem Schluss und nicht aus einer Messung: die Android-Fassung bindet OpenJPEG
+ein, *also* kann iOS es auch nicht.
+
+Das ist der Fehlertyp dieser Sitzung, zum vierten Mal — und der teuerste von
+allen, weil er nicht im Code stand, sondern in einem Rechtstext: die Erklärung
+sagte, das Lichtbild werde **nicht angezeigt und nicht gespeichert**. Beides war
+falsch, und zwar in der Richtung, die eine Datenschutzerklärung nie haben darf:
+sie hat weniger Verarbeitung behauptet, als stattfindet. Alle Stellen sind
+berichtigt.
+
+Und eine Aufgabe entfällt: OpenJPEG einzubinden war Punkt 3 der offenen Liste.
+

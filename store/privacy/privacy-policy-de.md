@@ -60,11 +60,15 @@ Fingerabdrücke werden **nicht** gelesen. Sie liegen in einer Datengruppe, die
 durch Extended Access Control geschützt ist und ein Zertifikat einer
 Inspektionsstelle voraussetzt. Die App hat keines und fragt nach keinem.
 
-**Zum Lichtbild in dieser Fassung:** auf der italienischen Identitätskarte liegt
-es als JPEG 2000 vor, und iOS bringt dafür keinen Decoder mit. Die App kann es
-deshalb derzeit nicht anzeigen und speichert es auch nicht; sie zeigt an dieser
-Stelle das erkannte Format an. Sobald ein Decoder eingebunden ist, wird das
-Lichtbild wie beschrieben verarbeitet, und diese Erklärung wird vorher angepasst.
+**Zum Lichtbild:** auf der italienischen Identitätskarte und im Reisepass liegt es
+als **JPEG 2000** vor. iOS 26 kann dieses Format lesen; die App zeigt das Bild an
+und bewahrt es wie die übrigen Angaben verschlüsselt auf. Kann ein Format nicht
+gelesen werden, zeigt die App an dieser Stelle das erkannte Format an, statt
+stillschweigend nichts zu zeigen.
+
+Das Lichtbild verlässt das Gerät **nur** beim E-Mail-Versand der lesbaren Fassung,
+und dafür wird es verkleinert und in ein gewöhnliches JPEG umgewandelt. Beim
+Teilen über die Zwischenablage und in der JSON-Fassung ist es nie enthalten.
 
 ### Voraussetzung für jeden Lesevorgang
 

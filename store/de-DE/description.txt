@@ -33,7 +33,7 @@ Ein solcher Datensatz trägt kein Siegel — kein graues, kein durchgestrichenes
 LICHTBILD
 Der schnelle Lesemodus lässt es weg, der vollständige nimmt es mit.
 
-Auf der italienischen Karte liegt es als JPEG 2000 vor; iOS bringt keinen Decoder mit, die App zeigt dann das erkannte Format an. Am Decoder wird gearbeitet.
+Auf Karte und Pass liegt es als JPEG 2000 vor. iOS liest das Format; kann es ein Format nicht lesen, zeigt die App das erkannte Format an statt stillschweigend nichts.
 
 ARCHIV
 Gelesene Dokumente bleiben 30 Tage auf dem Gerät und löschen sich dann selbst. Pro Person bleibt ein Eintrag. Mehrere lassen sich gemeinsam ausgeben, als Text oder als JSON.

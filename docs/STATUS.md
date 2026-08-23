@@ -65,11 +65,15 @@ In der Reihenfolge, in der es sich lohnt:
    gepatchte Kopie fremden Codes. Sauberer wäre ein Fork unter eigener Adresse als
    Paketverweis; der Patch liegt dafür bereit und ist auch als Beitrag nach oben
    brauchbar.
-3. **JPEG 2000 für DG2** — OpenJPEG einbinden. Bis dahin zeigt die App das erkannte
-   Format an der Stelle des Bildes, wie das Original bei einem unbekannten Format.
-   **Ob die Karte das Bild wirklich als JPEG 2000 führt, ist noch nicht gemessen**
-   — die Datenschutzerklärung behauptet es aus der Spezifikation. Bau 23 schreibt
-   Typ und Größe mit; ein Lesevorgang entscheidet es.
+3. ~~JPEG 2000 für DG2 — OpenJPEG einbinden~~ — **entfällt.** Gemessen unter
+   Bau 23: DG2 ist auf Karte und Pass `image/jp2`, rund 10 KB, und **ImageIO liest
+   es** — das Lichtbild wird angezeigt und verschlüsselt aufbewahrt. Die
+   Gegenbehauptung stand in fünf Dateien, darunter in der Datenschutzerklärung und
+   in der Store-Beschreibung, und stammte aus einem Schluss: die Android-Fassung
+   bindet OpenJPEG ein, *also* kann iOS es auch nicht. Alle Stellen berichtigt.
+
+   Der Zweig für ein nicht lesbares Format bleibt: welche Formate ImageIO kann,
+   ist eine Eigenschaft des Betriebssystems und keine Zusage.
 4. **Die Elastik der Eingabemasken.** Die drei Masken sollen ohne Scrollen auf
    einen Bildschirm passen; Dokumentgrafik und Ziffernblock nehmen ihre Höhe aus
    dem Restplatz, und unter einem Mindestmaß weicht die Grafik ganz. Heute steht

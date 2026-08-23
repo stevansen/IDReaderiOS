@@ -265,11 +265,14 @@ final class PassportChipReader: ChipDocumentReader {
 
     /// Das Lichtbild aus DG2.
     ///
-    /// Bewusst nicht `model.passportImage`: das ruft `UIImage(data:)`, und iOS
-    /// decodiert kein JPEG 2000 - bei einer CIE kaeme dort immer nil heraus, ohne
-    /// dass sich sagen liesse, warum. Die rohen Bytes gehen deshalb an
+    /// Bewusst nicht `model.passportImage`: das ruft `UIImage(data:)` und gibt bei
+    /// einem Format, das es nicht kann, `nil` zurueck, ohne dass sich sagen
+    /// liesse, welches Format es war. Die rohen Bytes gehen deshalb an
     /// ``FaceImageDecoder``, der das Format an den Magic Bytes erkennt und es
-    /// weitergibt, wenn er es nicht lesen kann.
+    /// auch dann weitergibt, wenn er das Bild nicht lesen kann.
+    ///
+    /// JPEG 2000 liest ImageIO - am Geraet gemessen, Karte und Pass. Die
+    /// Begruendung, die hier fuenf Dateien lang stand, war falsch.
     private func photo(from model: NFCPassportModel) -> DocumentPhoto? {
         guard let dg2 = model.getDataGroup(.DG2) as? DataGroup2, !dg2.imageData.isEmpty else {
             return nil
@@ -356,12 +359,14 @@ final class PassportChipReader: ChipDocumentReader {
         }
         // Das Format des Lichtbildes - Typ und Groesse, nie die Bilddaten.
         //
-        // Es prueft eine Aussage in der Datenschutzerklaerung: dort steht, dass
-        // das Bild auf der Karte als JPEG 2000 vorliegt, dass iOS dafuer keinen
-        // Decoder mitbringt und dass die App es deshalb nicht anzeigt und nicht
-        // speichert. Das stand bisher aus der Spezifikation da und war am Geraet
-        // nie nachgesehen. Eine Zusage, die niemand geprueft hat, ist eine
-        // Vermutung im Rechtstext.
+        // Diese Zeile hat eine Aussage in der Datenschutzerklaerung widerlegt.
+        // Dort stand, das Bild liege als JPEG 2000 vor, iOS bringe dafuer keinen
+        // Decoder mit, und die App zeige es deshalb nicht an und speichere es
+        // nicht. Das erste stimmt, das zweite nicht - und das dritte war damit
+        // eine Untertreibung ueber die Verarbeitung, in einem Rechtstext.
+        //
+        // Sie bleibt stehen: welche Formate ImageIO kann, ist eine Eigenschaft
+        // des Betriebssystems, und die naechste Fassung kann es anders halten.
         if let dg2 = model.getDataGroup(.DG2) as? DataGroup2, !dg2.imageData.isEmpty {
             let bild = FaceImageDecoder.decode(Data(dg2.imageData), declaredMimeType: nil)
             ReadLog.shared.add(

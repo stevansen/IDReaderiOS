@@ -33,7 +33,7 @@ Such a record carries no seal — not a grey one, not a struck-out one, but the 
 THE PHOTOGRAPH
 The fast read leaves it out, the full read takes it along.
 
-One limitation for now: on the Italian card it is JPEG 2000, and iOS has no decoder for it. The app then shows the detected format instead of silently showing nothing. A decoder is being worked on.
+On the card and in the passport it is JPEG 2000. iOS reads that format; where a format cannot be read, the app shows the detected format instead of silently showing nothing.
 
 ARCHIVE
 Documents read stay on the device for 30 days and then delete themselves. One record per person. Several can be exported together, as readable text or as JSON.

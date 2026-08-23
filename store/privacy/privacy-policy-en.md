@@ -52,11 +52,14 @@ Fingerprints are **not** read. They sit in a data group protected by Extended
 Access Control, which requires an inspection-system certificate. The app has none
 and asks for none.
 
-**On the facial image in this version:** on the Italian identity card it is JPEG
-2000, and iOS ships no decoder for it. The app therefore cannot display it at
-present and does not store it; it shows the detected format instead. Once a
-decoder is in place the image will be processed as described, and this policy will
-be updated before that happens.
+**On the facial image:** on the Italian identity card and in the passport it is
+**JPEG 2000**. iOS 26 can read that format; the app displays the image and keeps it
+encrypted alongside the other fields. If a format cannot be read, the app shows the
+detected format in its place rather than silently showing nothing.
+
+The image leaves the device **only** when the readable version is sent by e-mail,
+and for that it is scaled down and converted to an ordinary JPEG. It is never part
+of a clipboard copy or of the JSON version.
 
 ### A precondition for every read
 
