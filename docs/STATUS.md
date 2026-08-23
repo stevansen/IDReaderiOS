@@ -1,6 +1,7 @@
 # Stand
 
-Stand vom **21. August 2026**, nach der Datenminimierung und der Sperrprüfung. Quelle: `cauer71/AndroidDev`, `apps/cie-reader`,
+Stand vom **22. August 2026**, nach dem ersten gelungenen Lesevorgang an
+echten Dokumenten. Quelle: `cauer71/AndroidDev`, `apps/cie-reader`,
 Commit `7ab0d20`, Version 1.8 / versionCode 11.
 
 ## Fertig und geprüft
@@ -21,31 +22,31 @@ Commit `7ab0d20`, Version 1.8 / versionCode 11.
 | Drei Eingabemasken, Lesescreen, Ergebnis, Archiv, Teilen, Einstellungen, erster Start, Fehlerblatt | gebaut | im Simulator durchlaufen |
 | Texterkennung (Vision statt ML Kit) | gebaut | am Simulator nicht prüfbar (keine Kamera) |
 | CSCA-Vertrauensanker (9 Zertifikate) | übernommen | 1 Test |
-| **PACE mit CAN**, Datengruppen, Passive Authentication, Chip Authentication | gebaut, **am Gerät nicht nachgewiesen** | siehe [NFC-PACE.md](NFC-PACE.md) |
+| **PACE mit CAN und mit MRZ**, Datengruppen, Passive Authentication, Chip Authentication | **am Gerät nachgewiesen, beide Dokumente, alle vier Stufen** | [NFC-PACE.md](NFC-PACE.md) |
 | Urteilsbildung aus den vier Teilprüfungen | portiert | `PassportChipReader.authenticity(from:)` |
 | CSCA-Vertrauensanker als PEM-Bündel für die Kettenprüfung | erzeugt | 2 Tests |
 | Datenschutz-Gegenstücke (Sicherung, Dateischutz, App-Umschalter, Zwischenablage, Netzprüfung) | gebaut | `Scripts/check-no-network.sh` |
-| Lizenz: Apache-2.0 | umgestellt, **Christians Zustimmung fehlt noch** | [LICENCE-CHOICE.md](LICENCE-CHOICE.md) |
+| Lizenz: Apache-2.0 | in **beiden** Repositorien; Christians eigener Beleg fehlt noch | [LICENCE-CHOICE.md](LICENCE-CHOICE.md), [`../COPYRIGHT`](../COPYRIGHT) |
 | Bedienungshilfen: Schriftgrößen, Vorlesefunktion, Kontrast | geprüft und nachgebessert | [ACCESSIBILITY.md](ACCESSIBILITY.md) |
-| **Lesen am echten Chip** | **geht** — CIE in 5,7 s, Reisepass in 15,3 s (Bau 18, iPhone 18,2 / iOS 26.6) | [NFC-PACE.md](NFC-PACE.md), [EU-EID-STANDARDS.md](EU-EID-STANDARDS.md), [`../REWORK_PROMPT.md`](../REWORK_PROMPT.md) |
-| Store-Eintrag über die API | Fassung 1.8, Kategorie, Texte und Bilder für `de-DE` und `it` gesetzt; **`en-US` fehlt** | [`../Scripts/asc.swift`](../Scripts/asc.swift), [`../store/README.md`](../store/README.md) |
+| **Lesen am echten Chip** | **geht, mit grünem Siegel für beide Dokumente** — Karte 4,3 s, Reisepass 5,5 s (Bau 21, iPhone 18,2 / iOS 26.6) | [NFC-PACE.md](NFC-PACE.md), [EU-EID-STANDARDS.md](EU-EID-STANDARDS.md), [`../REWORK_PROMPT.md`](../REWORK_PROMPT.md) |
+| Store-Eintrag über die API | **vollständig** — drei Sprachen, 21 Bildschirmfotos, Datenschutz-Adresse, Altersfreigabe 4+, Inhalte Dritter, Preis, Gebiete, Händlerangabe | [`../Scripts/asc.swift`](../Scripts/asc.swift), [`../store/README.md`](../store/README.md) |
 | Sperrprüfung: CRL lesen, Signatur prüfen, ablegen, offline abgleichen, offene Prüfungen nachholen, Datum am Datensatz | gebaut, **gegen die echte italienische CRL durchlaufen** | 29 Tests; im Simulator geholt, geprüft und angezeigt |
 
-**Fassung 1.8 (Build 2) liegt seit dem 21. August 2026 in App Store Connect**
-(Delivery `1b03a02f-6914-4c84-a9d8-3b0fc8f69ab3`), signiert mit
-`Apple Distribution`, für TestFlight freigegeben. Build 1 vom
-selben Tag ist damit überholt: er kannte weder die Datenminimierung noch die
-Sperrprüfung. Die Fassungsnummer bleibt 1.8 — veröffentlicht war Build 1 nie,
-also ist dies weiterhin die erste iOS-Auslieferung und nur ein neuer Bau.
+**Fassung 1.8 mit Bau 22 liegt in App Store Connect** und steht den internen
+Testern zur Verfügung. Bau 23 ist gebaut und geprüft, aber nicht hochgeladen:
+Apple hat das Tageslimit gezogen, nachdem heute fünfzehn Bauten hochgegangen sind
+(8 bis 22). Die `.ipa` liegt fertig in `build/export/`.
 
-Damit ist der Weg auf ein Gerät offen — der Nachweis am Gerät selbst ist Punkt 1
-unten. Was ein Tester an Build 2 gegenüber Build 1 prüfen soll: dass beim ersten
-Start der Hinweis **erneut** erscheint (Fassung 2, weil der Satz über den
-Netzzugriff nicht mehr stimmte), dass bei einem gelesenen Dokument „gelesen,
-nicht gespeichert" steht statt einer Anschrift, und dass die Sperrprüfung ein
-Datum zeigt statt „noch nicht geprüft".
+Fünfzehn Bauten an einem Tag sind keine Auszeichnung. Fünf davon waren je eine
+Vermutung zu PACE, drei je eine Vermutung darüber, **wo** die Auskunft über eine
+gescheiterte Prüfung landet. Was die Suche entschieden hat, war jedes Mal ein
+Instrument und keine Vermutung — erst das APDU-Protokoll, dann die sechs
+Übertragungsformen in einem Kartenkontakt, dann die Aufschlüsselung der vier
+Echtheitsstufen, dann der festgehaltene Fehler aus dem verworfenen `catch`. Die
+Lehre steht in [`../REWORK_PROMPT.md`](../REWORK_PROMPT.md) und ist an einem Tag
+zweimal gebraucht worden.
 
-103 Tests, `swift test`, alle grün. Die App baut ohne eine einzige Warnung im
+104 Tests, `swift test`, alle grün. Die App baut ohne eine einzige Warnung im
 eigenen Code (`xcodebuild -scheme IDReader -sdk iphonesimulator`) und läuft im
 Simulator.
 
@@ -53,19 +54,22 @@ Simulator.
 
 In der Reihenfolge, in der es sich lohnt:
 
-1. **Der Nachweis am Gerät.** Der Build steht in TestFlight; jetzt eine echte
-   CIE 3.0 an ein iPhone halten und die vier Phasen durchlaufen sehen. Ohne das gilt der Leseweg als gebaut, nicht als
-   geprüft — die Android-Fassung ist gegen ein echtes Dokument auf zwei Geräten
-   vermessen, und weniger ist hier keine Grundlage. Zu prüfen sind besonders: der
-   schnelle Weg ohne Lichtbild, das grüne Siegel bei einer echten Karte, und dass
-   eine falsche CAN als „CAN stimmt nicht" ankommt und nicht als „unbekannter
-   Fehler".
+1. **Christian Auers eigener Beleg für Apache-2.0.** Die Lizenzdateien liegen in
+   beiden Repositorien, aber **beide** Festschreibungen im Android-Repository sind
+   von Stefan Hellweger verfasst (`447a8f6`, `94369bb`). Kein Artefakt in einem
+   der beiden ist von Christian. Eine Festschreibung von ihm oder ein Wort in
+   einem Issue, mit Datum, schließt das; `AndroidDev/COPYRIGHT` trägt in der
+   Zustimmungstabelle noch die Platzhalter, die dafür angelegt wurden.
+
 2. **Der Fork statt der Kopie.** `ThirdParty/NFCPassportReaderCAN` ist eine
    gepatchte Kopie fremden Codes. Sauberer wäre ein Fork unter eigener Adresse als
    Paketverweis; der Patch liegt dafür bereit und ist auch als Beitrag nach oben
    brauchbar.
 3. **JPEG 2000 für DG2** — OpenJPEG einbinden. Bis dahin zeigt die App das erkannte
    Format an der Stelle des Bildes, wie das Original bei einem unbekannten Format.
+   **Ob die Karte das Bild wirklich als JPEG 2000 führt, ist noch nicht gemessen**
+   — die Datenschutzerklärung behauptet es aus der Spezifikation. Bau 23 schreibt
+   Typ und Größe mit; ein Lesevorgang entscheidet es.
 4. **Die Elastik der Eingabemasken.** Die drei Masken sollen ohne Scrollen auf
    einen Bildschirm passen; Dokumentgrafik und Ziffernblock nehmen ihre Höhe aus
    dem Restplatz, und unter einem Mindestmaß weicht die Grafik ganz. Heute steht
@@ -73,16 +77,19 @@ In der Reihenfolge, in der es sich lohnt:
    200 % Systemschrift zu prüfen. Die Falle, in die die Compose-Fassung dreimal
    gelaufen ist: in einem scrollenden Vorfahren ist die Höhe unendlich, und dort
    ergibt ein Gewicht null.
-5. **Store-Material.** Texte in drei Sprachen und 15 Bildschirmfotos liegen in
-   [`../store/`](../store/); die Längen sind gegen Apples Feldgrenzen geprüft. Es
-   Die **Support-URL** ist erledigt, seit das Repository öffentlich ist:
-   [`../SUPPORT.md`](../SUPPORT.md), dreisprachig und benutzerseitig. Für die
-   **Datenschutzerklärung** liegt der Text in
-   [`../store/privacy/`](../store/privacy/) und ein Weg, ihn zu veröffentlichen
-   (`Scripts/build-privacy-pages.py` → GitHub Pages aus `/docs`); es fehlen zwei
-   Handgriffe: Name und Mailadresse des Verantwortlichen ausfüllen — der Generator
-   bricht bis dahin ab — und Pages einschalten. Das App-Zeichen ist ein Entwurf
-   aus `Scripts/make-app-icon.swift`.
+5. **Store-Material: erledigt.** Drei Sprachen, 21 Bildschirmfotos, Beschreibung,
+   Stichworte, Support- und Datenschutz-Adresse, Altersfreigabe, Inhalte Dritter,
+   Preis, Gebiete, Händlerangabe — alles über die Schnittstelle gesetzt und dort
+   nachgelesen. GitHub Pages braucht es nicht: die Datenschutz-Adresse zeigt auf
+   die Fassung im Repository, und die Erklärungen kommen **ohne Kontaktadresse**
+   aus, weil der Entwickler keine Daten verarbeitet und damit nicht
+   Verantwortlicher ist — begründet in [`../store/README.md`](../store/README.md).
+   Das App-Zeichen ist weiterhin ein Entwurf aus `Scripts/make-app-icon.swift`.
+
+   Was noch offen ist, ist eine Entscheidung und kein Handgriff: im englischen
+   Store heißt der Eintrag „CIE Reader", weil `IDReader` für `en-US` belegt ist —
+   auf jedem Bildschirmfoto steht aber „IDReader". Zwei Namen für eine App, und
+   zu ändern nur mit einem zweiten Anzeigenamen im Bundle.
 6. **Die Anerkennungen müssen in der App erreichbar sein** — die fremden (MIT für
    NFCPassportReader, Apache-2.0 für OpenSSL) und seit der Umstellung auch die
    eigene: die App steht selbst unter Apache-2.0, und Abschnitt 4(d) will
@@ -97,7 +104,12 @@ In der Reihenfolge, in der es sich lohnt:
    signiert wurde, ist nicht zu prüfen; der Datensatz sagt dann „für diesen
    Aussteller liegt keine Liste vor". Ob es die drei Listen woanders gibt, ist
    nicht nachgesehen — die BSI-Masterliste enthält Zertifikate, keine CRLs.
-9. **Die Sperrprüfung am echten Dokument.** Der Weg ist gegen die echte
+9. **Ein Durchgang mit eingeschaltetem VoiceOver am Gerät.** Danach kann die
+   Bedienungshilfen-Erklärung im Store vom Entwurf in die Veröffentlichung; heute
+   ist sie absichtlich Entwurf, weil eine Zusage über die Vorlesefunktion, die
+   niemand gehört hat, genau der Fehler wäre, den
+   [ACCESSIBILITY.md](ACCESSIBILITY.md) anderen vorwirft.
+10. **Die Sperrprüfung am echten Dokument.** Der Weg ist gegen die echte
    italienische CRL durchlaufen (geholt, Signatur geprüft, abgelegt, verglichen),
    aber der Signierer kam dabei aus Beispieldaten. Am Gerät zu sehen bleibt, dass
    ein echtes Dokumentsignierer-Zertifikat den Ausstellerabdruck einer der sechs
