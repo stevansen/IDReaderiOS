@@ -1,6 +1,14 @@
 /* IDReader - it. Erzeugt aus dem Android-Original; siehe docs/ANDROID-TO-IOS.md. */
 
 
+"about_authors_text" = "Christian Auer — la versione Android (CIEreader)\nStefan Hellweger — il porting su iOS\n\nDue piattaforme, una sola applicazione. Entrambi gli autori detengono entrambe le parti congiuntamente e in parti uguali; le due righe dicono chi ha scritto quale parte, non chi possiede quale.";
+"about_authors_title" = "Chi l'ha realizzata";
+"about_licence_text" = "Copyright 2026 Christian Auer e Stefan Hellweger.\n\nDistribuito con licenza Apache, versione 2.0. Il software è fornito «così com'è», senza garanzie né condizioni di alcun tipo.\n\n«IDReader» e «CIEreader» sono i nomi con cui queste applicazioni si presentano. La sezione 6 della licenza non concede alcun diritto su di essi: chi prende il codice dia al proprio programma un nome proprio.";
+"about_licence_title" = "Licenza";
+"about_repository" = "Codice sorgente e testi completi delle licenze";
+"about_thirdparty_text" = "NFCPassportReader (MIT) — la lettura secondo ICAO 9303, qui estesa a PACE con CAN e al Diffie-Hellman classico.\nOpenSSL (Apache-2.0) — la crittografia.\nDue glifi Material Symbols (Apache-2.0).\n\nI certificati CSCA italiani inclusi sono documenti pubblici dello Stato italiano, ridistribuiti senza modifiche.";
+"about_thirdparty_title" = "Componenti di terzi";
+"about_title" = "Informazioni su IDReader";
 "action_back" = "Indietro";
 "action_back_to_photo" = "Foto";
 "action_backspace" = "Cancella l'ultima cifra";
@@ -73,6 +81,8 @@
 "error_title" = "Lettura non riuscita";
 "error_unknown" = "Errore sconosciuto durante la lettura della carta.";
 "error_copy_log" = "Copia il registro (%d righe)";
+"menu_about" = "Informazioni sull'app";
+"menu_notice" = "Rivedi l'avviso";
 "settings_diagnostics" = "Diagnostica";
 "settings_diagnostics_empty" = "Nessuna lettura in questa sessione.";
 "settings_diagnostics_hint" = "Il registro dell’ultima lettura — i comandi inviati al chip e le sue risposte. Resta solo in memoria, viene svuotato a ogni nuova lettura e non è scritto in alcun file. Dopo l’apertura del canale sicuro contiene solo lunghezze e parole di stato, quindi nessun dato personale. Esce dal dispositivo solo se lo copia e lo incolla lei.";

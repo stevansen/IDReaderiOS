@@ -1,6 +1,14 @@
 /* IDReader - en. Erzeugt aus dem Android-Original; siehe docs/ANDROID-TO-IOS.md. */
 
 
+"about_authors_text" = "Christian Auer — the Android release (CIEreader)\nStefan Hellweger — the port to iOS\n\nTwo platforms, one application. Both authors hold both sides jointly and in equal shares; the two lines say who wrote which side, not who owns which.";
+"about_authors_title" = "Who made it";
+"about_licence_text" = "Copyright 2026 Christian Auer and Stefan Hellweger.\n\nLicensed under the Apache License, Version 2.0. The software is distributed on an \"as is\" basis, without warranties or conditions of any kind.\n\n\"IDReader\" and \"CIEreader\" are the names these applications go by. Section 6 of the License grants no rights in them: take the code, give your build its own name.";
+"about_licence_title" = "Licence";
+"about_repository" = "Source code and full licence texts";
+"about_thirdparty_text" = "NFCPassportReader (MIT) — reading under ICAO 9303, extended here for PACE with a CAN and for classic Diffie-Hellman.\nOpenSSL (Apache-2.0) — the cryptography.\nTwo Material Symbols glyphs (Apache-2.0).\n\nThe bundled Italian CSCA certificates are public documents of the Italian state, redistributed unchanged.";
+"about_thirdparty_title" = "Third-party components";
+"about_title" = "About IDReader";
 "action_back" = "Back";
 "action_back_to_photo" = "Photo";
 "action_backspace" = "Delete last digit";
@@ -73,6 +81,8 @@
 "error_title" = "Reading failed";
 "error_unknown" = "Unknown error while reading the card.";
 "error_copy_log" = "Copy the log (%d lines)";
+"menu_about" = "About this app";
+"menu_notice" = "Show the notice again";
 "settings_diagnostics" = "Diagnostics";
 "settings_diagnostics_empty" = "No read in this session yet.";
 "settings_diagnostics_hint" = "The log of the last read — the commands sent to the chip and its answers. It lives in memory only, is cleared on every new read and is written to no file. After the secure channel is established it holds only lengths and status words, so no personal data. It leaves the device only if you copy it and paste it yourself.";

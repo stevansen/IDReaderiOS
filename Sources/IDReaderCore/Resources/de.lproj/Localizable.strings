@@ -1,6 +1,14 @@
 /* IDReader - de. Erzeugt aus dem Android-Original; siehe docs/ANDROID-TO-IOS.md. */
 
 
+"about_authors_text" = "Christian Auer — die Android-Fassung (CIEreader)\nStefan Hellweger — die Portierung auf iOS\n\nZwei Plattformen, eine Anwendung. Beide halten beide Seiten gemeinsam und zu gleichen Teilen; die zwei Zeilen sagen, wer welche Seite geschrieben hat, nicht wer welche besitzt.";
+"about_authors_title" = "Wer sie gemacht hat";
+"about_licence_text" = "Copyright 2026 Christian Auer und Stefan Hellweger.\n\nLizenziert unter der Apache-Lizenz, Fassung 2.0. Die Software wird ohne Mängelgewähr und ohne Garantien oder Bedingungen jeder Art bereitgestellt.\n\n„IDReader“ und „CIEreader“ sind die Namen, unter denen diese Anwendungen laufen. Abschnitt 6 der Lizenz erteilt daran keine Rechte: Wer den Quelltext nimmt, gibt seinem Bau einen eigenen Namen.";
+"about_licence_title" = "Lizenz";
+"about_repository" = "Quelltext und vollständige Lizenztexte";
+"about_thirdparty_text" = "NFCPassportReader (MIT) — das Lesen nach ICAO 9303, hier um PACE mit CAN und um klassisches Diffie-Hellman erweitert.\nOpenSSL (Apache-2.0) — die Kryptografie.\nZwei Material-Symbols-Zeichen (Apache-2.0).\n\nDie mitgelieferten italienischen CSCA-Zertifikate sind öffentliche Dokumente des italienischen Staates, unverändert weitergegeben.";
+"about_thirdparty_title" = "Fremde Bestandteile";
+"about_title" = "Über IDReader";
 "action_back" = "Zurück";
 "action_back_to_photo" = "Foto";
 "action_backspace" = "Letzte Ziffer löschen";
@@ -73,6 +81,8 @@
 "error_title" = "Lesen fehlgeschlagen";
 "error_unknown" = "Unbekannter Fehler beim Lesen der Karte.";
 "error_copy_log" = "Protokoll kopieren (%d Zeilen)";
+"menu_about" = "Über die App";
+"menu_notice" = "Hinweis erneut ansehen";
 "settings_diagnostics" = "Diagnose";
 "settings_diagnostics_empty" = "Noch kein Lesevorgang in dieser Sitzung.";
 "settings_diagnostics_hint" = "Das Protokoll des letzten Lesevorgangs — Befehle an den Chip und seine Antworten. Es liegt nur im Arbeitsspeicher, wird bei jedem neuen Lesevorgang geleert und steht in keiner Datei. Nach dem Aufbau der gesicherten Verbindung enthält es nur Längen und Statuswörter, also keine Personendaten. Es verlässt das Gerät nur, wenn Sie es kopieren und selbst einfügen.";

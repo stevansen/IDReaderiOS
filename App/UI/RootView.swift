@@ -12,6 +12,10 @@ struct RootView: View {
     @Bindable var model: ReaderModel
 
     @State private var settingsOpen = false
+    /// Der Hinweis, noch einmal angesehen. Getrennt von
+    /// ``noticeAcknowledged``: die Bestaetigung bleibt, was sie war.
+    @State private var noticeReview = false
+    @State private var aboutOpen = false
     @State private var noticeAcknowledged: Bool
     @State private var cameraOpen = false
     @State private var exportingIds: [String] = []
@@ -67,6 +71,18 @@ struct RootView: View {
     @ViewBuilder private var content: some View {
         if settingsOpen {
             SettingsScreen(model: model, onBack: { settingsOpen = false })
+        } else if aboutOpen {
+            AboutScreen(strings: strings, onBack: { aboutOpen = false })
+        } else if noticeReview {
+            // Derselbe Bildschirm, aber ohne die Bestaetigung: `acknowledgeNotice`
+            // wird hier **nicht** gerufen. Der vermerkte Zeitpunkt soll der der
+            // ersten Zustimmung bleiben.
+            FirstRunNotice(
+                strings: strings,
+                retentionDays: DocumentArchive.retentionDays,
+                onAcknowledge: { noticeReview = false },
+                reviewing: true
+            )
         } else if !noticeAcknowledged {
             // Vor allem anderen: es soll niemand ein Dokument gelesen haben, bevor
             // er weiss, dass er dafuer verantwortlich ist.
@@ -96,6 +112,8 @@ struct RootView: View {
                 archiveCount: model.records.count,
                 onOpenArchive: model.openArchive,
                 onOpenSettings: { settingsOpen = true },
+                onShowNotice: { noticeReview = true },
+                onShowAbout: { aboutOpen = true },
                 strings: strings,
                 onShowErrorSheet: {
                     #if DEBUG

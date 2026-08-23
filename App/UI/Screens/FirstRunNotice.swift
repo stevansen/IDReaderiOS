@@ -40,6 +40,11 @@ struct FirstRunNotice: View {
     let strings: Strings
     let retentionDays: Int
     let onAcknowledge: () -> Void
+    /// Wird der Hinweis aus dem Menue heraus noch einmal angesehen, ist er keine
+    /// Bestaetigung mehr, sondern eine Auskunft. Dann heisst der Knopf „Fertig"
+    /// und nicht „Alles klar": eine Zustimmung zweimal einzuholen macht die erste
+    /// wertlos, und der vermerkte Zeitpunkt soll der der ersten bleiben.
+    var reviewing = false
 
     @Environment(\.palette) private var palette
 
@@ -76,7 +81,7 @@ struct FirstRunNotice: View {
 
             BottomActionBar {
                 Button(action: onAcknowledge) {
-                    Text(strings[.actionUnderstood])
+                    Text(strings[reviewing ? .actionDone : .actionUnderstood])
                         .font(AppType.actionLarge)
                         .frame(maxWidth: .infinity, minHeight: 56)
                 }

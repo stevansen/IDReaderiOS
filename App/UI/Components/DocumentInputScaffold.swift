@@ -25,6 +25,15 @@ struct DocumentInputScaffold<Content: View>: View {
     let archiveCount: Int
     let onOpenArchive: () -> Void
     let onOpenSettings: () -> Void
+    /// Den Hinweis vom ersten Start noch einmal ansehen.
+    ///
+    /// Er ist die Stelle, an der die App sagt, wer fuer eine
+    /// Identitaetsfeststellung verantwortlich ist - und wer ihn einmal bestaetigt
+    /// hat, sah ihn nie wieder. Eine Auskunft, die man nur einmal bekommt, ist
+    /// eine schlechte Auskunft.
+    let onShowNotice: () -> Void
+    /// Urheber, Lizenz, fremde Bestandteile. Apache-2.0 Abschnitt 4(d).
+    let onShowAbout: () -> Void
     let strings: Strings
     /// Nur im Debug-Bau benutzt - die Eigenschaft steht aber in **beiden**
     /// Fassungen. Sie hinter `#if DEBUG` zu setzen war ein Fehler: die
@@ -137,6 +146,12 @@ struct DocumentInputScaffold<Content: View>: View {
                     onOpenSettings()
                 } label: {
                     Label(strings[.menuSettings], systemImage: "gearshape")
+                }
+                Button(action: onShowNotice) {
+                    Label(strings[.menuNotice], systemImage: "hand.raised")
+                }
+                Button(action: onShowAbout) {
+                    Label(strings[.menuAbout], systemImage: "info.circle")
                 }
                 // Die Version ist keine Handlung, sondern eine Auskunft. Sie bleibt
                 // im Menue, weil man sie dort im Zweifel schneller findet als hinter
