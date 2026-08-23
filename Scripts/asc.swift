@@ -961,13 +961,13 @@ func setzeBedienungshilfen(veroeffentlichen: Bool) async throws {
         // Sprachsteuerung ist etwas anderes als die Vorlesefunktion und wurde
         // nicht geprueft.
         "supportsVoiceControl": false,
-        // Eingebaut, aber **noch nicht im angehaengten Bau**: die pulsierenden
-        // Ringe und der Uebergang zwischen den Masken weichen seit dem Bau nach
-        // 23, wenn „Bewegung reduzieren" gesetzt ist. Diese Angabe wird erst
-        // umgestellt, wenn ein Bau mit dieser Aenderung an der Fassung haengt -
-        // sonst behauptet die Erklaerung etwas ueber ein Programm, das der Leser
-        // herunterlaedt und das es dort nicht tut.
-        "supportsReducedMotion": false,
+        // Seit Bau 24 wahr, und erst seit Bau 24 gesetzt: die pulsierenden Ringe
+        // des Lesescreens und der Uebergang zwischen den Masken weichen ganz,
+        // wenn „Bewegung reduzieren" gesetzt ist. Solange die Aenderung in keinem
+        // hochgeladenen Bau war, stand die Angabe hier auf `false` - eine Angabe
+        // im Store beschreibt das Programm, das der Leser herunterlaedt, und
+        // nicht den Quelltext.
+        "supportsReducedMotion": true,
         "supportsCaptions": false,
         "supportsAudioDescriptions": false,
     ]

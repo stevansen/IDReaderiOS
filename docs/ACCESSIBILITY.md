@@ -190,10 +190,13 @@ den Quelltext. Deshalb:
 |---|---|---|
 | Größerer Text, Kontrast, nicht nur Farbe, dunkle Oberfläche | `true` | Simulator, alle Masken, hell und dunkel |
 | **VoiceOver** | `true` | Gerät, Bau 22, mit gelesenem Dokument |
-| **Bewegung reduzieren** | noch `false` | eingebaut nach Bau 23 — wird umgestellt, sobald ein Bau damit an der Fassung hängt |
+| **Bewegung reduzieren** | `true` | eingebaut in Bau 24, und **erst mit Bau 24 gesetzt** — vorher wäre es eine Zusage über ein Programm gewesen, das es nicht tut |
 | Sprachsteuerung, Untertitel, Audiodeskription | `false` | nicht geprüft bzw. nicht zutreffend |
 
-Die dritte Zeile ist der Grund für diese Tabelle. Die Änderung ist geschrieben,
-geprüft und festgeschrieben — und sie ist in keinem Bau, den jemand installieren
-kann. Eine Zusage darüber wäre heute unwahr.
+Die dritte Zeile ist der Grund für diese Tabelle. Sie stand einen halben Tag auf
+`false`, obwohl die Änderung geschrieben, geprüft und festgeschrieben war — weil
+sie in keinem Bau steckte, den jemand installieren kann. Erst als Bau 24 an der
+Fassung hing, wurde sie umgestellt. Eine Angabe im Store beschreibt das Programm,
+das der Leser herunterlädt, und nicht den Quelltext; wer die beiden verwechselt,
+gibt eine Zusage über etwas, das es noch nicht gibt.
 
