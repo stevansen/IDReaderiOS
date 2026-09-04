@@ -95,19 +95,27 @@ binds only later versions, and cannot take back what is already out.
 
 Recorded consent to Apache-2.0:
 
-    Stefan Hellweger   21 August 2026   the commit that added LICENSE, NOTICE and
+    Stefan Hellweger   21 August 2026   commits that added LICENSE, NOTICE and
                                         COPYRIGHT to this repository
-    Christian Auer     agreed, not yet recorded in writing
+    Christian Auer     21 August 2026   orally, to Stefan Hellweger
 
 **The Android original now carries the same licence.** LICENSE, NOTICE and
 COPYRIGHT are in `cauer71/AndroidDev` as of 21 August 2026 (commits `447a8f6`
 and `94369bb`), so the two repositories no longer state two different licence
 positions for one work. That was the mess worth avoiding, and it is avoided.
 
-What is still open is smaller and precise: **both of those commits were authored
-by Stefan Hellweger.** The files record Christian Auer as a holder and record
-his consent as required, but no artefact in either repository is *his*. A reader
-who checks will find a licence that one holder wrote down for two. One line from
-him — a commit of his own, or a word in an issue, with a date — closes it, and
-`AndroidDev/COPYRIGHT` still carries the `<date> <how>` placeholders that were
-put there for exactly this.
+One thing about that second line deserves saying plainly rather than being
+discovered later: **it records a spoken consent, and a spoken consent leaves no
+artefact.** Both licence commits in the Android repository were authored by
+Stefan Hellweger; nothing in either repository is in Christian Auer's own hand.
+
+What does stand in the history is conduct: he has continued to develop in that
+repository under this licence — seven commits from 2 September 2026 onwards,
+including one that revises the privacy policy. Acceptance by conduct is what a
+reader will find, and it is consistent with the line above.
+
+If either holder ever wants the record to be stronger than a remembered
+conversation, the cure is one line from Christian Auer himself — a commit or a
+word in an issue, with a date. Neither Apache-2.0 nor this file requires a
+particular form; this note exists so that nobody mistakes the record for
+something it is not.
