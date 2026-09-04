@@ -8,6 +8,15 @@ Die Regel dabei war: Verhalten und Wortlaut bleiben, die Mechanik wird
 ausgetauscht. Wo iOS etwas nicht kann, steht das hier und nicht in einem
 Kommentar, den niemand liest.
 
+> **Der Name bleibt „CIEreader".** Die Android-App heißt seit dem 2. September
+> 2026 im Anzeigenamen **CIEscan** (`64468c3`); ihre Kennung ist weiterhin
+> `com.ciereader.app`, und `NOTICE` und `COPYRIGHT` dort nennen sie weiterhin
+> CIEreader. Auf der iOS-Seite wird **nicht** nachgezogen — entschieden am
+> 4. September 2026. Wer „CIEreader" hier findet, hat also keine veraltete Stelle
+> gefunden, sondern eine Festlegung. Das betrifft zwölf Stellen, darunter den
+> Über-Bildschirm der App, `NOTICE`, `COPYRIGHT`, `README.md` und die
+> Was-ist-neu-Texte im Store.
+
 ---
 
 ## Schichten
