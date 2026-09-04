@@ -1,0 +1,39 @@
+WHAT THE APP DOES
+
+IDReader reads the chip of an identity document over NFC and checks whether the
+document's signatures hold up. It is a utility: no account, no sign-up, no
+server of ours, nothing to buy.
+
+HOW TO EXERCISE IT WITHOUT AN ITALIAN DOCUMENT
+
+The chip path needs a physical document held against the phone, so please note:
+
+1. ANY ePassport works, not only Italian ones. Choose "Passport", enter the
+   passport number, date of birth and expiry date exactly as printed in the two
+   machine-readable lines at the bottom of the data page, then hold the passport
+   flat against the upper third of the back of the phone. Reading takes about
+   five to fifteen seconds; the document must not be moved during it.
+
+2. The driving-licence path needs NO chip and NO document of ours. Choose
+   "Licence" and photograph any Italian driving licence, or type the fields by
+   hand. This exercises the full interface - result screen, archive, sharing -
+   without any NFC hardware at all. Every field stays editable, and the record
+   is marked "unverified", because a photograph confirms nothing.
+
+3. On the Simulator there is no NFC hardware. The app says so plainly instead of
+   failing silently: "No NFC available - this device has no NFC hardware."
+
+WHAT REQUIRES A DEVICE
+
+NFC. An iPhone 7 or newer. The Simulator cannot exercise the chip path.
+
+DATA AND NETWORK
+
+Everything read stays on the device, encrypted, and is deleted after 30 days.
+The app makes exactly one network request: it fetches the issuing authority's
+public certificate revocation list, at launch and on request. Nothing about the
+document goes out with it, and it can be switched off in Settings. There is no
+analytics, no advertising, no tracking, and no server of ours.
+
+Privacy policy: https://github.com/stevansen/IDReaderiOS/blob/main/store/privacy/privacy-policy-en.md
+Source code: https://github.com/stevansen/IDReaderiOS

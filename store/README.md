@@ -367,3 +367,51 @@ xcrun simctl io $U screenshot store/screenshots/6.9-en/01-notice.png
 
 Das `uninstall` ist nicht Kosmetik: der Ersthinweis kommt nur beim ersten Start.
 
+## Die Einreichung, und woran sie hängt
+
+`swift Scripts/asc.swift submit` zeigt, was passieren würde;
+`submit jetzt` reicht ein. Das Wort ist Absicht: es ist die einzige Handlung in
+diesem Werkzeug, die sich nicht zurückdrehen lässt.
+
+Gesetzt sind seit dem 4. September auch die zwei Felder, die vorher leer waren
+und die keine Formalien sind:
+
+* **Copyright** — `store/copyright.txt`, gleichlautend mit `NOTICE`:
+  „2026 Christian Auer, Stefan Hellweger". Es ist die einzige Stelle, an der
+  Apple die Rechteinhaber auf der Produktseite nennt.
+* **Prüfnotiz** — `store/review-notes.txt`. Bei dieser App ist sie der
+  Unterschied zwischen einer Prüfung und einer Ablehnung: die Hauptfunktion
+  braucht ein physisches Dokument mit Chip und ein iPhone mit NFC, und ein
+  Prüfer, der beides nicht hat, sieht eine App, die scheinbar nichts tut. Die
+  Notiz sagt deshalb, dass **jeder** Reisepass geht und nicht nur ein
+  italienischer, und dass sich die ganze Oberfläche über den
+  Fahrerlaubnis-Weg ohne jeden Chip durchspielen lässt.
+
+### Der eine Riegel, den die Schnittstelle nicht öffnet
+
+Die Einreichung wird abgewiesen mit:
+
+> Answers to what data your app collects and how it's used are needed. You must
+> have published answers to your app's data usages.
+
+Das ist die **App-Datenschutzangabe** („Privacy Nutrition Label") — nicht die
+Datenschutzerklärung, die schon gesetzt ist, sondern der Fragebogen darüber,
+welche Daten die App erhebt. Die Schnittstelle kennt ihn nicht: unter den
+vierzig Beziehungen der App-Ressource gibt es keine `appDataUsages`, und die
+drei denkbaren Endpunkte antworten mit „does not exist". Nachgesehen, nicht
+vermutet.
+
+Er ist also von Hand auszufüllen, einmalig:
+
+> App Store Connect → IDReader → **App-Datenschutz** → *Antworten bearbeiten* →
+> **„Es werden keine Daten erfasst"** → *Veröffentlichen*
+
+Das ist auch die zutreffende Antwort. Apple versteht unter „erfasst", dass Daten
+das Gerät verlassen und über die Sitzung hinaus vorgehalten werden. Diese App
+überträgt nichts: kein Analysewerkzeug, kein Server der Entwickler, und der eine
+Netzzugriff holt eine öffentliche Datei ab, ohne etwas mitzuschicken.
+
+Danach genügt `submit jetzt`. Ein leerer Einreichungsbehälter aus dem ersten
+Anlauf steht noch im Konto — `reviewSubmissions` lässt kein `DELETE` zu, und der
+Befehl übernimmt ihn beim nächsten Mal, statt einen zweiten anzulegen.
+

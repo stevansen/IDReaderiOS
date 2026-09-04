@@ -741,6 +741,156 @@ func setzeAusfuhrangabe(_ nummer: String, ausgenommen: Bool) async throws {
     print("Bau \(nummer): Ausfuhrangabe gesetzt (nicht-freigestellte Verschluesselung = \(!ausgenommen)).")
 }
 
+/// Reicht die Fassung zur Pruefung ein.
+///
+/// ## Warum das ein eigener Befehl mit einem eigenen Wort ist
+///
+/// Es ist die einzige Handlung in diesem Werkzeug, die sich nicht
+/// zurueckdrehen laesst: eine Einreichung geht an Menschen bei Apple, und ein
+/// zweiter Lauf macht sie nicht rueckgaengig. Deshalb verlangt sie das Wort
+/// `jetzt` als zweites Argument - ein Tippfehler soll nichts einreichen.
+///
+/// Der Weg geht ueber drei Schritte, und nur der dritte ist die Einreichung:
+/// ein `reviewSubmission` anlegen (ein Behaelter, harmlos), die Fassung als
+/// Posten hineinlegen (ebenfalls harmlos), und dann `submitted: true` setzen.
+func reicheEin(bestaetigt: Bool) async throws {
+    let version = try await inflightVersion()
+    let zustand = attr(version, "appStoreState")
+    guard zustand == "PREPARE_FOR_SUBMISSION" || zustand == "DEVELOPER_REJECTED" else {
+        throw Fehler("Fassung \(attr(version, "versionString")) steht auf \(zustand) - nichts einzureichen.")
+    }
+
+    guard bestaetigt else {
+        print("""
+            Das reicht Fassung \(attr(version, "versionString")) bei Apple zur Pruefung ein.
+            Das laesst sich nicht zurueckdrehen. Wenn Sie das wollen:
+
+                swift Scripts/asc.swift submit jetzt
+            """)
+        return
+    }
+
+    // Ein offener Behaelter kann von einem frueheren Anlauf stehengeblieben sein.
+    let offene = rows(try await call(
+        "GET",
+        "apps/\(appID)/reviewSubmissions?filter[platform]=IOS&filter[state]=READY_FOR_REVIEW&limit=5"
+    ))
+    let behaelter: [String: Any]
+    if let vorhanden = offene.first {
+        behaelter = vorhanden
+        print("Offener Behaelter uebernommen: \(ident(vorhanden))")
+    } else {
+        behaelter = one(try await call("POST", "reviewSubmissions", body: [
+            "data": [
+                "type": "reviewSubmissions",
+                "attributes": ["platform": "IOS"],
+                "relationships": ["app": ["data": ["type": "apps", "id": appID]]],
+            ],
+        ]))
+        print("Behaelter angelegt: \(ident(behaelter))")
+    }
+
+    let posten = rows(try await call(
+        "GET", "reviewSubmissions/\(ident(behaelter))/items?limit=10"
+    ))
+    if posten.isEmpty {
+        _ = try await call("POST", "reviewSubmissionItems", body: [
+            "data": [
+                "type": "reviewSubmissionItems",
+                "relationships": [
+                    "reviewSubmission": [
+                        "data": ["type": "reviewSubmissions", "id": ident(behaelter)],
+                    ],
+                    "appStoreVersion": [
+                        "data": ["type": "appStoreVersions", "id": ident(version)],
+                    ],
+                ],
+            ],
+        ])
+        print("Fassung als Posten eingelegt.")
+    } else {
+        print("Posten schon vorhanden: \(posten.count)")
+    }
+
+    let fertig = one(try await call("PATCH", "reviewSubmissions/\(ident(behaelter))", body: [
+        "data": [
+            "type": "reviewSubmissions",
+            "id": ident(behaelter),
+            "attributes": ["submitted": true],
+        ],
+    ]))
+    print("Eingereicht. Zustand: \(attr(fertig, "state"))")
+}
+
+/// Traegt Copyright-Zeile und Pruefnotiz in die Fassung ein.
+///
+/// Beide waren leer, und beide sind mehr als Formalien.
+///
+/// Die **Copyright-Zeile** erscheint auf der Produktseite und ist die einzige
+/// Stelle, an der Apple die Rechteinhaber nennt. Sie kommt aus
+/// `store/copyright.txt` und lautet gleich wie NOTICE - zwei verschiedene
+/// Angaben zu einem Werk sind genau das, was dieses Projekt schon einmal
+/// aufgeraeumt hat.
+///
+/// Die **Pruefnotiz** ist bei dieser App der Unterschied zwischen einer Pruefung
+/// und einer Ablehnung. Die Hauptfunktion braucht ein physisches Dokument mit
+/// Chip und ein iPhone mit NFC; ein Pruefer, der das nicht hat, sieht eine App,
+/// die scheinbar nichts tut. Die Notiz sagt deshalb, dass **jeder** Reisepass
+/// geht und nicht nur ein italienischer, und dass sich die ganze Oberflaeche
+/// ueber den Fuehrerschein-Weg ohne jeden Chip durchspielen laesst.
+func setzeFassungsangaben() async throws {
+    let version = try await inflightVersion()
+    var felder: [String: Any] = [:]
+    if let zeile = feldDatei("copyright") { felder["copyright"] = zeile }
+    guard !felder.isEmpty else { throw Fehler("store/copyright.txt fehlt.") }
+
+    try await call("PATCH", "appStoreVersions/\(ident(version))", body: [
+        "data": [
+            "type": "appStoreVersions",
+            "id": ident(version),
+            "attributes": felder,
+        ],
+    ])
+    print("Copyright: \(felder["copyright"] ?? "")")
+
+    guard let notiz = feldDatei("review-notes") else {
+        print("store/review-notes.txt fehlt - Pruefnotiz nicht gesetzt.")
+        return
+    }
+    let detail = one(try await call("GET", "appStoreVersions/\(ident(version))/appStoreReviewDetail"))
+    if detail.isEmpty {
+        _ = try await call("POST", "appStoreReviewDetails", body: [
+            "data": [
+                "type": "appStoreReviewDetails",
+                "attributes": ["notes": notiz],
+                "relationships": [
+                    "appStoreVersion": [
+                        "data": ["type": "appStoreVersions", "id": ident(version)],
+                    ],
+                ],
+            ],
+        ])
+        print("Pruefnotiz angelegt (\(notiz.count) Zeichen).")
+    } else {
+        try await call("PATCH", "appStoreReviewDetails/\(ident(detail))", body: [
+            "data": [
+                "type": "appStoreReviewDetails",
+                "id": ident(detail),
+                "attributes": ["notes": notiz],
+            ],
+        ])
+        print("Pruefnotiz gesetzt (\(notiz.count) Zeichen).")
+    }
+}
+
+/// Eine Datei unter `store/`, ohne Sprachordner.
+func feldDatei(_ name: String) -> String? {
+    let url = storeDir.appendingPathComponent("\(name).txt")
+    guard let text = try? String(contentsOf: url, encoding: .utf8) else { return nil }
+    let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+    return trimmed.isEmpty ? nil : trimmed
+}
+
 /// Setzt die Erklaerung zu Inhalten Dritter.
 ///
 /// Ebenfalls leer vorgefunden, ebenfalls ein Riegel vor jeder Einreichung.
@@ -1091,6 +1241,9 @@ do {
     case "test-build":
         guard argumente.count > 2 else { throw Fehler("Aufruf: test-build <Nummer> <Gruppe>") }
         try await gibZumTest(argumente[1], gruppe: argumente[2])
+    case "version-details": try await setzeFassungsangaben()
+    case "submit":
+        try await reicheEin(bestaetigt: argumente.count > 1 && argumente[1] == "jetzt")
     case "age-rating": try await setzeAltersfreigabe()
     case "content-rights":
         try await setzeInhalteDritter(argumente.count > 1 && argumente[1] == "fremd")
