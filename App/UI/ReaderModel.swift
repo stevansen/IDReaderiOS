@@ -398,7 +398,31 @@ final class ReaderModel {
             // Aufsetzen.
             var lastStep = ReadStep.waitingForCard
             do {
-                let result = try await reader.read(key: key, readPhoto: readPhoto) { [weak self] step in
+                // Der Text fuer das Systemblatt entsteht hier und nicht im
+                // Leser: nur hier sind die Sprache und die gewaehlte Dokumentart
+                // bekannt. Und es sind dieselben Texte, die hinter dem Blatt auf
+                // dem Lesescreen stehen - eine zweite Wortwahl fuer denselben
+                // Vorgang waere fuer den Bediener nur Verwirrung.
+                let modus = documentMode
+                let texte = strings
+                let blatt: (NFCSheetStage) -> String = { stufe in
+                    guard case let .step(step) = stufe else { return texte[.errorTitle] }
+                    if step == .waitingForCard {
+                        return texte[modus == .passport ? .stepTapPassport : .stepTapCard]
+                    }
+                    switch step.phase {
+                    case .connect: return texte[.phaseConnect]
+                    case .secure: return texte[.phaseSecure]
+                    case .data: return texte[.phaseData]
+                    case .verify: return texte[.phaseVerify]
+                    }
+                }
+
+                let result = try await reader.read(
+                    key: key,
+                    readPhoto: readPhoto,
+                    sheetMessage: blatt
+                ) { [weak self] step in
                     lastStep = step
                     guard let self, case .reading = self.stage else { return }
                     self.stage = .reading(step)

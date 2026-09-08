@@ -43,6 +43,7 @@ final class PassportChipReader: ChipDocumentReader {
     func read(
         key: AccessKey,
         readPhoto: Bool,
+        sheetMessage: @escaping (NFCSheetStage) -> String,
         onProgress: @escaping (ReadStep) -> Void
     ) async throws -> ChipReadResult {
         let reader = PassportReader()
@@ -82,12 +83,27 @@ final class PassportChipReader: ChipDocumentReader {
                 tags: tags,
                 skipSecureElements: true,
                 customDisplayMessage: { message in
-                    // Der Rueckruf kommt, um den Text im Systemblatt zu setzen -
-                    // und er ist der einzige Fortschrittsbericht, den die
-                    // Bibliothek hergibt. Also wird er beides: `nil` heisst „nimm
-                    // deinen eigenen Text", und der Schritt wandert nach draussen.
-                    onProgress(PassportChipReader.step(for: message))
-                    return nil
+                    // Der Rueckruf ist zweierlei: der einzige Fortschrittsbericht,
+                    // den die Bibliothek hergibt, **und** der Text im Systemblatt.
+                    //
+                    // Er gab bis Bau 25 `nil` zurueck - „nimm deinen eigenen
+                    // Text". Der eigene Text der Bibliothek ist englisch und redet
+                    // von einem „passport":
+                    //
+                    //     Hold your iPhone near an NFC enabled passport.
+                    //
+                    // Das stand auf dem Blatt, das iOS ueber die ganze App legt,
+                    // unter einer deutschen Ueberschrift („Bereit zum Scannen"),
+                    // waehrend eine Identitaetskarte auflag. In den Videos des
+                    // Testers Bild fuer Bild zu sehen - und wahrscheinlich ein Teil
+                    // dessen, was Apple unter Richtlinie 4 beanstandet hat.
+                    //
+                    // Jetzt kommt der Text von aussen: in der Sprache der App und
+                    // mit dem Wort fuer das Dokument, das der Bediener gewaehlt hat.
+                    let schritt = PassportChipReader.step(for: message)
+                    onProgress(schritt)
+                    if case .error = message { return sheetMessage(.failed) }
+                    return sheetMessage(.step(schritt))
                 }
             )
         } catch let error as NFCPassportReaderError where isCancel(error) {

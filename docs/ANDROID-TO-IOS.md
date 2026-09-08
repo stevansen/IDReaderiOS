@@ -133,3 +133,66 @@ Archiv, das eine Steuernummer nicht enthält, kann sie auch nicht verlieren. Die
 Android-Fassung sollte dieselbe Änderung bekommen.
 * Der Hinweis beim ersten Start, einschließlich der Reihenfolge seiner drei Punkte
   und der Fassungsnummer.
+
+## Das Systemblatt sprach Englisch — und von einem „passport"
+
+Gefunden am 8. September 2026 in zwei Videos, die für App Review gefilmt wurden.
+Nicht in einem Test, nicht im Quelltext: **auf dem Bildschirm eines Geräts.**
+
+Während der NFC-Sitzung legt iOS ein eigenes Blatt über die ganze App. Die
+Überschrift kommt vom System und ist übersetzt („Bereit zum Scannen"). Der Satz
+darunter kommt von der Lesebibliothek:
+
+```
+Bereit zum Scannen
+Hold your iPhone near an NFC enabled passport.
+```
+
+Zwei Fehler in einer Zeile: **englisch** in einer deutsch eingestellten App, und
+**„passport"**, während eine Identitätskarte auflag.
+
+Die Ursache war eine einzige Zeile in `PassportChipReader`:
+
+```swift
+customDisplayMessage: { message in
+    onProgress(PassportChipReader.step(for: message))
+    return nil          // ← „nimm deinen eigenen Text"
+}
+```
+
+`nil` heißt: die Bibliothek nimmt ihre eigene Zeichenkette. Sie ist auf Englisch
+fest eingebaut und redet in jeder ihrer sechs Meldungen von einem Pass — das
+Projekt heißt `NFCPassportReader`, und für seinen Zweck ist das richtig.
+
+### Was jetzt dort steht
+
+Der Text kommt von außen herein, aus `ReaderModel`, weil nur dort die Sprache
+und die **gewählte Dokumentart** bekannt sind:
+
+| Stufe | Text |
+|---|---|
+| wartet auf das Dokument | `step_tap_card` / `step_tap_passport` — „Karte hinten ans Handy halten" bzw. „Pass …" |
+| Verbindung | `phase_connect` |
+| gesicherte Verbindung | `phase_secure` |
+| Datengruppen | `phase_data` |
+| Prüfung | `phase_verify` |
+| Fehler | `error_title` |
+
+**Keine neuen Texte.** Es sind dieselben sechs, die hinter dem Blatt auf dem
+Lesescreen stehen, und das ist kein Zufall, sondern der Punkt: eine zweite
+Wortwahl für denselben Vorgang wäre für den Bediener nur Verwirrung.
+
+Der Fehlerfall hat dabei einen eigenen Typ bekommen (`NFCSheetStage`). Grund:
+`step(for:)` bildet die Fehlermeldung auf `ReadStep.verifying` ab, weil es dafür
+keinen eigenen Schritt gibt. Auf dem Fortschrittsbalken ist das harmlos — auf
+dem Systemblatt stünde „Echtheit prüfen", während gerade nichts mehr geprüft
+wird. Genau der Fehlertyp, der diese Woche mehrfach Zeit gekostet hat: eine
+Anzeige, die im Normalfall stimmt und im Fehlerfall in die Irre führt.
+
+### Der Zusammenhang mit der Ablehnung
+
+Apple beanstandete unter Richtlinie 4 „permissions requests that are not written
+in the same language as the app's localization". Belegt und behoben sind die
+Berechtigungstexte (`InfoPlist.strings`, Bau 25). **Dieses Blatt ist der zweite
+Kandidat für dieselbe Beanstandung** und war in Bau 25 noch drin.
+
