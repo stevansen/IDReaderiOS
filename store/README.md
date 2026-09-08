@@ -415,3 +415,47 @@ Danach genügt `submit jetzt`. Ein leerer Einreichungsbehälter aus dem ersten
 Anlauf steht noch im Konto — `reviewSubmissions` lässt kein `DELETE` zu, und der
 Befehl übernimmt ihn beim nächsten Mal, statt einen zweiten anzulegen.
 
+## Die erste Ablehnung, 7. September 2026
+
+Fassung 1.8 (24), Prüfgerät iPhone 17 Pro Max, Einreichung
+`bb1f5585-dee4-48c4-bcca-6ac755d3fe9c`. Zwei Beanstandungen.
+
+### Richtlinie 4 — die Systemabfragen waren einsprachig
+
+> the app includes permissions requests that are not written in the same
+> language as the app's localization
+
+Ein echter Fehler, und einer, den kein Test gefunden hätte, weil er nicht im
+Programm steht: `NFCReaderUsageDescription` und `NSCameraUsageDescription`
+standen **nur auf Deutsch** in `Config/Info.plist`, und im App-Bundle lag
+**kein einziges `.lproj`**. Die Oberfläche ist dreisprachig — aber die
+Sprachdateien liegen im Ressourcenpaket `IDReaderCore`, und iOS liest die
+Berechtigungstexte aus dem App-Bundle. Für das System war die App damit
+einsprachig: englische Oberfläche, deutsche Kamera-Abfrage.
+
+Behoben mit `App/{de,en,it}.lproj/InfoPlist.strings`. Der `App/`-Ordner ist eine
+synchronisierte Gruppe, die Dateien werden also ohne Projektänderung eingelesen.
+Im signierten Archiv nachgesehen: drei `.lproj`, je zwei Schlüssel, richtige
+Sprache.
+
+Der Hinweis auf das iPad in derselben Nachricht ist Textbaustein:
+`TARGETED_DEVICE_FAMILY = 1`, die App wird gar nicht auf iPads angeboten.
+
+### Richtlinie 2.1 — ein Vorführvideo fehlt
+
+Apple verlangt ein Video, das die App **auf einem echten Gerät** zusammen mit der
+NFC-Hardware zeigt. Das kann kein Werkzeug herstellen; es muss gefilmt werden.
+Was im Bild sein muss, steht in der Antwort an den Tester.
+
+Ein Punkt der Anforderung geht an dieser App vorbei und wird in der Prüfnotiz
+benannt statt ignoriert: „the initial pairing process" gibt es hier nicht. Die
+„designated hardware" ist das Dokument, und kontaktloses Lesen kennt keine
+Kopplung — kein Bonding, kein Code, kein Zubehör.
+
+### Eine Sperre, die daraus folgt
+
+`version-details` weigert sich jetzt, eine Prüfnotiz zu setzen, die noch `«…»`
+oder `<<…>>` enthält. Die Notiz ist eine Nachricht an einen Menschen; ein
+Platzhalter darin ist schlimmer als eine fehlende Notiz. Dieselbe Sperre hätte
+den drei Datenschutzerklärungen ihre Platzhalter erspart.
+

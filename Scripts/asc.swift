@@ -857,6 +857,18 @@ func setzeFassungsangaben() async throws {
         print("store/review-notes.txt fehlt - Pruefnotiz nicht gesetzt.")
         return
     }
+    // Kein Platzhalter geht zu Apple.
+    //
+    // Die Notiz ist eine Nachricht an einen Menschen, der die App prueft. Ein
+    // «VIDEO-URL» darin ist schlimmer als eine fehlende Notiz: es sagt, dass
+    // hier jemand etwas vergessen hat. Dieselbe Sperre haette den drei
+    // Datenschutzerklaerungen ihre `<<...>>` erspart.
+    if notiz.contains("«") || notiz.contains("<<") {
+        throw Fehler("""
+            store/review-notes.txt enthaelt noch einen Platzhalter.
+            Erst ausfuellen, dann setzen - der Text geht an einen Pruefer.
+            """)
+    }
     let detail = one(try await call("GET", "appStoreVersions/\(ident(version))/appStoreReviewDetail"))
     if detail.isEmpty {
         _ = try await call("POST", "appStoreReviewDetails", body: [

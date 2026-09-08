@@ -1,0 +1,12 @@
+/* Die Texte der Systemabfragen. Sie sind NICHT dieselben Zeichenketten wie die
+   der Oberflaeche: iOS liest sie aus dem App-Bundle und nicht aus dem
+   Ressourcenpaket, und es waehlt die Sprache des Geraets.
+
+   Sie haben in Fassung 1.8 (24) eine Ablehnung nach Richtlinie 4 gekostet:
+   „the app includes permissions requests that are not written in the same
+   language as the app's localization". Sie standen nur auf Deutsch in der
+   Info.plist, und damit fragte eine englisch oder italienisch eingestellte App
+   auf Deutsch nach der Kamera. */
+
+"NFCReaderUsageDescription" = "Zum Lesen des Chips in Identitätskarte und Reisepass. Die Daten bleiben verschlüsselt auf diesem Gerät.";
+"NSCameraUsageDescription" = "Zum Fotografieren des Dokuments. Die Aufnahme wird nur auf diesem Gerät ausgewertet, nicht gespeichert und nicht gesendet.";

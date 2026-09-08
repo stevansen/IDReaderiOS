@@ -1,0 +1,4 @@
+/* The system prompts. See de.lproj/InfoPlist.strings for why these exist. */
+
+"NFCReaderUsageDescription" = "To read the chip in an identity card or passport. The data stays encrypted on this device.";
+"NSCameraUsageDescription" = "To photograph the document. The picture is processed on this device only, is not stored and is not sent anywhere.";

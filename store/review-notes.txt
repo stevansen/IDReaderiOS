@@ -23,6 +23,21 @@ The chip path needs a physical document held against the phone, so please note:
 3. On the Simulator there is no NFC hardware. The app says so plainly instead of
    failing silently: "No NFC available - this device has no NFC hardware."
 
+DEMO VIDEO
+
+«VIDEO-URL»
+
+The video shows version 1.8 running on a physical iPhone, an Italian electronic
+identity card and an ePassport being held against the back of the phone, and the
+whole workflow from entering the key to the result screen.
+
+One point about the wording of the request: there is no pairing step to film.
+The "designated hardware" here is the document itself, and NFC contactless
+reading has no pairing - no bonding, no code, no accessory. The phone powers the
+chip through the field and talks to it while it is held there. What the video
+shows instead is the moment the document is placed against the phone and the
+progress that follows.
+
 WHAT REQUIRES A DEVICE
 
 NFC. An iPhone 7 or newer. The Simulator cannot exercise the chip path.

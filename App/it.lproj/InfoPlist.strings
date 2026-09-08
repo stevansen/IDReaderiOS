@@ -1,0 +1,4 @@
+/* Le richieste di sistema. Vedere de.lproj/InfoPlist.strings per il motivo. */
+
+"NFCReaderUsageDescription" = "Per leggere il chip della carta d'identità o del passaporto. I dati restano cifrati su questo dispositivo.";
+"NSCameraUsageDescription" = "Per fotografare il documento. L'immagine viene elaborata solo su questo dispositivo, non viene conservata né inviata.";
