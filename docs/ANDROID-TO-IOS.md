@@ -196,3 +196,25 @@ in the same language as the app's localization". Belegt und behoben sind die
 Berechtigungstexte (`InfoPlist.strings`, Bau 25). **Dieses Blatt ist der zweite
 Kandidat für dieselbe Beanstandung** und war in Bau 25 noch drin.
 
+## Das italienische Register ist absichtlich gemischt
+
+> **Bitte nicht „vereinheitlichen".** Die Regel steht auch im Kopf von
+> `Sources/IDReaderCore/Resources/it.lproj/Localizable.strings`, damit sie sieht,
+> wer die Datei ändert.
+
+| | Register | Beispiele |
+|---|---|---|
+| Knöpfe und kurze Anweisungen | **Imperativ**, 2. Person | „Riprova", „Inserisci", „Fotografa la carta", „Appoggia la carta sul retro del telefono" |
+| Fließtext | **Sie-Form** | „Dica brevemente…", „Decide lei", „Esce dal dispositivo solo se lo copia e lo incolla lei." |
+
+Der Imperativ ist kein Versehen: es ist der Stil, den **Apple im italienischen
+iOS selbst verwendet** — „Riprova", „Annulla", „Consenti". Italienische Benutzer
+erwarten ihn an Knöpfen, und die Sie-Form wirkt dort steif. Umgekehrt wäre ein
+geduzter Fließtext in einer App, die Ausweise liest, unpassend.
+
+Am 8. September 2026 habe ich drei Texte auf die Sie-Form gebracht, weil ich das
+Gemisch für eine Uneinheitlichkeit hielt. Eine der drei Änderungen war richtig
+(`settings_diagnostics_hint`, Fließtext); die beiden anderen waren
+Fehlermeldungen mit kurzer Anweisung und sind zurückgestellt. Entschieden am
+8. September 2026.
+

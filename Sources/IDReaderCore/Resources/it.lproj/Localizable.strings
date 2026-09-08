@@ -1,4 +1,17 @@
-/* IDReader - it. Erzeugt aus dem Android-Original; siehe docs/ANDROID-TO-IOS.md. */
+/* IDReader - it. Erzeugt aus dem Android-Original; siehe docs/ANDROID-TO-IOS.md
+
+   REGISTER, absichtlich gemischt - bitte nicht "vereinheitlichen":
+
+   * Knoepfe und kurze Anweisungen stehen im IMPERATIV der 2. Person:
+     "Riprova", "Inserisci", "Fotografa la carta", "Appoggia la carta".
+     Das ist der Stil, den Apple im italienischen iOS selbst verwendet
+     ("Riprova", "Annulla", "Consenti"), und italienische Benutzer erwarten ihn.
+   * Fliesstext siezt: "Dica brevemente...", "Decide lei",
+     "Esce dal dispositivo solo se lo copia e lo incolla lei."
+
+   Am 8. September 2026 sind zwei Fehlermeldungen versehentlich in die Sie-Form
+   gebracht und wieder zurueckgestellt worden. Wer das naechste Mal eine
+   Uneinheitlichkeit zu finden glaubt: sie ist hier oben erklaert.. */
 
 
 "about_authors_text" = "Christian Auer — la versione Android (CIEreader)\nStefan Hellweger — il porting su iOS\n\nDue piattaforme, una sola applicazione. Entrambi gli autori detengono entrambe le parti congiuntamente e in parti uguali; le due righe dicono chi ha scritto quale parte, non chi possiede quale.";
@@ -65,9 +78,9 @@
 "can_hint" = "Sei cifre in basso a destra sul fronte";
 "can_label" = "CAN";
 "can_scan" = "Fotografa la carta";
-"can_scan_ambiguous" = "Nella foto ci sono più numeri di sei cifre. Si avvicini al numero, oppure lo digiti.";
+"can_scan_ambiguous" = "Nella foto ci sono più numeri di sei cifre. Avvicinati al numero, oppure digitalo.";
 "can_scan_failed" = "Non è stato possibile leggere la foto. Digita le cifre.";
-"can_scan_not_found" = "Nella foto non c’è nessun numero di sei cifre. Inquadri il numero in basso a destra sul fronte.";
+"can_scan_not_found" = "Nella foto non c’è nessun numero di sei cifre. Inquadra il numero in basso a destra sul fronte.";
 "can_scan_taken" = "Letto dalla foto. Se le cifre sono giuste lo dirà la lettura della carta.";
 "can_scan_working" = "Lettura della foto…";
 "can_scan_wrong_side" = "La foto mostra la zona a lettura ottica. Il CAN è sul fronte, in basso a destra.";
