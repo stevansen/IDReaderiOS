@@ -459,3 +459,35 @@ oder `<<…>>` enthält. Die Notiz ist eine Nachricht an einen Menschen; ein
 Platzhalter darin ist schlimmer als eine fehlende Notiz. Dieselbe Sperre hätte
 den drei Datenschutzerklärungen ihre Platzhalter erspart.
 
+## Die zweite Einreichung, 9. September 2026
+
+Fassung 1.8 (26), Behälter `10fb36c4-97a9-41be-836f-f61ec40bc2a5`, eingereicht
+04:42 UTC, Zustand `WAITING_FOR_REVIEW`.
+
+Behoben gegenüber der Ablehnung: die Berechtigungstexte (Bau 25) und der Text im
+NFC-Systemblatt (Bau 26). Das Vorführvideo liegt bei, die Prüfnotiz nennt es und
+erklärt zwei Dinge, die ein Prüfer sonst falsch deutet — dass es an dieser App
+keine Kopplung zu filmen gibt, und dass die Verpixelung im Video steckt und nicht
+in der App.
+
+### Drei Riegel auf dem Weg dorthin
+
+Alle drei melden sich nicht von selbst, und keiner davon steht in der
+Ablehnungsnachricht.
+
+1. **Die Fassung hing noch im abgelehnten Behälter.** App Store Connect lässt
+   eine Fassung in genau einem `reviewSubmission` liegen; ein zweiter scheitert
+   mit „Item is already present in another reviewSubmission". Der abgelehnte
+   Posten muss erst heraus (`reviewSubmissionItems/<id>` mit `removed: true`),
+   dann schließt sich der alte Behälter von selbst auf `COMPLETE`.
+2. **`usesIdfa` stand auf `null`.** Die Erklärung zum Werbe-Identifikator ist
+   Pflicht. Gesetzt auf **nein** — die App bindet kein Werbenetz ein, misst keine
+   Zuschreibung und ruft `ASIdentifierManager` nicht auf.
+3. **Die Fehlermeldung sagt nichts davon.** Sie lautet in beiden Fällen nur
+   „Version is not ready to be submitted yet, please try again later". Gefunden
+   wurde die Ursache, indem die Fassung Feld für Feld ausgelesen wurde — nicht,
+   indem gewartet wurde.
+
+`submit` kennt jetzt beide Fälle: er übernimmt einen offenen Behälter, überspringt
+abgeschlossene, und legt nur an, wenn es keinen gibt.
+

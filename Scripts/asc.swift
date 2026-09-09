@@ -770,15 +770,44 @@ func reicheEin(bestaetigt: Bool) async throws {
         return
     }
 
-    // Ein offener Behaelter kann von einem frueheren Anlauf stehengeblieben sein.
-    let offene = rows(try await call(
-        "GET",
-        "apps/\(appID)/reviewSubmissions?filter[platform]=IOS&filter[state]=READY_FOR_REVIEW&limit=5"
+    // Nach einer Ablehnung haengt die Fassung noch im **alten** Behaelter.
+    //
+    // App Store Connect laesst eine Fassung in genau einem `reviewSubmission`
+    // liegen; ein zweiter anzulegen scheitert mit
+    // „Item is already present in another reviewSubmission". Der Weg nach einer
+    // Ablehnung ist deshalb nicht „neu einreichen", sondern **denselben Behaelter
+    // noch einmal abschicken**, nachdem die Beanstandungen behoben sind. Genau
+    // das tut auch der Knopf in der Weboberflaeche.
+    let behaelterListe = rows(try await call(
+        "GET", "apps/\(appID)/reviewSubmissions?filter[platform]=IOS&limit=20"
     ))
+
+    /// Der Behaelter, der diese Fassung schon enthaelt.
+    // Abgeschlossene Behaelter zaehlen nicht mehr, auch wenn ihr Posten noch in
+    // der Liste steht: ein herausgenommener Posten bleibt sichtbar, und die
+    // Fassung ist dann trotzdem wieder frei.
+    let erledigt: Set<String> = ["COMPLETE", "CANCELING", "CANCELED"]
+    var haltend: [String: Any]?
+    for kandidat in behaelterListe where !erledigt.contains(attr(kandidat, "state")) {
+        let posten = rows(try await call(
+            "GET",
+            "reviewSubmissions/\(ident(kandidat))/items?include=appStoreVersion&limit=10"
+        ))
+        let treffer = posten.contains { posten in
+            let bez = posten["relationships"] as? [String: Any]
+            let fassung = (bez?["appStoreVersion"] as? [String: Any])?["data"] as? [String: Any]
+            return (fassung?["id"] as? String) == ident(version)
+        }
+        if treffer { haltend = kandidat; break }
+    }
+
     let behaelter: [String: Any]
-    if let vorhanden = offene.first {
-        behaelter = vorhanden
-        print("Offener Behaelter uebernommen: \(ident(vorhanden))")
+    if let haltend {
+        behaelter = haltend
+        print("Behaelter mit dieser Fassung: \(ident(haltend)) (\(attr(haltend, "state")))")
+    } else if let leer = behaelterListe.first(where: { attr($0, "state") == "READY_FOR_REVIEW" }) {
+        behaelter = leer
+        print("Offener Behaelter uebernommen: \(ident(leer))")
     } else {
         behaelter = one(try await call("POST", "reviewSubmissions", body: [
             "data": [
@@ -790,10 +819,7 @@ func reicheEin(bestaetigt: Bool) async throws {
         print("Behaelter angelegt: \(ident(behaelter))")
     }
 
-    let posten = rows(try await call(
-        "GET", "reviewSubmissions/\(ident(behaelter))/items?limit=10"
-    ))
-    if posten.isEmpty {
+    if haltend == nil {
         _ = try await call("POST", "reviewSubmissionItems", body: [
             "data": [
                 "type": "reviewSubmissionItems",
@@ -808,8 +834,6 @@ func reicheEin(bestaetigt: Bool) async throws {
             ],
         ])
         print("Fassung als Posten eingelegt.")
-    } else {
-        print("Posten schon vorhanden: \(posten.count)")
     }
 
     let fertig = one(try await call("PATCH", "reviewSubmissions/\(ident(behaelter))", body: [
@@ -843,6 +867,16 @@ func setzeFassungsangaben() async throws {
     var felder: [String: Any] = [:]
     if let zeile = feldDatei("copyright") { felder["copyright"] = zeile }
     guard !felder.isEmpty else { throw Fehler("store/copyright.txt fehlt.") }
+
+    // Die Erklaerung zum Werbe-Identifikator. Sie stand auf `null`, und solange
+    // sie das tut, meldet die Einreichung nur „Version is not ready to be
+    // submitted yet, please try again later" - ohne zu sagen, woran es liegt.
+    // Gefunden, indem die Fassung Feld fuer Feld ausgelesen wurde.
+    //
+    // **Nein**, und das ist keine Ermessensfrage: die App bindet kein Werbenetz
+    // ein, misst keine Zuschreibung und ruft `ASIdentifierManager` nicht auf.
+    // Sie deckt sich mit der Antwort „keine Daten erfasst" im App-Datenschutz.
+    felder["usesIdfa"] = false
 
     try await call("PATCH", "appStoreVersions/\(ident(version))", body: [
         "data": [
@@ -1265,6 +1299,16 @@ do {
         guard argumente.count > 1 else { throw Fehler("Pfad fehlt.") }
         try await call("DELETE", argumente[1])
         print("Geloescht: \(argumente[1])")
+    case "patch":
+        // Notausgang zum Probieren, das Gegenstueck zu `get`:
+        //     patch <pfad> '<json>'
+        guard argumente.count > 2 else { throw Fehler("Aufruf: patch <pfad> <json>") }
+        let koerper = try JSONSerialization.jsonObject(
+            with: Data(argumente[2].utf8)
+        ) as? [String: Any] ?? [:]
+        let antwort = try await call("PATCH", argumente[1], body: koerper)
+        let daten = try JSONSerialization.data(withJSONObject: antwort, options: [.prettyPrinted])
+        print(String(data: daten, encoding: .utf8) ?? "")
     case "get":
         // Notausgang zum Nachsehen: `get apps/<id>/…`. Nuetzlich, um einen
         // Endpunkt zu pruefen, bevor man einen Befehl dafuer schreibt.

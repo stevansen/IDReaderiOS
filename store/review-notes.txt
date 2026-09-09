@@ -25,11 +25,16 @@ The chip path needs a physical document held against the phone, so please note:
 
 DEMO VIDEO
 
-«VIDEO-URL»
+https://youtube.com/shorts/K6UC-9E8h_M
 
-The video shows version 1.8 running on a physical iPhone, an Italian electronic
+The video shows the app running on a physical iPhone, an Italian electronic
 identity card and an ePassport being held against the back of the phone, and the
 whole workflow from entering the key to the result screen.
+
+The name, the document number and the dates are pixelated in the video. They are
+the real data of a real person - the developer's own document - and they are not
+needed to judge the app. The pixelation is in the video only; the app itself
+displays every field normally.
 
 One point about the wording of the request: there is no pairing step to film.
 The "designated hardware" here is the document itself, and NFC contactless
