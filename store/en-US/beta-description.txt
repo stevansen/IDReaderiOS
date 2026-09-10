@@ -1,0 +1,5 @@
+What to try: hold an Italian electronic identity card (CIE 3.0) or a passport against the back of the iPhone and read it. The key is printed on the document — six digits at the bottom right of the card, or the three fields of the machine-readable zone of a passport.
+
+The driving-licence path needs no chip and no NFC: it reads a photograph.
+
+If something goes wrong, the log under Settings → Diagnostics helps. It holds no personal data and can be copied into your feedback.

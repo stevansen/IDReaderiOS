@@ -1,0 +1,5 @@
+Was zu prüfen ist: eine italienische Identitätskarte (CIE 3.0) oder einen Reisepass an die Rückseite des iPhones halten und lesen. Der Schlüssel steht auf dem Dokument — bei der Karte die sechs Ziffern vorne rechts unten, beim Pass die drei Felder der maschinenlesbaren Zone.
+
+Der Weg über die Fahrerlaubnis braucht keinen Chip und kein NFC: er liest ein Foto.
+
+Wenn etwas schiefgeht, hilft das Protokoll aus Einstellungen → Diagnose. Es enthält keine Personendaten und lässt sich kopieren und der Rückmeldung anhängen.

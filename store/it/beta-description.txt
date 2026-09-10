@@ -1,0 +1,5 @@
+Cosa provare: appoggia una carta d'identità elettronica italiana (CIE 3.0) o un passaporto sul retro dell'iPhone e leggilo. La chiave è stampata sul documento — le sei cifre in basso a destra sulla carta, oppure i tre campi della zona a lettura ottica del passaporto.
+
+Il percorso della patente non richiede né chip né NFC: legge una fotografia.
+
+Se qualcosa non funziona, aiuta il registro in Impostazioni → Diagnostica. Non contiene dati personali e si può copiare e allegare alla segnalazione.

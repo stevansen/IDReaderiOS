@@ -741,6 +741,95 @@ func setzeAusfuhrangabe(_ nummer: String, ausgenommen: Bool) async throws {
     print("Bau \(nummer): Ausfuhrangabe gesetzt (nicht-freigestellte Verschluesselung = \(!ausgenommen)).")
 }
 
+/// Traegt die Angaben fuer den **Betatest** ein und schickt einen Bau in die
+/// Beta-Pruefung.
+///
+/// ## Warum das eine eigene Pruefung ist
+///
+/// Externe Tester bekommen einen Bau erst, wenn er die **Beta-Pruefung**
+/// bestanden hat - eine andere als die des Stores, mit eigener Notiz und eigener
+/// Beschreibung. Ohne sie bleibt ein eingetragener Tester auf `NOT_INVITED`
+/// stehen und bekommt nie eine Einladung.
+///
+/// Die Notiz ist dieselbe wie fuer die Store-Pruefung: dieselbe App, dieselbe
+/// Frage („wie soll ich das ohne italienischen Ausweis pruefen?"), also dieselbe
+/// Antwort. Die Beschreibung ist eine andere Sache - sie steht in TestFlight vor
+/// dem Tester und sagt, was zu probieren ist.
+func setzeBetaAngaben(_ bauNummer: String?) async throws {
+    // --- Notiz fuer die Pruefer -----------------------------------------
+    guard let notiz = feldDatei("review-notes") else {
+        throw Fehler("store/review-notes.txt fehlt.")
+    }
+    if notiz.contains("«") || notiz.contains("<<") {
+        throw Fehler("store/review-notes.txt enthaelt noch einen Platzhalter.")
+    }
+    let detail = one(try await call("GET", "apps/\(appID)/betaAppReviewDetail"))
+    try await call("PATCH", "betaAppReviewDetails/\(ident(detail))", body: [
+        "data": [
+            "type": "betaAppReviewDetails",
+            "id": ident(detail),
+            "attributes": ["notes": notiz, "demoAccountRequired": false],
+        ],
+    ])
+    print("Beta-Pruefnotiz gesetzt (\(notiz.count) Zeichen).")
+
+    // --- Was der Tester in TestFlight liest ------------------------------
+    let vorhandene = rows(try await call(
+        "GET", "apps/\(appID)/betaAppLocalizations?limit=20"
+    ))
+    for (locale, ordner) in sprachen {
+        guard let text = feldDatei("\(ordner)/beta-description") else { continue }
+        var felder: [String: Any] = [
+            "description": text,
+            "feedbackEmail": attr(vorhandene.first ?? [:], "feedbackEmail"),
+        ]
+        if (felder["feedbackEmail"] as? String)?.isEmpty != false {
+            felder.removeValue(forKey: "feedbackEmail")
+        }
+        if let da = vorhandene.first(where: { attr($0, "locale") == locale }) {
+            try await call("PATCH", "betaAppLocalizations/\(ident(da))", body: [
+                "data": [
+                    "type": "betaAppLocalizations",
+                    "id": ident(da),
+                    "attributes": felder,
+                ],
+            ])
+            print("\(locale): Beta-Beschreibung aktualisiert")
+        } else {
+            felder["locale"] = locale
+            _ = try await call("POST", "betaAppLocalizations", body: [
+                "data": [
+                    "type": "betaAppLocalizations",
+                    "attributes": felder,
+                    "relationships": ["app": ["data": ["type": "apps", "id": appID]]],
+                ],
+            ])
+            print("\(locale): Beta-Beschreibung angelegt")
+        }
+    }
+
+    // --- Den Bau einreichen ---------------------------------------------
+    guard let bauNummer else {
+        print("Kein Bau genannt - nichts in die Beta-Pruefung geschickt.")
+        return
+    }
+    let bau = try await holeBau(bauNummer)
+    let schon = rows(try await call(
+        "GET", "betaAppReviewSubmissions?filter[build]=\(ident(bau))&limit=5"
+    ))
+    if let vorher = schon.first {
+        print("Bau \(bauNummer) ist schon in der Beta-Pruefung: \(attr(vorher, "betaReviewState"))")
+        return
+    }
+    let neu = one(try await call("POST", "betaAppReviewSubmissions", body: [
+        "data": [
+            "type": "betaAppReviewSubmissions",
+            "relationships": ["build": ["data": ["type": "builds", "id": ident(bau)]]],
+        ],
+    ]))
+    print("Bau \(bauNummer) in die Beta-Pruefung geschickt: \(attr(neu, "betaReviewState"))")
+}
+
 /// Reicht die Fassung zur Pruefung ein.
 ///
 /// ## Warum das ein eigener Befehl mit einem eigenen Wort ist
@@ -1288,6 +1377,8 @@ do {
         guard argumente.count > 2 else { throw Fehler("Aufruf: test-build <Nummer> <Gruppe>") }
         try await gibZumTest(argumente[1], gruppe: argumente[2])
     case "version-details": try await setzeFassungsangaben()
+    case "beta-details":
+        try await setzeBetaAngaben(argumente.count > 1 ? argumente[1] : nil)
     case "submit":
         try await reicheEin(bestaetigt: argumente.count > 1 && argumente[1] == "jetzt")
     case "age-rating": try await setzeAltersfreigabe()

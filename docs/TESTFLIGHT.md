@@ -259,3 +259,41 @@ App **vom Benutzer erhebt**. Ein Abruf einer öffentlichen Datei erhebt nichts �
 es wird nichts gesendet, nichts gespeichert und nichts mit einer Person
 verknüpft. `App/PrivacyInfo.xcprivacy` sagt dasselbe. Wer trotzdem fragt, findet
 die Begründung in [DATA-PROTECTION.md](DATA-PROTECTION.md).
+
+## Externe Tester: der Schritt, den niemand nennt
+
+Am 10. September 2026 kam der erste externe Tester dazu
+(`giuseppe.ruggirello@vigilfuoco.it`, Gruppe **Extern**). Zwei Dinge dabei
+gelernt:
+
+**Eintragen genügt nicht.** Der Tester stand auf `NOT_INVITED` und wäre dort
+geblieben. Externe Tester bekommen einen Bau erst, wenn er die **Beta-Prüfung**
+bestanden hat — eine andere Prüfung als die des Stores, mit eigener Notiz und
+eigener Beschreibung. Ohne sie geht keine Einladung hinaus, und die Oberfläche
+sagt nicht, woran es liegt.
+
+**Und die Gruppe hing an einem alten Bau.** In `Extern` war Bau 4 zugewiesen —
+längst abgelaufen. Eine Zuweisung an die Gruppe ist ein eigener Schritt
+(`test-build 26 Extern`); die interne Gruppe braucht ihn nicht, weil sie auf
+„alle Bauten" steht.
+
+Was jetzt gesetzt ist, und was es vorher war:
+
+| | vorher | jetzt |
+|---|---|---|
+| Beta-Prüfnotiz | `null` | derselbe Text wie für die Store-Prüfung, samt Video |
+| Beta-Beschreibung | „First Test", nur `it` | drei Sprachen, mit dem, was zu probieren ist |
+| Bau in der Gruppe Extern | 4 | 26 |
+| Beta-Prüfung Bau 26 | keine | `WAITING_FOR_REVIEW` |
+
+Die Notiz ist bewusst dieselbe wie für die Store-Prüfung: dieselbe App, dieselbe
+Frage („wie soll ich das ohne italienischen Ausweis prüfen?"), also dieselbe
+Antwort. Die Beschreibung ist eine andere Sache — sie steht in TestFlight vor dem
+Tester und sagt, was zu probieren ist.
+
+```bash
+swift Scripts/asc.swift add-tester <mail> <Vorname> <Nachname> Extern
+swift Scripts/asc.swift test-build <Nummer> Extern
+swift Scripts/asc.swift beta-details <Nummer>     # Notiz, Beschreibungen, Einreichung
+```
+
