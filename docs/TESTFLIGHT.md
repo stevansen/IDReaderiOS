@@ -297,3 +297,29 @@ swift Scripts/asc.swift test-build <Nummer> Extern
 swift Scripts/asc.swift beta-details <Nummer>     # Notiz, Beschreibungen, Einreichung
 ```
 
+### Warum ein neu eingetragener interner Tester keine Einladung bekommt
+
+Am 10. September stand `giuseppe.ruggirello@vigilfuoco.it` auf `NOT_INVITED`,
+obwohl alles stimmte. Nachgesehen, Punkt für Punkt:
+
+| | Befund |
+|---|---|
+| Kontobenutzer | ja, Rolle `APP_MANAGER` |
+| Kontoeinladung offen | nein, `userInvitations` leer — angenommen |
+| IDReader sichtbar | ja (er hat **nicht** „alle Apps", nur diese) |
+| in der Gruppe `Intern` | ja |
+| Gruppe hat Bauten | ja, 26 gültig, „alle Bauten" gesetzt |
+
+Also kein Fehler, sondern ein fehlendes Ereignis:
+
+> **TestFlight lädt interne Tester ein, wenn ein Bau für sie verfügbar *wird* —
+> nicht rückwirkend, wenn jemand zu einer Gruppe kommt, in der schon Bauten
+> liegen.**
+
+Belegt: Bau 27 hochgeladen, verarbeitet, und unmittelbar danach stand er auf
+`INVITED`. Die anderen beiden waren schon dabei, als frühere Bauten landeten.
+
+Wer also einen internen Tester nachträgt, hat zwei Möglichkeiten: in App Store
+Connect die Einladung von Hand erneut senden, oder den nächsten Bau abwarten.
+Ein eigener Bau nur dafür ist die teure Variante — hier war er ohnehin fällig.
+
