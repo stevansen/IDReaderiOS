@@ -15,10 +15,28 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
+# Zweiter Weg: ein Bau fuer die Verteilung ueber ein MDM statt fuer den Store.
+#
+#     Scripts/archive.sh --adhoc [Buildnummer]
+#
+# Er laeuft nur auf Geraeten, deren UDID im Konto registriert ist - siehe
+# docs/MDM-VERTEILUNG.md.
+ART="store"
+if [ "${1:-}" = "--adhoc" ]; then
+	ART="adhoc"
+	shift
+fi
+
 BUILD="${1:-}"
 SCHEME="IDReader"
 ARCHIVE="build/IDReader.xcarchive"
 EXPORT="build/export"
+OPTIONEN="Config/ExportOptions.plist"
+if [ "$ART" = "adhoc" ]; then
+	OPTIONEN="Config/ExportOptions-AdHoc.plist"
+	EXPORT="build/export-adhoc"
+	echo "==> Ad-hoc-Bau fuer MDM (nicht fuer den Store)"
+fi
 
 # Die Zusage prüfen, bevor irgendetwas gebaut wird. Ein Bau, der schon läuft,
 # lädt zum Wegsehen ein.
@@ -62,7 +80,7 @@ echo
 echo "==> Ausfuhr"
 xcodebuild -exportArchive \
 	-archivePath "$ARCHIVE" \
-	-exportOptionsPlist Config/ExportOptions.plist \
+	-exportOptionsPlist "$OPTIONEN" \
 	-exportPath "$EXPORT" \
 	-allowProvisioningUpdates
 

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!--
+		Fuer die Verteilung ueber ein MDM, ohne den App Store.
+
+		„release-testing" ist der heutige Name fuer das, was frueher „ad-hoc"
+		hiess. Der Bau laeuft damit auf **genau den Geraeten**, deren UDID im
+		Konto registriert ist - hoechstens hundert iPhones je Mitgliedsjahr. Auf
+		jedem anderen Geraet bricht die Installation ab, auch ueber ein MDM.
+
+		Das ist keine Einschraenkung dieses Profils, sondern der Kontoart: eine
+		Datei, die sich auf jedes Geraet legen laesst, gibt es nur im Apple
+		Developer Enterprise Program. Siehe docs/MDM-VERTEILUNG.md.
+	-->
+	<key>method</key>
+	<string>release-testing</string>
+
+	<key>teamID</key>
+	<string>JF8N3J347R</string>
+
+	<key>signingStyle</key>
+	<string>automatic</string>
+
+	<!--
+		Ohne Manifest laesst sich die Datei nur ueber ein MDM oder Apple
+		Configurator einspielen, nicht ueber einen Link im Browser. Das ist hier
+		gewollt: ein „itms-services"-Link waere eine oeffentliche Adresse, unter
+		der eine Ausweis-Lese-App liegt.
+	-->
+	<key>uploadSymbols</key>
+	<true/>
+	<key>compileBitcode</key>
+	<false/>
+</dict>
+</plist>
