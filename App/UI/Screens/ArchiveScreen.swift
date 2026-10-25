@@ -16,7 +16,6 @@ struct ArchiveScreen: View {
 
     @Bindable var model: ReaderModel
     let retentionDays: Int
-    let onBack: () -> Void
     let onExportSelected: () -> Void
 
     @State private var selecting = false
@@ -26,8 +25,6 @@ struct ArchiveScreen: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            header
-
             if model.records.isEmpty {
                 VStack(spacing: 8) {
                     Spacer()
@@ -98,40 +95,10 @@ struct ArchiveScreen: View {
 
     // -----------------------------------------------------------------------
 
-    private var header: some View {
-        HStack(spacing: 4) {
-            Button(action: onBack) {
-                Image(systemName: "chevron.backward")
-                    .frame(width: 44, height: 44)
-                    .contentShape(.rect)
-            }
-            .accessibilityLabel(strings[.actionBack])
-
-            Text(
-                selecting && !model.selectedIds.isEmpty
-                    ? strings.plural(.archiveSelected, model.selectedIds.count)
-                    : strings.plural(.archiveTitle, model.records.count)
-            )
-            .font(AppType.screenTitle)
-            .lineLimit(1)
-
-            Spacer(minLength: 0)
-
-            if !model.records.isEmpty {
-                Button {
-                    selecting = true
-                    model.toggleSelectAll()
-                } label: {
-                    Text(strings[.archiveSelectAll]).font(AppType.actionSmall)
-                }
-            }
-        }
-        .padding(.horizontal, 8)
-        .padding(.bottom, 10)
-        .frame(maxWidth: .infinity)
-        .background(palette.surfaceContainer)
-        .foregroundStyle(palette.onSurface)
-        .clipShape(.rect(bottomLeadingRadius: 26, bottomTrailingRadius: 26))
+    private var title: String {
+        selecting && !model.selectedIds.isEmpty
+            ? strings.plural(.archiveSelected, model.selectedIds.count)
+            : strings.plural(.archiveTitle, model.records.count)
     }
 
     private func row(_ record: StoredDocument) -> some View {

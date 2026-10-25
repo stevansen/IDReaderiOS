@@ -23,7 +23,6 @@ import IDReaderCore
 struct AboutScreen: View {
 
     let strings: Strings
-    let onBack: () -> Void
 
     @Environment(\.palette) private var palette
 
@@ -33,27 +32,6 @@ struct AboutScreen: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            HStack(spacing: 12) {
-                Button(action: onBack) {
-                    Image(systemName: "chevron.left")
-                        .font(.title3)
-                        .frame(width: 44, height: 44)
-                        .contentShape(.rect)
-                }
-                .accessibilityLabel(strings[.actionBack])
-
-                Text(strings[.aboutTitle])
-                    .font(.title3.weight(.semibold))
-                    .fixedSize(horizontal: false, vertical: true)
-                Spacer(minLength: 0)
-            }
-            .padding(.horizontal, 4)
-            .padding(.vertical, 8)
-            .background(palette.surfaceContainerHigh)
-            .clipShape(.rect(cornerRadius: 20))
-            .padding(.horizontal, 16)
-            .padding(.top, 12)
-
             ScrollView {
                 VStack(spacing: 12) {
                     karte(strings[.aboutAuthorsTitle], strings[.aboutAuthorsText])

@@ -129,15 +129,19 @@ struct ResultScreen: View {
         case .verified:
             Button { authenticityShown = true } label: {
                 Image(systemName: "checkmark.seal.fill")
-                    .font(.system(size: 26))
+                    .font(.title)
                     .foregroundStyle(palette.sealVerified)
+                    .frame(minWidth: 44, minHeight: 44)
+                    .contentShape(.rect)
             }
             .accessibilityLabel(strings[.authenticityVerified])
         case .failed, .notChecked:
             Button { authenticityShown = true } label: {
                 Image(systemName: "xmark.seal.fill")
-                    .font(.system(size: 26))
+                    .font(.title)
                     .foregroundStyle(palette.sealFailed)
+                    .frame(minWidth: 44, minHeight: 44)
+                    .contentShape(.rect)
             }
             .accessibilityLabel(strings[.authenticityFailed])
         case .unverifiable:
@@ -552,7 +556,7 @@ struct AuthenticitySheet: View {
     private func checkRow(_ label: String, detail: String?, passed: Bool) -> some View {
         HStack(alignment: .top, spacing: 12) {
             Image(systemName: passed ? "checkmark.seal.fill" : "xmark.seal.fill")
-                .font(.system(size: 20))
+                .font(.title3)
                 .foregroundStyle(passed ? palette.verified : palette.error)
             VStack(alignment: .leading, spacing: 2) {
                 Text(label).font(.subheadline)

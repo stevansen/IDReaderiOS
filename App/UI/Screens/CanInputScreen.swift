@@ -130,7 +130,7 @@ struct CanInputScreen: View {
             } label: {
                 Text(strings[model.canIsValid ? .actionChange : .actionEnterByHand])
                     .font(AppType.actionSmall)
-                    .frame(minHeight: 40)
+                    .frame(minHeight: 44)
                     .padding(.horizontal, 16)
             }
             .buttonStyle(.bordered)
@@ -238,6 +238,7 @@ private struct Keypad: View {
     let strings: Strings
 
     @Environment(\.palette) private var palette
+    @State private var presses = 0
 
     var body: some View {
         Grid(horizontalSpacing: 8, verticalSpacing: 8) {
@@ -249,13 +250,13 @@ private struct Keypad: View {
                 }
             }
             GridRow {
-                Button(action: onClear) {
+                Button { presses += 1; onClear() } label: {
                     Image(systemName: "trash")
                         .frame(maxWidth: .infinity, minHeight: 48)
                 }
                 .accessibilityLabel(strings[.actionClearAll])
                 key("0")
-                Button(action: onBackspace) {
+                Button { presses += 1; onBackspace() } label: {
                     Image(systemName: "delete.left")
                         .frame(maxWidth: .infinity, minHeight: 48)
                 }
@@ -263,10 +264,12 @@ private struct Keypad: View {
             }
         }
         .buttonStyle(KeypadButtonStyle(palette: palette))
+        .sensoryFeedback(.selection, trigger: presses)
     }
 
     private func key(_ digit: String) -> some View {
         Button {
+            presses += 1
             onDigit(Character(digit))
         } label: {
             Text(digit)

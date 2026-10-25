@@ -136,7 +136,7 @@ struct DocumentInputScaffold<Content: View>: View {
     private var titleRow: some View {
         HStack(spacing: 9) {
             Image(systemName: "person.text.rectangle.fill")
-                .font(.system(size: 22))
+                .font(.title2)
             Text(strings[.appName])
                 .font(AppType.actionLarge)
                 .lineLimit(1)
@@ -243,7 +243,7 @@ struct DocumentInputScaffold<Content: View>: View {
                 .lineLimit(wrapping ? nil : 1)
                 .minimumScaleFactor(wrapping ? 1 : 0.8)
                 .multilineTextAlignment(.center)
-                .frame(maxWidth: .infinity, minHeight: 40)
+                .frame(maxWidth: .infinity, minHeight: 44)
                 .background(
                     selected ? palette.surface : .clear,
                     in: .rect(cornerRadius: 18)
@@ -269,7 +269,7 @@ struct DocumentInputScaffold<Content: View>: View {
                 Text("\(archiveCount)").font(AppType.actionSmall)
             }
             .padding(.horizontal, 13)
-            .frame(minHeight: 40)
+            .frame(minHeight: 44)
             .overlay {
                 RoundedRectangle(cornerRadius: 20)
                     .stroke(palette.onPrimaryContainer.opacity(0.56), lineWidth: 1)

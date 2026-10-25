@@ -158,7 +158,6 @@ struct FirstRunNotice: View {
 struct SettingsScreen: View {
 
     @Bindable var model: ReaderModel
-    let onBack: () -> Void
 
     @Environment(\.palette) private var palette
     @State private var warningShown = false
@@ -167,23 +166,6 @@ struct SettingsScreen: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            HStack(spacing: 4) {
-                Button(action: onBack) {
-                    Image(systemName: "chevron.backward")
-                        .frame(width: 44, height: 44)
-                        .contentShape(.rect)
-                }
-                .accessibilityLabel(strings[.actionBack])
-                Text(strings[.menuSettings]).font(AppType.screenTitle).lineLimit(2)
-                Spacer(minLength: 0)
-            }
-            .padding(.horizontal, 8)
-            .padding(.bottom, 10)
-            .frame(maxWidth: .infinity)
-            .background(palette.surfaceContainer)
-            .foregroundStyle(palette.onSurface)
-            .clipShape(.rect(bottomLeadingRadius: 26, bottomTrailingRadius: 26))
-
             ScrollView {
                 VStack(alignment: .leading, spacing: 12) {
                     VStack(alignment: .leading, spacing: 0) {
